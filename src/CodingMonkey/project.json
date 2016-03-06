@@ -1,11 +1,12 @@
 {
-  "userSecretsId": "aspnet5-skeleton_navigation_es2016_vs-6df5fca9-b862-4931-8867-c46d52bbed68",
+  "userSecretsId": "codingmonkey-6df5fca9-b862-4931-8867-c46d52bbed68",
   "version": "1.0.0-*",
   "compilationOptions": {
     "emitEntryPoint": true
   },
 
   "dependencies": {
+    "CodingMonkey.CodeExecutor": "1.0.0-*",
     "EntityFramework.Commands": "7.0.0-rc1-final",
     "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
     "Microsoft.ApplicationInsights.AspNet": "1.0.0-rc1",
@@ -19,7 +20,7 @@
     "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
     "Microsoft.AspNet.Tooling.Razor": "1.0.0-rc1-final",
     "Microsoft.Extensions.CodeGenerators.Mvc": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.FileProviderExtensions" : "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
@@ -36,10 +37,8 @@
   "frameworks": {
     "dnx451": {
       "dependencies": {
-        "CodingMonkey.CodeExecutor": "1.0.0-*"
       }
-    },
-    "dnxcore50": { }
+    }
   },
 
   "exclude": [

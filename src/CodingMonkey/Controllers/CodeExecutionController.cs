@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CodingMonkey.CodeExecutor;
 using Microsoft.AspNet.Mvc;
 
 namespace CodingMonkey.Controllers
@@ -23,6 +24,13 @@ namespace CodingMonkey.Controllers
                                         }
                                     }";
 
+            List<string> assemblies = new List<string>()
+            {
+                "System.dll"
+            };
+
+            Compiler codeCompiler = new Compiler(compilerCode, assemblies, false);
+            var x = codeCompiler.Compile();
             return Json("Hello");
         }
     }
