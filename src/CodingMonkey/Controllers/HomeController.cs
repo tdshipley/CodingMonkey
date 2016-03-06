@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Mvc;
 
-namespace coding_monkey.Controllers
+namespace CodingMonkey.Controllers
 {
     public class HomeController : Controller
     {

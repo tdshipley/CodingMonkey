@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 
-namespace coding_monkey.Controllers
+namespace CodingMonkey.Controllers
 {
     [Route("api/[controller]/[action]")]
     public class ApiController : Controller
