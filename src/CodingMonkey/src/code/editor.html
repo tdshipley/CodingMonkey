@@ -1,0 +1,17 @@
+﻿<template>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <div id="aceEditor" value.bind="code">
+                //Enter code here
+            </div>
+        </div>
+        <div class="col-lg-1">
+            <h2>Actions</h2>
+            <div class="row">
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-primary" click.trigger="submitCodeToCompile()">Compile Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -5,7 +5,6 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
   "frameworks": {
     "dnx451": {
       "frameworkAssemblies": {
@@ -17,5 +16,7 @@
         "System.Threading": "4.0.0.0"
       }
     }
+  },
+  "dependencies": {
   }
 }

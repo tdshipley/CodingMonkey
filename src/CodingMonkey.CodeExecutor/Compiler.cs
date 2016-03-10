@@ -16,7 +16,7 @@ namespace CodingMonkey.CodeExecutor
             this.CompileInMemory = compileInMemory;
         }
 
-        public CompilerResults Compile()
+        public CompilerResults CompileFromSource()
         {
             var compiler = GetCSharpCompiler();
             var compilerParameters = GetCompilerParameters(this.Assemblies, this.CompileInMemory);

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Security;
 using System.Security.Permissions;
 using System.Security.Policy;
@@ -27,13 +30,67 @@ namespace CodingMonkey.CodeExecutor
                 "System.dll"
             }, false);
 
-            CompilerResults results = compiler.Compile();
+            CompilerResults results = compiler.CompileFromSource();
+
+            var appDomain = GetAppDomain(results.PathToAssembly,
+                "sandbox",
+                this.PermissionFlags);
+
+            var newDomainInstance = GetNewDomainInstance(appDomain);
+
+            string untrusedAssembly = "HelloWorld";
+            string className = "HelloWorld.Hello";
+            string entryPoint = "Main";
+
+            newDomainInstance.ExecuteUntrustedCode(untrusedAssembly, className, entryPoint, null);
         }
 
-        private AppDomain GetAppDomain(Zone presetZone)
+        public void ExecuteUntrustedCode(string assemblyName, string typeName, string entryPoint, Object[] parameters)
         {
-            var permissionSet = GetPermissionSet(presetZone);
-            throw new NotImplementedException();
+            //Assembly.GetEntryAssembly()
+            //Load the MethodInfo for a method in the new Assembly. This might be a method you know, or 
+            //you can use Assembly.EntryPoint to get to the main function in an executable.
+            MethodInfo target = Assembly.Load(assemblyName).GetType(typeName).GetMethod(entryPoint);
+            try
+            {
+                //Now invoke the method.
+                bool retVal = (bool)target.Invoke(null, parameters);
+            }
+            catch (Exception ex)
+            {
+                // When we print informations from a SecurityException extra information can be printed if we are 
+                //calling it with a full-trust stack.
+                (new PermissionSet(PermissionState.Unrestricted)).Assert();
+                Console.WriteLine("SecurityException caught:\n{0}", ex.ToString());
+                CodeAccessPermission.RevertAssert();
+                Console.ReadLine();
+            }
+        }
+
+        private Executor GetNewDomainInstance(AppDomain newDomain)
+        {
+            ObjectHandle handle = Activator.CreateInstanceFrom(
+            newDomain, typeof(Executor).Assembly.ManifestModule.FullyQualifiedName,
+            typeof(Executor).FullName
+            );
+
+            return (Executor)handle.Unwrap();
+        }
+
+        private AppDomain GetAppDomain(string dllPath, string name, List<SecurityPermissionFlag> permissionFlags)
+        {
+            AppDomainSetup adSetup = new AppDomainSetup();
+            adSetup.ApplicationBase = Path.GetFullPath(dllPath);
+
+            var permissionSet = GetPermissionSet(permissionFlags);
+            StrongName fullTrustAssembly = GetAssemblyStrongName();
+
+            return AppDomain.CreateDomain(name, null, adSetup, permissionSet, fullTrustAssembly);
+        }
+
+        private StrongName GetAssemblyStrongName()
+        {
+            return typeof(Executor).Assembly.Evidence.GetHostEvidence<StrongName>();
         }
 
         private PermissionSet GetPermissionSet(List<SecurityPermissionFlag> permissionFlags)
