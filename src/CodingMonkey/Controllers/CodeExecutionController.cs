@@ -13,9 +13,9 @@ namespace CodingMonkey.Controllers
     public class CodeExecutionController : ApiController
     {
         [HttpPost]
-        public Task<JsonResult> Compile([FromBody] CodeEditorViewModel model)
+        public JsonResult Compile([FromBody] CodeEditorViewModel model)
         {
-            var result = RoslynCompiler.Compile(model.Code).Result;
+            var result = RoslynCompiler.Compile(model.Code);
 
             if (result == null || result.Count == 0)
             {
@@ -28,7 +28,7 @@ namespace CodingMonkey.Controllers
                 model.Errors = result;
             }
 
-            return Task.FromResult(Json(model));
+            return Json(model);
         }
     }
 }

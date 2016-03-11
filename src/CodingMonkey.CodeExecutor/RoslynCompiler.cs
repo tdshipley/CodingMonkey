@@ -11,7 +11,7 @@ namespace CodingMonkey.CodeExecutor
     public class RoslynCompiler
     {
 
-        public static async Task<IList<Diagnostic>> Compile(string code)
+        public static IList<Diagnostic> Compile(string code)
         {
             var script = CSharpScript.Create(code);
             IList<Diagnostic> errors = script.Compile();
