@@ -1,37 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
-using System.Security.Policy;
+//using System.Security.Permissions;
+//using System.Security.Policy;
 using System.Threading.Tasks;
-using coding_monkey.ViewModels;
-using CodingMonkey.CodeExecutor;
+using CodingMonkey.ViewModels;
 using Microsoft.AspNet.Mvc;
+using CodingMonkey.CodeExecutor;
 
 namespace CodingMonkey.Controllers
 {
     public class CodeExecutionController : ApiController
     {
         [HttpPost]
-        public IActionResult Compile([FromBody] CodeEditorViewModel model)
+        public Task<JsonResult> Compile([FromBody] CodeEditorViewModel model)
         {
-            List<string> assemblies = new List<string>()
+            var result = RoslynCompiler.Compile(model.Code).Result;
+
+            if (result == null || result.Count == 0)
             {
-                "System.dll"
-            };
-
-            Compiler codeCompiler = new Compiler(model.Code, assemblies, false);
-            var compiledCode = codeCompiler.CompileFromSource();
-
-            if (compiledCode.Errors.HasErrors)
+                model.HasErrors = false;
+                model.Errors = null;
+            }
+            else
             {
                 model.HasErrors = true;
-                model.Errors = compiledCode.Errors;
-                return Json(model);
+                model.Errors = result;
             }
 
-            model.HasErrors = false;
-            return Json(model);
+            return Task.FromResult(Json(model));
         }
     }
 }

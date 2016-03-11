@@ -1,15 +1,12 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 
-namespace coding_monkey.ViewModels
+namespace CodingMonkey.ViewModels
 {
     public class CodeEditorViewModel
     {
         public string Code { get; set; }
         public bool HasErrors { get; set; }
-        public CompilerErrorCollection Errors { get; set; }
+        public IList<Diagnostic> Errors { get; set; }
     }
 }
