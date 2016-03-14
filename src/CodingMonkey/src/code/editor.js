@@ -36,7 +36,8 @@ export class Editor {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            this.vm = data;
+            this.vm.SubmittedCode = true;
         })
         .catch(err => {
             console.log(err);

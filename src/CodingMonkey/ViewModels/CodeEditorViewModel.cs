@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CodingMonkey.CodeExecutor.Models;
 using Microsoft.CodeAnalysis;
 
 namespace CodingMonkey.ViewModels
@@ -7,6 +8,6 @@ namespace CodingMonkey.ViewModels
     {
         public string Code { get; set; }
         public bool HasErrors { get; set; }
-        public IList<Diagnostic> Errors { get; set; }
+        public IList<CompilerErrorViewModel> Errors { get; set; }
     }
 }

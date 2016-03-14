@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CodingMonkey.ViewModels;
 using Microsoft.AspNet.Mvc;
 using CodingMonkey.CodeExecutor;
+using Microsoft.CodeAnalysis;
 
 namespace CodingMonkey.Controllers
 {
@@ -25,7 +26,22 @@ namespace CodingMonkey.Controllers
             else
             {
                 model.HasErrors = true;
-                model.Errors = result;
+                model.Errors = new List<CompilerErrorViewModel>();
+
+                foreach (var resultError in result)
+                {
+                    model.Errors.Add(new CompilerErrorViewModel()
+                    {
+                        Id = resultError.Id,
+                        Severity = resultError.Severity,
+                        Message = resultError.Message,
+                        LineNumberStart = resultError.StartLineNumber,
+                        LineNumberEnd = resultError.EndLineNumber,
+                        ColStart = resultError.ColStart,
+                        ColEnd = resultError.ColEnd,
+                        ErrorLength = resultError.ErrorLength
+                    });
+                }
             }
 
             return Json(model);

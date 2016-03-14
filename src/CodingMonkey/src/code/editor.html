@@ -1,17 +1,45 @@
 ﻿<template>
-    <div class="row top-buffer">
+    <div class="row top-buffer" id="editor-toolbar">
+        <div class="col-lg-8 col-lg-offset-1">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn" click.trigger="submitCodeToCompile()">Compile Code</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-lg-8 col-lg-offset-1">
             <div id="aceEditor" value.bind="code">
                 //Enter code here
             </div>
         </div>
-        <div class="col-lg-1">
-            <h2>Actions</h2>
-            <div class="row">
-                <div class="col-lg-1">
-                    <button type="button" class="btn btn-primary" click.trigger="submitCodeToCompile()">Compile Code</button>
-                </div>
+    </div>
+    <div class="col-lg-8 col-lg-offset-1">
+        <h3>Error List</h3>
+    </div>
+    <div if.bind="!vm.HasErrors && vm.SubmittedCode" class="col-lg-8 col-lg-offset-1">
+        <h4>No Errors!</h4>
+    </div>
+    <div if.bind="vm.HasErrors" class="row top-buffer" id="editor-errorlist">
+        <div class="col-lg-8 col-lg-offset-1">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr repeat.for="Error of vm.Errors" value.two-way="vm.Errors">
+                        <td>${Error.Id}</td>
+                        <td>${Error.Message}</td>
+                    </tr>
+                </tbody>
+                </table>
             </div>
         </div>
-    </div>
+        <div class="row top-buffer" id="editor-output">
+            <div class="col-lg-8 col-lg-offset-1">
+
+            </div>
+        </div>
 </template>
