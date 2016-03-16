@@ -46,5 +46,13 @@ namespace CodingMonkey.Controllers
 
             return Json(model);
         }
+
+        [HttpPost]
+        public JsonResult Execute([FromBody] CodeEditorViewModel model)
+        {
+            model.Output = RoslynCompiler.Execute(model.Code);
+
+            return Json(model);
+        }
     }
 }

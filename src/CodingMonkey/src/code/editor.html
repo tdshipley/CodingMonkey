@@ -2,7 +2,8 @@
     <div class="row top-buffer" id="editor-toolbar">
         <div class="col-lg-8 col-lg-offset-1">
             <div class="btn-group btn-group-sm">
-                <button type="button" class="btn" click.trigger="submitCodeToCompile()">Compile Code</button>
+                <button type="button" class="btn" click.trigger="submitCodeToCompile()">Compile</button>
+                <button type="button" class="btn" click.trigger="submitCodeToExecute()">Compile and Run</button>
             </div>
         </div>
     </div>
@@ -37,9 +38,12 @@
                 </table>
             </div>
         </div>
-        <div class="row top-buffer" id="editor-output">
-            <div class="col-lg-8 col-lg-offset-1">
-
-            </div>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h3>Output</h3>
         </div>
+    </div>
+    <div class="row top-buffer" id="editor-output">
+        <p value.bind="vm.Output">Output: ${Output}</p>
+    </div>
 </template>

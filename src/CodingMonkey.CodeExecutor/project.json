@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "Microsoft.CodeAnalysis.CSharp.Scripting": "1.1.1",
+    "Newtonsoft.Json": "8.0.2",
     "System.Collections": "4.0.11-beta-23516"
   }
 }
