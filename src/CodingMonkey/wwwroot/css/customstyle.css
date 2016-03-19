@@ -1,0 +1,38 @@
+﻿/* Styles */
+.page-host {
+    background-color: #F8F8FF;
+}
+
+#editor-toolbar {
+    margin-bottom: 2px;
+}
+
+#editor-output {
+    
+}
+
+#editor-errorlist {
+    width: 80%;
+}
+
+.errorHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:rgba(253, 20, 20, 0.20);
+}
+
+
+/* Boostrap Additional */
+.top-buffer {
+    margin-top:20px;
+}
+
+.small-top-buffer {
+    margin-top: 5px;
+}
+
+/* Ace Editor */
+#aceEditor {
+    width: 80%;
+    min-height: 300px;
+}
