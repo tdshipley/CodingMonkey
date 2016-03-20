@@ -1,0 +1,22 @@
+{
+    "version": "0.1.0",
+    "command": "gulp",
+    "isShellCommand": true,
+    "options": {
+        "cwd": "${workspaceRoot}/src/CodingMonkey"
+    },
+    "tasks": [
+        {
+            "taskName": "dnu-build",
+            "isBuildCommand": true,
+            "showOutput": "always",
+            "isWatching": true
+        },
+        {
+            "taskName": "dnx-watch",
+            "isBuildCommand": true,
+            "showOutput": "always",
+            "isWatching": true
+        }
+    ]
+}
