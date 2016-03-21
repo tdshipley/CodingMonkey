@@ -8,8 +8,8 @@ namespace CodingMonkey.Models
         public int ExerciseId { get; set; }
         public string Name { get; set; }
         public string Guidance { get; set; }
-        public ExerciseCategory Category { get; set; }
         public ExerciseTemplate Template { get; set; }
+        public List<ExerciseCategory> Categories { get; set; }
         public List<Test> Tests { get; set; }
     }
 }

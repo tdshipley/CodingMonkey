@@ -9,5 +9,8 @@ namespace CodingMonkey.Models
         public string InitalCode { get; set; }
         public string ClassName { get; set; }
         public string MainMethodName { get; set; }
+
+        public int ExerciseForeignKey { get; set; }
+        public Exercise Exercise { get; set; }
     }
 }
