@@ -1,12 +1,14 @@
-﻿using Microsoft.Data.Entity;
+﻿using System;
 
 namespace CodingMonkey.Models
 {
-    public class TestInput : TestObject
+    public class TestInput
     {
+        public int TestInputId { get; set; }
+        public Type ValueType { get; set; }
+        public object Value { get; set; }
         public string ArgumentName { get; set; }
 
-        public int TestId { get; set; }
         public Test Test { get; set; }
     }
 }
