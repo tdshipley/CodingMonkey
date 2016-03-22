@@ -1,4 +1,6 @@
+using Microsoft.Data.Entity;
 using System.Collections.Generic;
+using System;
 
 namespace CodingMonkey.Models
 {
