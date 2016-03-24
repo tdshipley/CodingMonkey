@@ -8,8 +8,8 @@ using CodingMonkey.Models;
 namespace CodingMonkey.Migrations
 {
     [DbContext(typeof(CodingMonkeyContext))]
-    [Migration("20160324124130_Inital")]
-    partial class Inital
+    [Migration("20160324172523_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,7 +51,7 @@ namespace CodingMonkey.Migrations
 
                     b.Property<int>("ExerciseForeignKey");
 
-                    b.Property<string>("InitalCode");
+                    b.Property<string>("InitialCode");
 
                     b.Property<string>("MainMethodName");
 

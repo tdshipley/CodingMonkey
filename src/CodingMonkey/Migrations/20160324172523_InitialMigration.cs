@@ -4,7 +4,7 @@ using Microsoft.Data.Entity.Migrations;
 
 namespace CodingMonkey.Migrations
 {
-    public partial class Inital : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -49,7 +49,7 @@ namespace CodingMonkey.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ClassName = table.Column<string>(nullable: true),
                     ExerciseForeignKey = table.Column<int>(nullable: false),
-                    InitalCode = table.Column<string>(nullable: true),
+                    InitialCode = table.Column<string>(nullable: true),
                     MainMethodName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

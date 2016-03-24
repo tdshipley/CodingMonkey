@@ -50,7 +50,7 @@ namespace CodingMonkey.Migrations
 
                     b.Property<int>("ExerciseForeignKey");
 
-                    b.Property<string>("InitalCode");
+                    b.Property<string>("InitialCode");
 
                     b.Property<string>("MainMethodName");
 
