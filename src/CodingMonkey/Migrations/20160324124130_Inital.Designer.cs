@@ -8,14 +8,13 @@ using CodingMonkey.Models;
 namespace CodingMonkey.Migrations
 {
     [DbContext(typeof(CodingMonkeyContext))]
-    [Migration("20160322194506_Initial")]
-    partial class Initial
+    [Migration("20160324124130_Inital")]
+    partial class Inital
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0-rc1-16348")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "7.0.0-rc1-16348");
 
             modelBuilder.Entity("CodingMonkey.Models.Exercise", b =>
                 {

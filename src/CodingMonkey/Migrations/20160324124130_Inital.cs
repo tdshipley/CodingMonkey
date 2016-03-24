@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.Entity.Migrations;
-using Microsoft.Data.Entity.Metadata;
 
 namespace CodingMonkey.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Inital : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +13,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     ExerciseId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     Guidance = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
                 },
@@ -27,7 +26,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     ExerciseCategoryId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     Description = table.Column<string>(nullable: true),
                     ExerciseId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true)
@@ -47,7 +46,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     ExerciseTemplateId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     ClassName = table.Column<string>(nullable: true),
                     ExerciseForeignKey = table.Column<int>(nullable: false),
                     InitalCode = table.Column<string>(nullable: true),
@@ -68,7 +67,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     TestId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     Description = table.Column<string>(nullable: true),
                     ExerciseExerciseId = table.Column<int>(nullable: true)
                 },
@@ -87,7 +86,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     TestInputId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     ArgumentName = table.Column<string>(nullable: true),
                     TestTestId = table.Column<int>(nullable: true),
                     Value = table.Column<string>(nullable: true),
@@ -108,7 +107,7 @@ namespace CodingMonkey.Migrations
                 columns: table => new
                 {
                     TestOutputId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Sqlite:Autoincrement", true),
                     TestForeignKey = table.Column<int>(nullable: false),
                     Value = table.Column<string>(nullable: true),
                     ValueType = table.Column<string>(nullable: true)

@@ -7,7 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace skeleton_navigation_es2016_vs
 {
+    using System.IO;
+
     using CodingMonkey.Models;
+
+    using Microsoft.Extensions.PlatformAbstractions;
 
     public class Startup
     {
@@ -45,13 +49,14 @@ namespace skeleton_navigation_es2016_vs
             // Add application services.
 
             // Add Db
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=CodingMonkey;Trusted_Connection=True;";
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
+            var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
 
             services.AddEntityFramework()
-                .AddSqlServer()
+                .AddSqlite()
                 .AddDbContext<CodingMonkeyContext>(
                     options =>
-                        { options.UseSqlServer(connection); });
+                        { options.UseSqlite(connection); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
