@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Security.Permissions;
-//using System.Security.Policy;
 using System.Threading.Tasks;
 using CodingMonkey.ViewModels;
 using Microsoft.AspNet.Mvc;
