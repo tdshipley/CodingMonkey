@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CodingMonkey.ViewModels;
-using Microsoft.AspNet.Mvc;
-using CodingMonkey.CodeExecutor;
-using Microsoft.CodeAnalysis;
-
-namespace CodingMonkey.Controllers
+﻿namespace CodingMonkey.Controllers
 {
+    using System.Collections.Generic;
+    using CodingMonkey.ViewModels;
+    using Microsoft.AspNet.Mvc;
+    using CodingMonkey.CodeExecutor;
+
     public class CodeExecutionController : ApiController
     {
         [HttpPost]
