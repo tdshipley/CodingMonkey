@@ -7,6 +7,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    [Route("api/[controller]/[action]")]
     public class ExerciseController : ApiController
     {
         [FromServices]

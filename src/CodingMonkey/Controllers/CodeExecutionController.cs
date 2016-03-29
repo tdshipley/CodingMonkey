@@ -5,6 +5,7 @@
     using Microsoft.AspNet.Mvc;
     using CodingMonkey.CodeExecutor;
 
+    [Route("api/[controller]/[action]")]
     public class CodeExecutionController : ApiController
     {
         [HttpPost]
