@@ -60,15 +60,8 @@
                     CodingMonkeyContext.Exercises.Add(exercise);
                     CodingMonkeyContext.SaveChanges();
                 }
-                
-                // Add Categories
-                foreach (int categoryId in model.CategoryIds)
-                {        
-                    exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory(){
-                        ExerciseId = exercise.ExerciseId,
-                        ExerciseCategoryId = categoryId
-                    });
-                }
+
+                AddCategoryIds(exercise, model.CategoryIds);
                 
                 CodingMonkeyContext.SaveChanges();
                 
@@ -78,7 +71,9 @@
                 throw ex;
             }
 
-            return Json(exercise);
+            model.Id = exercise.ExerciseId;
+
+            return Json(model);
         }
         
         [HttpPost]
@@ -105,16 +100,11 @@
                     CodingMonkeyContext.SaveChanges();
                 }
                 
+                // TODO: Fix updating categories
                 // Update categories
                 exercise.ExerciseExerciseCategories = new List<ExerciseExerciseCategory>();
-                foreach (int categoryId in model.CategoryIds)
-                {
-                    exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory(){
-                        ExerciseId = exercise.ExerciseId,
-                        ExerciseCategoryId = categoryId
-                    });
-                }
-                
+                AddCategoryIds(exercise, model.CategoryIds);
+
                 CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
@@ -125,7 +115,7 @@
                 return Json(exceptionResult);
             }
 
-            return Json(exercise);
+            return Json(model);
         }
         
         [HttpDelete]
@@ -156,6 +146,20 @@
             }
             
             return Json(result);
+        }
+
+        private void AddCategoryIds(Exercise exercise, List<int> categoryIds)
+        {
+            foreach (int categoryId in categoryIds)
+            {
+                exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory()
+                {
+                    ExerciseId = exercise.ExerciseId,
+                    ExerciseCategoryId = categoryId,
+                    ExerciseCategory = CodingMonkeyContext.ExerciseCategories.SingleOrDefault(ec => ec.ExerciseCategoryId == categoryId),
+                    Exercise = exercise
+                });
+            }
         }
     }
 }
