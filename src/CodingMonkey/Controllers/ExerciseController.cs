@@ -8,7 +8,7 @@
     using System.Linq;
 
     [Route("api/[controller]/[action]")]
-    public class ExerciseController : ApiController
+    public class ExerciseController : Controller
     {
         [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
@@ -48,16 +48,30 @@
             Exercise exercise = new Exercise()
             {
                 Name = model.Name,
-                Guidance = model.Guidance
+                Guidance = model.Guidance,
+                ExerciseExerciseCategories = new List<ExerciseExerciseCategory>()
             };
 
             try
             {
+                
                 if (ModelState.IsValid)
                 {
                     CodingMonkeyContext.Exercises.Add(exercise);
                     CodingMonkeyContext.SaveChanges();
                 }
+                
+                // Add Categories
+                foreach (int categoryId in model.CategoryIds)
+                {        
+                    exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory(){
+                        ExerciseId = exercise.ExerciseId,
+                        ExerciseCategoryId = categoryId
+                    });
+                }
+                
+                CodingMonkeyContext.SaveChanges();
+                
             }
             catch (Exception ex)
             {
@@ -90,6 +104,18 @@
                     exercise.Guidance = model.Guidance;
                     CodingMonkeyContext.SaveChanges();
                 }
+                
+                // Update categories
+                exercise.ExerciseExerciseCategories = new List<ExerciseExerciseCategory>();
+                foreach (int categoryId in model.CategoryIds)
+                {
+                    exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory(){
+                        ExerciseId = exercise.ExerciseId,
+                        ExerciseCategoryId = categoryId
+                    });
+                }
+                
+                CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
             {

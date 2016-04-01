@@ -6,7 +6,7 @@
     using CodingMonkey.CodeExecutor;
 
     [Route("api/[controller]/[action]")]
-    public class CodeExecutionController : ApiController
+    public class CodeExecutionController : Controller
     {
         [HttpPost]
         public JsonResult Compile([FromBody] CodeEditorViewModel model)

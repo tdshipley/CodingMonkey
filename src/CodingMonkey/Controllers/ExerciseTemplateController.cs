@@ -8,7 +8,7 @@ namespace CodingMonkey.Controllers
     using System.Linq;
 
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
-    public class ExerciseTemplateController : ApiController
+    public class ExerciseTemplateController : Controller
     {
         [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
