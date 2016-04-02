@@ -17,9 +17,27 @@ namespace CodingMonkey.Controllers
         [HttpGet]
         public JsonResult List()
         {
-            var exerciseCategories = CodingMonkeyContext.ExerciseCategories;
+            var exerciseCategories = CodingMonkeyContext.ExerciseCategories.Include(e => e.ExerciseExerciseCategories);
             
-            return Json(exerciseCategories);
+            List<ExerciseCategoryViewModel> result = new List<ExerciseCategoryViewModel>();
+            
+            foreach (var exerciseCategory in exerciseCategories)
+            {                
+                List<int> exerciseIds = exerciseCategory
+                                            .ExerciseExerciseCategories
+                                            .Where(e => e.ExerciseCategoryId == exerciseCategory.ExerciseCategoryId)
+                                            .Select(e => e.ExerciseId)
+                                            .ToList();
+                
+                result.Add(new ExerciseCategoryViewModel(){
+                    Id = exerciseCategory.ExerciseCategoryId,
+                    Name = exerciseCategory.Name,
+                    Description = exerciseCategory.Description,
+                    ExerciseIds = exerciseIds
+                });
+            }
+            
+            return Json(result);
         }
         
         [HttpGet]

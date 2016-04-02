@@ -6,6 +6,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.Data.Entity;
 
     [Route("api/[controller]/[action]")]
     public class ExerciseController : Controller
@@ -25,18 +26,27 @@
         [Route("{id}")]
         public JsonResult Details(int id)
         {
-            var exercise = CodingMonkeyContext.Exercises.SingleOrDefault(e => e.ExerciseId == id);
+            var exercise = CodingMonkeyContext
+                                .Exercises
+                                .Include(e => e.ExerciseExerciseCategories)
+                                .SingleOrDefault(e => e.ExerciseId == id);
             
             if (exercise == null)
             {
                 return Json(string.Empty);
             }
             
+            List<int> exerciseCategoryIds = exercise
+                                                .ExerciseExerciseCategories
+                                                .Where(ec => ec.ExerciseId == id)
+                                                .Select(ecid => ecid.ExerciseCategoryId).ToList();
+            
             var result = new ExerciseViewModel()
             {
                 Id = exercise.ExerciseId,
                 Name = exercise.Name,
-                Guidance = exercise.Guidance
+                Guidance = exercise.Guidance,
+                CategoryIds = exerciseCategoryIds
             };
             
             return Json(result);
@@ -71,6 +81,7 @@
                 throw ex;
             }
 
+
             model.Id = exercise.ExerciseId;
 
             return Json(model);
@@ -81,7 +92,10 @@
         public JsonResult Update(int id, [FromBody] ExerciseViewModel model)
         {
             var exceptionResult = new Dictionary<string, dynamic>();
-            var exercise = CodingMonkeyContext.Exercises.SingleOrDefault(e => e.ExerciseId == id);
+            var exercise = CodingMonkeyContext
+                            .Exercises
+                            .Include(e => e.ExerciseExerciseCategories)
+                            .SingleOrDefault(e => e.ExerciseId == id);
             
             if (exercise == null)
             {
@@ -100,10 +114,31 @@
                     CodingMonkeyContext.SaveChanges();
                 }
                 
-                // TODO: Fix updating categories
                 // Update categories
-                exercise.ExerciseExerciseCategories = new List<ExerciseExerciseCategory>();
-                AddCategoryIds(exercise, model.CategoryIds);
+                
+                //Remove categories not in new list
+                foreach (var row in exercise.ExerciseExerciseCategories.ToList())
+                {
+                    if(!model.CategoryIds.Contains(row.ExerciseCategoryId))
+                    {
+                        exercise.ExerciseExerciseCategories.Remove(row);
+                    }
+                }
+                
+                //Add categories not currently in db
+                foreach (var categoryId in model.CategoryIds)
+                {
+                    if(!exercise.ExerciseExerciseCategories.Any(ec => ec.ExerciseCategoryId == categoryId))
+                    {
+                        exercise.ExerciseExerciseCategories.Add(new ExerciseExerciseCategory()
+                        {
+                            ExerciseId = exercise.ExerciseId,
+                            ExerciseCategoryId = categoryId,
+                            ExerciseCategory = CodingMonkeyContext.ExerciseCategories.SingleOrDefault(ec => ec.ExerciseCategoryId == categoryId),
+                            Exercise = exercise
+                        });
+                    }
+                }
 
                 CodingMonkeyContext.SaveChanges();
             }
@@ -114,6 +149,14 @@
                 
                 return Json(exceptionResult);
             }
+            
+            model.CategoryIds = exercise
+                                    .ExerciseExerciseCategories
+                                    .Where(x => x.ExerciseId == exercise.ExerciseId)
+                                    .Select(x => x.ExerciseCategoryId).ToList();
+            model.Id = exercise.ExerciseId;
+            model.Guidance = exercise.Guidance;
+            model.Name = exercise.Name;
 
             return Json(model);
         }
@@ -123,7 +166,10 @@
         public JsonResult Delete(int id)
         {
             var result = new Dictionary<string, dynamic>();
-            var exercise = CodingMonkeyContext.Exercises.SingleOrDefault(e => e.ExerciseId == id);
+            var exercise = CodingMonkeyContext
+                                .Exercises
+                                .Include(e => e.ExerciseExerciseCategories)
+                                .SingleOrDefault(e => e.ExerciseId == id);
             
             if (exercise == null)
             {
@@ -134,6 +180,7 @@
             {
                 try
                 {
+                    exercise.ExerciseExerciseCategories.Clear();
                     CodingMonkeyContext.Exercises.Remove(exercise);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;
