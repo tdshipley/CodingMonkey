@@ -143,7 +143,10 @@ namespace CodingMonkey.Controllers
         public JsonResult Delete(int id)
         {
             var result = new Dictionary<string, dynamic>();
-            var exerciseCategory = CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
+            var exerciseCategory = CodingMonkeyContext
+                                    .ExerciseCategories
+                                    .Include(ec => ec.ExerciseExerciseCategories)
+                                    .SingleOrDefault(e => e.ExerciseCategoryId == id);
             
             if (exerciseCategory == null)
             {
@@ -154,6 +157,11 @@ namespace CodingMonkey.Controllers
             {
                 try
                 {
+                    //Remove category assignments
+                    exerciseCategory
+                        .ExerciseExerciseCategories
+                        .RemoveAll(x => x.ExerciseCategoryId == exerciseCategory.ExerciseCategoryId);
+                    
                     CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategory);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;
