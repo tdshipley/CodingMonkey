@@ -1,3 +1,5 @@
+# ignore sqlite dbs
+*.db
 
 # ignore wwwroot folders
 wwwroot/dist

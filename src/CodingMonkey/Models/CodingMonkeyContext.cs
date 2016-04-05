@@ -19,7 +19,22 @@ namespace CodingMonkey.Models
                 .WithOne(e => e.Exercise)
                 .HasForeignKey<ExerciseTemplate>(tfk => tfk.ExerciseForeignKey);
 
-            modelBuilder.Entity<Exercise>().HasMany(c => c.Categories).WithOne(e => e.Exercise);
+            // Exercise / Exercise Category Many to Many Relationships
+            // EF 7 Doesn't yet support creating Join tables itself
+            // so must do it on the fly.
+            modelBuilder.Entity<ExerciseExerciseCategory>()
+                .HasKey(t => new { t.ExerciseId, t.ExerciseCategoryId });
+
+            modelBuilder.Entity<ExerciseExerciseCategory>()
+                .HasOne(e => e.Exercise)
+                .WithMany(ec => ec.ExerciseExerciseCategories)
+                .HasForeignKey(eid => eid.ExerciseId);
+
+            modelBuilder.Entity<ExerciseExerciseCategory>()
+                .HasOne(ec => ec.ExerciseCategory)
+                .WithMany(c => c.ExerciseExerciseCategories)
+                .HasForeignKey(ecid => ecid.ExerciseCategoryId);
+
             modelBuilder.Entity<Exercise>().HasMany(t => t.Tests).WithOne(e => e.Exercise);
 
             // Test Relationships

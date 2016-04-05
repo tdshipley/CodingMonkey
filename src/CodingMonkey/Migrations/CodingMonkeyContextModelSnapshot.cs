@@ -34,11 +34,18 @@ namespace CodingMonkey.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<int>("ExerciseId");
-
                     b.Property<string>("Name");
 
                     b.HasKey("ExerciseCategoryId");
+                });
+
+            modelBuilder.Entity("CodingMonkey.Models.ExerciseExerciseCategory", b =>
+                {
+                    b.Property<int>("ExerciseId");
+
+                    b.Property<int>("ExerciseCategoryId");
+
+                    b.HasKey("ExerciseId", "ExerciseCategoryId");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseTemplate", b =>
@@ -50,7 +57,7 @@ namespace CodingMonkey.Migrations
 
                     b.Property<int>("ExerciseForeignKey");
 
-                    b.Property<string>("InitalCode");
+                    b.Property<string>("InitialCode");
 
                     b.Property<string>("MainMethodName");
 
@@ -99,8 +106,12 @@ namespace CodingMonkey.Migrations
                     b.HasKey("TestOutputId");
                 });
 
-            modelBuilder.Entity("CodingMonkey.Models.ExerciseCategory", b =>
+            modelBuilder.Entity("CodingMonkey.Models.ExerciseExerciseCategory", b =>
                 {
+                    b.HasOne("CodingMonkey.Models.ExerciseCategory")
+                        .WithMany()
+                        .HasForeignKey("ExerciseCategoryId");
+
                     b.HasOne("CodingMonkey.Models.Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId");

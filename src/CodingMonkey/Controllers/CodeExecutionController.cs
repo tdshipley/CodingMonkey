@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CodingMonkey.ViewModels;
-using Microsoft.AspNet.Mvc;
-using CodingMonkey.CodeExecutor;
-using Microsoft.CodeAnalysis;
-
-namespace CodingMonkey.Controllers
+﻿namespace CodingMonkey.Controllers
 {
-    public class CodeExecutionController : ApiController
+    using System.Collections.Generic;
+    using CodingMonkey.ViewModels;
+    using Microsoft.AspNet.Mvc;
+    using CodingMonkey.CodeExecutor;
+
+    [Route("api/[controller]/[action]")]
+    public class CodeExecutionController : Controller
     {
         [HttpPost]
         public JsonResult Compile([FromBody] CodeEditorViewModel model)

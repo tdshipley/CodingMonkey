@@ -4,7 +4,7 @@ using Microsoft.Data.Entity.Migrations;
 
 namespace CodingMonkey.Migrations
 {
-    public partial class Inital : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,18 +28,11 @@ namespace CodingMonkey.Migrations
                     ExerciseCategoryId = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Description = table.Column<string>(nullable: true),
-                    ExerciseId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExerciseCategory", x => x.ExerciseCategoryId);
-                    table.ForeignKey(
-                        name: "FK_ExerciseCategory_Exercise_ExerciseId",
-                        column: x => x.ExerciseId,
-                        principalTable: "Exercise",
-                        principalColumn: "ExerciseId",
-                        onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.CreateTable(
                 name: "ExerciseTemplate",
@@ -49,7 +42,7 @@ namespace CodingMonkey.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ClassName = table.Column<string>(nullable: true),
                     ExerciseForeignKey = table.Column<int>(nullable: false),
-                    InitalCode = table.Column<string>(nullable: true),
+                    InitialCode = table.Column<string>(nullable: true),
                     MainMethodName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -80,6 +73,29 @@ namespace CodingMonkey.Migrations
                         principalTable: "Exercise",
                         principalColumn: "ExerciseId",
                         onDelete: ReferentialAction.Restrict);
+                });
+            migrationBuilder.CreateTable(
+                name: "ExerciseExerciseCategory",
+                columns: table => new
+                {
+                    ExerciseId = table.Column<int>(nullable: false),
+                    ExerciseCategoryId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExerciseExerciseCategory", x => new { x.ExerciseId, x.ExerciseCategoryId });
+                    table.ForeignKey(
+                        name: "FK_ExerciseExerciseCategory_ExerciseCategory_ExerciseCategoryId",
+                        column: x => x.ExerciseCategoryId,
+                        principalTable: "ExerciseCategory",
+                        principalColumn: "ExerciseCategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExerciseExerciseCategory_Exercise_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercise",
+                        principalColumn: "ExerciseId",
+                        onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.CreateTable(
                 name: "TestInput",
@@ -126,10 +142,11 @@ namespace CodingMonkey.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("ExerciseCategory");
+            migrationBuilder.DropTable("ExerciseExerciseCategory");
             migrationBuilder.DropTable("ExerciseTemplate");
             migrationBuilder.DropTable("TestInput");
             migrationBuilder.DropTable("TestOutput");
+            migrationBuilder.DropTable("ExerciseCategory");
             migrationBuilder.DropTable("Test");
             migrationBuilder.DropTable("Exercise");
         }

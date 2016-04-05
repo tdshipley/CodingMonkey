@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNet.Mvc;
-
-namespace CodingMonkey.Controllers
+﻿namespace CodingMonkey.Controllers
 {
+    using Microsoft.AspNet.Mvc;
+
     public class HomeController : Controller
     {
         public IActionResult Index()
