@@ -20,20 +20,20 @@
         [HttpGet]
         public JsonResult List()
         {
-            var exercises = CodingMonkeyContext.Exercises;
-
-            List<ExerciseViewModel> vm =
-                exercises.Select(
-                    exercise =>
-                    new ExerciseViewModel()
+            var exercises = CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories);
+            
+            List<ExerciseViewModel> vm = new List<ExerciseViewModel>();
+            
+            foreach (var exercise in exercises)
+            {
+                vm.Add(new ExerciseViewModel()
                         {
                             Id = exercise.ExerciseId,
                             Guidance = exercise.Guidance,
                             Name = exercise.Name,
-                            CategoryIds =
-                                GetExerciseCategoryIdsForExercise(exercise.ExerciseId, exercise)
-                        })
-                    .ToList();
+                            CategoryIds = GetExerciseCategoryIdsForExercise(exercise.ExerciseId, exercise)
+                        });
+            }
 
             return Json(vm);
         }
