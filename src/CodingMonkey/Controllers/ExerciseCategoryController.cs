@@ -2,10 +2,13 @@ namespace CodingMonkey.Controllers
 {
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
+
     using Microsoft.AspNet.Mvc;
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.Data.Entity;
 
     [Route("api/[controller]/[action]")]
@@ -13,142 +16,158 @@ namespace CodingMonkey.Controllers
     {
         [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
-        
+
         [HttpGet]
         public JsonResult List()
         {
             var exerciseCategories = CodingMonkeyContext.ExerciseCategories.Include(e => e.ExerciseExerciseCategories);
-            
-            List<ExerciseCategoryViewModel> result = new List<ExerciseCategoryViewModel>();
-            
+
+            List<ExerciseCategoryViewModel> vm = new List<ExerciseCategoryViewModel>();
+
             foreach (var exerciseCategory in exerciseCategories)
-            {                
-                List<int> exerciseIds = exerciseCategory
-                                            .ExerciseExerciseCategories
-                                            .Where(e => e.ExerciseCategoryId == exerciseCategory.ExerciseCategoryId)
-                                            .Select(e => e.ExerciseId)
-                                            .ToList();
-                
-                result.Add(new ExerciseCategoryViewModel(){
-                    Id = exerciseCategory.ExerciseCategoryId,
-                    Name = exerciseCategory.Name,
-                    Description = exerciseCategory.Description,
-                    ExerciseIds = exerciseIds
-                });
+            {
+                List<int> exerciseIdsInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
+
+                vm.Add(
+                    new ExerciseCategoryViewModel()
+                        {
+                            Id = exerciseCategory.ExerciseCategoryId,
+                            Name = exerciseCategory.Name,
+                            Description = exerciseCategory.Description,
+                            ExerciseIds = exerciseIdsInCategory
+                        });
             }
-            
-            return Json(result);
+
+            return Json(vm);
         }
-        
+
         [HttpGet]
         [Route("{id}")]
         public JsonResult Details(int id)
         {
-            var exerciseCategory = CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
-            
+            var exerciseCategory =
+                CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
+
             if (exerciseCategory == null)
             {
                 return Json(string.Empty);
             }
-            
-            List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
-            
-            var result = new ExerciseCategoryViewModel()
-            {
-                Id = exerciseCategory.ExerciseCategoryId,
-                Name = exerciseCategory.Name,
-                Description = exerciseCategory.Description,
-                ExerciseIds = exercisesInCategory
-            };
-            
-            return Json(result);
-        }
-        
-        [HttpPost]
-        public JsonResult Create([FromBody] ExerciseCategoryViewModel model)
-        {
-            ExerciseCategory exerciseCategory = new ExerciseCategory()
-            {
-                Name = model.Name,
-                Description = model.Description
-            };
 
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.ExerciseCategories.Add(exerciseCategory);
-                    CodingMonkeyContext.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            
             List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
 
-            model.Id = exerciseCategory.ExerciseCategoryId;
-            model.Name = exerciseCategory.Name;
-            model.Description = exerciseCategory.Description;
-            model.ExerciseIds = exercisesInCategory;
+            var vm = new ExerciseCategoryViewModel()
+                             {
+                                 Id = exerciseCategory.ExerciseCategoryId,
+                                 Name = exerciseCategory.Name,
+                                 Description = exerciseCategory.Description,
+                                 ExerciseIds = exercisesInCategory
+                             };
 
-            return Json(model);
+            return Json(vm);
         }
-        
+
         [HttpPost]
-        [Route("{id}")]
-        public JsonResult Update(int id, [FromBody] ExerciseCategoryViewModel model)
+        public JsonResult Create([FromBody] ExerciseCategoryViewModel vm)
         {
             var exceptionResult = new Dictionary<string, dynamic>();
-            var exerciseCategory = CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
-            
-            if (exerciseCategory == null)
+
+            if (vm == null)
             {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "record not found";
-                
-                return Json(exceptionResult);
+                return Json(string.Empty);
             }
+
+            ExerciseCategory exerciseCategoryToCreate = new ExerciseCategory()
+                                                            {
+                                                                Name = vm.Name,
+                                                                Description = vm.Description
+                                                            };
 
             try
             {
+                CodingMonkeyContext.ExerciseCategories.Add(exerciseCategoryToCreate);
+
                 if (ModelState.IsValid)
                 {
-                    exerciseCategory.Name = model.Name;
-                    exerciseCategory.Description = model.Description;
                     CodingMonkeyContext.SaveChanges();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 exceptionResult["updated"] = false;
                 exceptionResult["reason"] = "exception thrown";
-                
+
                 return Json(exceptionResult);
             }
-            
-            List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
-            
-            model.Id = exerciseCategory.ExerciseCategoryId;
-            model.Name = exerciseCategory.Name;
-            model.Description = exerciseCategory.Description;
-            model.ExerciseIds = exercisesInCategory;
 
-            return Json(model);
+            List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategoryToCreate.ExerciseCategoryId);
+
+            vm.Id = exerciseCategoryToCreate.ExerciseCategoryId;
+            vm.Name = exerciseCategoryToCreate.Name;
+            vm.Description = exerciseCategoryToCreate.Description;
+            vm.ExerciseIds = exercisesInCategory;
+
+            return Json(vm);
         }
-        
+
+        [HttpPost]
+        [Route("{id}")]
+        public JsonResult Update(int id, [FromBody] ExerciseCategoryViewModel vm)
+        {
+            if (vm == null)
+            {
+                return Json(string.Empty);
+            }
+
+            var exceptionResult = new Dictionary<string, dynamic>();
+            var exerciseCategoryToUpdate =
+                CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
+
+            if (exerciseCategoryToUpdate == null)
+            {
+                exceptionResult["updated"] = false;
+                exceptionResult["reason"] = "record not found";
+
+                return Json(exceptionResult);
+            }
+
+            try
+            {
+                exerciseCategoryToUpdate.Name = vm.Name;
+                exerciseCategoryToUpdate.Description = vm.Description;
+
+                if (ModelState.IsValid)
+                {
+                    CodingMonkeyContext.SaveChanges();
+                }
+            }
+            catch (Exception)
+            {
+                exceptionResult["updated"] = false;
+                exceptionResult["reason"] = "exception thrown";
+
+                return Json(exceptionResult);
+            }
+
+            List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategoryToUpdate.ExerciseCategoryId);
+
+            vm.Id = exerciseCategoryToUpdate.ExerciseCategoryId;
+            vm.Name = exerciseCategoryToUpdate.Name;
+            vm.Description = exerciseCategoryToUpdate.Description;
+            vm.ExerciseIds = exercisesInCategory;
+
+            return Json(vm);
+        }
+
         [HttpDelete]
         [Route("{id}")]
         public JsonResult Delete(int id)
         {
             var result = new Dictionary<string, dynamic>();
-            var exerciseCategory = CodingMonkeyContext
-                                    .ExerciseCategories
-                                    .Include(ec => ec.ExerciseExerciseCategories)
-                                    .SingleOrDefault(e => e.ExerciseCategoryId == id);
-            
-            if (exerciseCategory == null)
+            var exerciseCategoryToDelete =
+                CodingMonkeyContext.ExerciseCategories.Include(ec => ec.ExerciseExerciseCategories)
+                    .SingleOrDefault(e => e.ExerciseCategoryId == id);
+
+            if (exerciseCategoryToDelete == null)
             {
                 result["deleted"] = false;
                 result["reason"] = "record not found";
@@ -158,33 +177,30 @@ namespace CodingMonkey.Controllers
                 try
                 {
                     //Remove category assignments
-                    exerciseCategory
-                        .ExerciseExerciseCategories
-                        .RemoveAll(x => x.ExerciseCategoryId == exerciseCategory.ExerciseCategoryId);
-                    
-                    CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategory);
+                    exerciseCategoryToDelete.ExerciseExerciseCategories.RemoveAll(
+                        x => x.ExerciseCategoryId == exerciseCategoryToDelete.ExerciseCategoryId);
+
+                    CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategoryToDelete);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;
                 }
-                catch(Exception ex)
+                catch (Exception)
                 {
                     result["deleted"] = false;
                     result["reason"] = "exception thrown";
                 }
             }
-            
+
             return Json(result);
         }
-        
+
         private List<int> GetExercisesInCategory(int exerciseCategoryId)
         {
-            return CodingMonkeyContext.Exercises
-                        .Include(e => e.ExerciseExerciseCategories)
-                        .Where(e => e.ExerciseExerciseCategories.
-                                Any( c => c.ExerciseCategoryId == exerciseCategoryId)
-                                )
-                        .Select(e => e.ExerciseId)
-                        .ToList();
+            return
+                CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories)
+                    .Where(e => e.ExerciseExerciseCategories.Any(c => c.ExerciseCategoryId == exerciseCategoryId))
+                    .Select(e => e.ExerciseId)
+                    .ToList();
         }
     }
 }
