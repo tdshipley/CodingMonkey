@@ -1,20 +1,42 @@
 <template>
-  <section class="au-animate">
-    <h2>${heading}</h2>
-    <form role="form" submit.delegate="submit()">
-      <div class="form-group">
-        <label for="fn">First Name</label>
-        <input type="text" value.bind="firstName" class="form-control" id="fn" placeholder="first name">
-      </div>
-      <div class="form-group">
-        <label for="ln">Last Name</label>
-        <input type="text" value.bind="lastName" class="form-control" id="ln" placeholder="last name">
-      </div>
-      <div class="form-group">
-        <label>Full Name</label>
-        <p class="help-block">${fullName | upper}</p>
-      </div>
-      <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-  </section>
+    <div class="jumbotron">
+        <div class="container">
+            <h1>${heading}</h1>
+            <p>Learn to code in C# by completing small exercises. Get immediate feedback on all submissions.</p>
+            <p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">Get Started</a>
+            </p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Small Exercises</h2>
+                <p>
+                    Bacon ipsum dolor amet shoulder andouille ball tip filet mignon.
+                    Strip steak alcatra corned beef bacon biltong cupim hamburger turkey brisket jowl pancetta.
+                    Kielbasa filet mignon flank short ribs ham hock ground round tail drumstick.
+                </p>
+                <a class="btn btn-default">View Details</a>
+            </div>
+            <div class="col-md-4">
+                <h2>Immediate Feedback</h2>
+                <p>
+                    Bacon ipsum dolor amet shoulder andouille ball tip filet mignon.
+                    Strip steak alcatra corned beef bacon biltong cupim hamburger turkey brisket jowl pancetta.
+                    Kielbasa filet mignon flank short ribs ham hock ground round tail drumstick.
+                </p>
+                <a class="btn btn-default">View Details</a>
+            </div>
+            <div class="col-md-4">
+                <h2>Save Your Progress</h2>
+                <p>
+                    Bacon ipsum dolor amet shoulder andouille ball tip filet mignon.
+                    Strip steak alcatra corned beef bacon biltong cupim hamburger turkey brisket jowl pancetta.
+                    Kielbasa filet mignon flank short ribs ham hock ground round tail drumstick.
+                </p>
+                <a class="btn btn-default">View Details</a>
+            </div>
+        </div>
+    </div>
 </template>
