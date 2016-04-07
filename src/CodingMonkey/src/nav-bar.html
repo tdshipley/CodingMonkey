@@ -14,11 +14,24 @@
     </div>
 
     <div class="collapse navbar-collapse" id="skeleton-navigation-navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li repeat.for="row of router.navigation" class="${row.isActive ? 'active' : ''}">
-          <a data-toggle="collapse" data-target="#skeleton-navigation-navbar-collapse.in" href.bind="row.href">${row.title}</a>
-        </li>
-      </ul>
+        <ul class="nav navbar-nav">
+            <template repeat.for="row of router.navigation">
+                <li if.bind="row.settings.group === 'root'" class="${row.isActive ? 'active' : ''}">
+                    <a data-toggle="collapse" data-target="#skeleton-navigation-navbar-collapse.in" href.bind="row.href">${row.title}</a>
+                </li>
+            </template>
+
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <template repeat.for="row of router.navigation">
+                        <li if.bind="row.settings.group === 'admin'" class="${row.isActive ? 'active' : ''}">
+                            <a href.bind="row.href">${row.title}</a>
+                        </li>
+                    </template>
+                </ul>
+            </li>
+        </ul>
 
       <ul class="nav navbar-nav navbar-right">
         <li class="loader" if.bind="router.isNavigating">
