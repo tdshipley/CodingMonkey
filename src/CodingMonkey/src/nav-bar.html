@@ -22,7 +22,7 @@
             </template>
 
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <template repeat.for="row of router.navigation">
                         <li if.bind="row.settings.group === 'admin'" class="${row.isActive ? 'active' : ''}">

@@ -1,3 +1,5 @@
+import bootstrap from 'bootstrap';
+
 export class App {
   configureRouter(config, router) {
     config.title = 'Coding Monkey';
