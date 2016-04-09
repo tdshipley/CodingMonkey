@@ -31,6 +31,12 @@
     margin-top: 5px;
 }
 
+@media (min-width: 979px) {
+  ul.nav li.dropdown:hover > ul.dropdown-menu {
+    display: block;
+  }
+}
+
 /* Ace Editor */
 #aceEditor {
     width: 80%;
