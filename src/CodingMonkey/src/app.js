@@ -35,6 +35,16 @@ export class App {
                 moduleId: './admin/exercise/create',
                 nav: true,
                 title: "Exercise Create"
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:id/:exerciseTemplateId',
+                name: 'ExerciseDetails',
+                moduleId: './admin/exercise/details',
+                nav: false,
+                title: "Exercise Details"
             }
     ]);
 

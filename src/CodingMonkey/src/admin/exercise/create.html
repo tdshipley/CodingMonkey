@@ -1,3 +1,31 @@
 ﻿<template>
-    <h1>${heading}</h1>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>${heading}</h1>
+            <div if.bind="exerciseCreateFail">${exerciseCreateFailMessage}</div>
+            <form submit.trigger="createExercise()">
+                <div class="form-group">
+                    <label for="exerciseName">Name</label>
+                    <input value.bind="vm.exercise.name" type="text" class="form-control" id="exerciseName" placeholder="Exercise Name">
+                </div>
+                <div class="form-group">
+                    <label for="exerciseGuidance">Exercise Guidance</label>
+                    <textarea value.bind="vm.exercise.guidance" class="form-control" rows="5" id="exerciseGuidance" placeholder="Guidance"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exerciseTemplateInitialCode">Exercise Initial Code</label>
+                    <textarea value.bind="vm.exerciseTemplate.initialCode" class="form-control" rows="10" id="exerciseTemplateInitialCode" placeholder="Initial Code for the Exercise"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exerciseTemplateClassName">Expected Class Name</label>
+                    <input value.bind="vm.exerciseTemplate.className" type="text" class="form-control" id="exerciseTemplateClassName" placeholder="Expected Class Name">
+                </div>
+                <div class="form-group">
+                    <label for="exerciseTemplateMainMethod">Expected Main Method Name</label>
+                    <input value.bind="vm.exerciseTemplate.mainMethodName" type="text" class="form-control" id="exerciseTemplateMainMethod" placeholder="Expected Main Method Name">
+                </div>
+                <button type="submit" class="btn btn-default">Create Exercise</button>
+            </form>
+        </div>
+    </div>
 </template>
