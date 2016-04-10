@@ -4,6 +4,11 @@
 
     public class ExerciseViewModel
     {
+        public ExerciseViewModel()
+        {
+            CategoryIds = new List<int>();
+        }
+        
         public int Id { get; set; }
         public List<int> CategoryIds { get; set; }
         public string Name { get; set; }
