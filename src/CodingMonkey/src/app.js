@@ -31,7 +31,7 @@ export class App {
                     group: 'admin'
                 },
                 route: 'admin/exercise/create',
-                name: 'ExerciseCreate', 
+                name: 'AdminExerciseCreate', 
                 moduleId: './admin/exercise/create',
                 nav: true,
                 title: "Exercise Create"
@@ -41,10 +41,20 @@ export class App {
                     group: 'admin'
                 },
                 route: 'admin/exercise/:id/:exerciseTemplateId',
-                name: 'ExerciseDetails',
+                name: 'AdminExerciseDetails',
                 moduleId: './admin/exercise/details',
                 nav: false,
                 title: "Exercise Details"
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercises',
+                name: 'AdminExercises',
+                moduleId: './admin/exercise/list',
+                nav: true,
+                title: 'Exercise List'
             }
     ]);
 

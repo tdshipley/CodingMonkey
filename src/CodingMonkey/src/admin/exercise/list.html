@@ -1,0 +1,27 @@
+﻿<template>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>${heading}</h1>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Guidance</th>
+                    <th>Actions</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr repeat.for="exercise of exerciseList">
+                    <td>${exercise.id}</td>
+                    <td>${exercise.name}</td>
+                    <td>${exercise.guidance}</td>
+                    <td><a route-href="route: AdminExerciseDetails;
+                                       params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Details</a></td>
+                    <td>Update</td>
+                    <td>Delete</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</template>
