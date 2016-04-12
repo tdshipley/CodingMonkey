@@ -1,13 +1,15 @@
 ﻿import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
+import {DialogService} from 'aurelia-dialog';
+import {DialogPrompt} from '../../dialog-prompt';
 import 'fetch';
 
-@inject(HttpClient)
+@inject(HttpClient, DialogService)
 export class details {
-    constructor(http) {
+    constructor(http, dialogService) {
+        this.dialogService = dialogService;
+        
         var loc = window.location;
-
-
         this.heading = "Exercises";
         this.baseUrl = loc.protocol + "//" + loc.host;
 
@@ -43,5 +45,25 @@ export class details {
           .catch(err => {
               console.log(err);
           });
+    }
+    
+    delete(exerciseName)
+    {
+        var question = "Are you sure you want to delete exercise '" + exerciseName + "' ?";
+        var questionHeader = "Confirm Delete Exercise";
+        
+        var dialogPromptModel = {
+            question: question,
+            questionHeader: questionHeader
+        };
+        
+        this.dialogService.open({ viewModel: DialogPrompt, model: dialogPromptModel}).then(response => {
+        if (!response.wasCancelled) {
+            console.log('good - ', response.output);
+        } else {
+            console.log('bad');
+        }
+        console.log(response.output);
+        });
     }
 }

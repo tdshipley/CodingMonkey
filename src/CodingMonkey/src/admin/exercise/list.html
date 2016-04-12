@@ -19,7 +19,7 @@
                     <td><a route-href="route: AdminExerciseDetails;
                                        params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Details</a></td>
                     <td>Update</td>
-                    <td>Delete</td>
+                    <td><span click.delegate="delete(exercise.name)">Delete</span></td>
                 </tr>
             </table>
         </div>
