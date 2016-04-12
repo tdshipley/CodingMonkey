@@ -45,6 +45,11 @@ System.config({
     "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "npm:font-awesome@4.5.0",
     "text": "github:systemjs/plugin-text@0.0.3",
+    "toastr": "github:CodeSeven/toastr@2.1.2",
+    "github:CodeSeven/toastr@2.1.2": {
+      "css": "github:systemjs/plugin-css@0.1.20",
+      "jquery": "github:components/jquery@2.2.1"
+    },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },

@@ -2,11 +2,15 @@
 import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
+import toastr from 'toastr';
 
 @inject(HttpClient, Router)
 export class create {
     constructor(http, router) {
         var loc = window.location;
+        
+        this.notify = toastr;
+        this.notify.options.progressBar = true;
         
         this.heading = "Create Exercise";
         this.exerciseCreateFailMessage = "";
@@ -56,6 +60,7 @@ export class create {
         })
         .then(() => this.createExerciseTemplate(this.vm.exercise.id))
         .catch(err => {
+            this.notify.error("Create Exercise failed.")
             console.log(err);
         })
     }
@@ -76,8 +81,12 @@ export class create {
         .then(data => {
             this.vm.exerciseTemplate.id = data.Id;
         })
-        .then(() => this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id))
+        .then(() => {
+            this.notify.success("Created Exercise '" + this.vm.exercise.name + "'");
+            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id);
+        })
         .catch(err => {
+            this.notify.error("Create Exercise Template for Exercise failed.")
             console.log(err);
         })
     }
