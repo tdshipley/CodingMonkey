@@ -15,5 +15,7 @@ export class DialogPrompt {
   activate(dialogModel) {
     this.vm.questionHeader = dialogModel.questionHeader;
     this.vm.question = dialogModel.question;
+    this.vm.dismissText = dialogModel.dismissText;
+    this.vm.confirmText = dialogModel.confirmText;
   }
 }

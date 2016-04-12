@@ -47,23 +47,37 @@ export class details {
           });
     }
     
-    delete(exerciseName)
+    delete(exerciseName, exerciseId)
     {
-        var question = "Are you sure you want to delete exercise '" + exerciseName + "' ?";
+        var question = "Are you sure you want to delete exercise '" + exerciseName + "'?";
         var questionHeader = "Confirm Delete Exercise";
         
         var dialogPromptModel = {
             question: question,
-            questionHeader: questionHeader
+            questionHeader: questionHeader,
+            dismissText: "Cancel",
+            confirmText: "Delete"
         };
         
         this.dialogService.open({ viewModel: DialogPrompt, model: dialogPromptModel}).then(response => {
-        if (!response.wasCancelled) {
-            console.log('good - ', response.output);
-        } else {
-            console.log('bad');
-        }
-        console.log(response.output);
+            if (!response.wasCancelled) {
+                this.http.fetch('delete/' + exerciseId, {
+                    method: "delete"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(!data.deleted)
+                    {
+                        console.log("Failed to delete the exercise");
+                    }
+                    else
+                    {
+                        this.exerciseList = this.exerciseList.filter(function( exercise ) {
+                            return exercise.id !== exerciseId;
+                        });
+                    }
+                });
+            }
         });
     }
 }

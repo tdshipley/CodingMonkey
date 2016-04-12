@@ -1,4 +1,4 @@
-﻿/* Styles */
+﻿/* ### Styles ### */
 .page-host {
     background-color: #F8F8FF;
 }
@@ -22,7 +22,7 @@
 }
 
 
-/* Boostrap Additional */
+/* ### Boostrap Additional ### */
 .top-buffer {
     margin-top:20px;
 }
@@ -37,7 +37,7 @@
   }
 }
 
-/* Ace Editor */
+/* ### Ace Editor ### */
 #aceEditor {
     width: 80%;
     min-height: 300px;
