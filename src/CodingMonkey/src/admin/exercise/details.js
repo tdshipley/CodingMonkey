@@ -60,9 +60,6 @@ export class details {
               this.vm.exerciseTemplate.initialCode = data.InitialCode;
               this.vm.exerciseTemplate.className = data.ClassName;
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
-              
-              console.log("Exercise Template Details")
-              console.log(data);
           })
           .catch(err => {
               console.log(err);

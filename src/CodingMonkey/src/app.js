@@ -50,6 +50,16 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
+                route: 'admin/exercise/:id/:exerciseTemplateId/update',
+                name: 'AdminExerciseUpdate',
+                moduleId: './admin/exercise/update',
+                nav: false,
+                title: "Exercise Update"
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
                 route: 'admin/exercises',
                 name: 'AdminExercises',
                 moduleId: './admin/exercise/list',

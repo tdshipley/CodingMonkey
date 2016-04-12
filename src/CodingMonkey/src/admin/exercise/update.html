@@ -1,8 +1,8 @@
-﻿<template>
+<template>
     <div class="row top-buffer">
         <div class="col-lg-10 col-lg-offset-1">
             <h1>${heading}</h1>
-            <form submit.trigger="createExercise()">
+            <form submit.trigger="updateExercise()">
                 <div class="form-group">
                     <label for="exerciseName">Name</label>
                     <input value.bind="vm.exercise.name" type="text" class="form-control" id="exerciseName" placeholder="Exercise Name">
@@ -23,7 +23,7 @@
                     <label for="exerciseTemplateMainMethod">Expected Main Method Name</label>
                     <input value.bind="vm.exerciseTemplate.mainMethodName" type="text" class="form-control" id="exerciseTemplateMainMethod" placeholder="Expected Main Method Name">
                 </div>
-                <button type="submit" class="btn btn-default">Create Exercise</button>
+                <button type="submit" class="btn btn-default">Update Exercise</button>
             </form>
         </div>
     </div>

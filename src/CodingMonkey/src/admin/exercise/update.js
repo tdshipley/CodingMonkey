@@ -1,18 +1,20 @@
-﻿import {inject} from 'aurelia-framework';
+import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 
 @inject(HttpClient, Router)
-export class create {
+export class update {
     constructor(http, router) {
         var loc = window.location;
         
         this.notify = toastr;
         this.notify.options.progressBar = true;
         
-        this.heading = "Create Exercise";
+        this.heading = "Update Exercise";
+        this.exerciseCreateFailMessage = "";
+        this.exerciseCreateFail = false;
         this.baseUrl = loc.protocol + "//" + loc.host;
         this.appRouter = router;
         
@@ -39,12 +41,44 @@ export class create {
         };
     }
     
-    createExercise() {
-        var exerciseId;
-                  
-        this.http.baseUrl = this.baseUrl + '/api/Exercise/';
+    activate(params) {
+        this.http.fetch('details/' + params.id)
+          .then(response => response.json())
+          .then(data => {
+              this.vm.exercise.id = data.Id;
+              this.vm.exercise.name = data.Name;
+              this.vm.exercise.guidance = data.Guidance;
+              this.vm.exercise.categoryids = data.CategoryIds;
+          })
+          .then(() => {
+              this.getExerciseTemplate(params.id, params.exerciseTemplateId)
+              this.heading = "Update Exercise: " + this.vm.exercise.name;
+          })
+          .catch(err => {
+              console.log(err);
+          });
+    }
+    
+    getExerciseTemplate(exerciseId, exerciseTemplateId) {
+        this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
         
-        this.http.fetch('Create', {
+        this.http.fetch('details/' + exerciseTemplateId)
+          .then(response => response.json())
+          .then(data => {
+              this.vm.exerciseTemplate.id = data.Id;
+              this.vm.exerciseTemplate.initialCode = data.InitialCode;
+              this.vm.exerciseTemplate.className = data.ClassName;
+              this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
+          })
+          .catch(err => {
+              console.log(err);
+          });
+    }
+    
+    updateExercise() {
+        this.http.baseUrl = this.baseUrl + "/api/Exercise/";
+        
+        this.http.fetch('update/' + this.vm.exercise.id, {
             method: 'post',
             body: json({
                 Name: this.vm.exercise.name,
@@ -56,17 +90,18 @@ export class create {
         .then(data => {
             this.vm.exercise.id = data.Id;
         })
-        .then(() => this.createExerciseTemplate(this.vm.exercise.id))
+        .then(() => this.updateExerciseTemplate(this.vm.exercise.id))
         .catch(err => {
-            this.notify.error("Create Exercise failed.")
+            this.notify.error("Update Exercise failed.")
             console.log(err);
         })
+        
     }
     
-    createExerciseTemplate(exerciseId) {
+    updateExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + exerciseId + '/ExerciseTemplate/';
         
-        this.http.fetch('Create', {
+        this.http.fetch('update/' + this.vm.exerciseTemplate.id, {
             method: 'post',
             body: json({
                 ExerciseId: exerciseId,
@@ -77,14 +112,15 @@ export class create {
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             this.vm.exerciseTemplate.id = data.Id;
         })
         .then(() => {
-            this.notify.success("Created Exercise '" + this.vm.exercise.name + "'");
+            this.notify.success("Updated Exercise '" + this.vm.exercise.name + "'");
             this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id);
         })
         .catch(err => {
-            this.notify.error("Create Exercise Template for Exercise failed.")
+            this.notify.error("Update Exercise Template for Exercise failed.")
             console.log(err);
         })
     }
