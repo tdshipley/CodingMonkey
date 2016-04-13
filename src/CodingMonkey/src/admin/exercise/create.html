@@ -1,6 +1,6 @@
 ﻿<template>
     <div class="row top-buffer">
-        <div class="col-lg-10 col-lg-offset-1">
+        <div class="col-lg-6 col-lg-offset-1">
             <h1>${heading}</h1>
             <form submit.trigger="createExercise()">
                 <div class="form-group">
@@ -11,6 +11,11 @@
                     <label for="exerciseGuidance">Exercise Guidance</label>
                     <textarea value.bind="vm.exercise.guidance" class="form-control" rows="5" id="exerciseGuidance" placeholder="Guidance"></textarea>
                 </div>
+                <h2>Exercise Template</h2>
+                <p>
+                    The code template to be used in the exercise. The <i>Initial Code</i> is what the user will start with.
+                    The <i>Expected Class Name</i> and <i>Expected Main Method Name</i> are used by the tests and for security.
+                </p>
                 <div class="form-group">
                     <label for="exerciseTemplateInitialCode">Exercise Initial Code</label>
                     <textarea value.bind="vm.exerciseTemplate.initialCode" class="form-control" rows="10" id="exerciseTemplateInitialCode" placeholder="Initial Code for the Exercise"></textarea>
@@ -23,7 +28,29 @@
                     <label for="exerciseTemplateMainMethod">Expected Main Method Name</label>
                     <input value.bind="vm.exerciseTemplate.mainMethodName" type="text" class="form-control" id="exerciseTemplateMainMethod" placeholder="Expected Main Method Name">
                 </div>
-                <button type="submit" class="btn btn-default">Create Exercise</button>
+                <button type="submit" class="btn btn-success">Create Exercise</button>
+            </form>
+        </div>
+        <div class="col-lg-4 col-lg-offset1">
+            <h1>Categories</h1>
+                <form submit.trigger="addCategory()">
+                    <div class="form-group">
+                        <select class="form-control" value.bind="vm.exercise.categoryids" multiple>
+                            <option repeat.for="category of categoriesList" value.bind="category.id">${category.name}</option>
+                        </select>
+                    </div>
+                </form>
+            <p>Add new <a click.delegate="toggleAddCategoryForm()">category</a></p>
+            <form submit.trigger="createCategory()" if.bind="showAddCategoryForm">
+                <div class="form-group">
+                    <label for="exerciseCategoryName">Name</label>
+                    <input type="text" value.bind="vm.exerciseCategory.name" class="form-control" id="exerciseCategoryName" placeholder="Name"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exerciseCategoryDescription">Description</label>
+                    <textarea value.bind="vm.exerciseCategory.description" class="form-control" rows="5" id="exerciseCategoryDescription" placeholder="Description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Create Category</button>
             </form>
         </div>
     </div>

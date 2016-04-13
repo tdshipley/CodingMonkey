@@ -23,6 +23,11 @@ export class create {
         
         this.http = http;
         
+        this.selectedCategories = [];
+        this.categoriesList = [];
+        this.getCategories();
+        this.showAddCategoryForm = false;
+
         this.vm = {
             exercise: {
                 id: 0,
@@ -35,6 +40,11 @@ export class create {
                 initialCode: "",
                 className: "",
                 mainMethodName: ""
+            },
+            exerciseCategory: {
+                id: 0,
+                name: "",
+                description: ""
             }
         };
     }
@@ -87,5 +97,61 @@ export class create {
             this.notify.error("Create Exercise Template for Exercise failed.")
             console.log(err);
         })
+    }
+    
+    createCategory() {
+        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/'
+        
+        this.http.fetch('Create', {
+            method: 'post',
+            body: json({
+                name: this.vm.exerciseCategory.name,
+                description: this.vm.exerciseCategory.description,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let categoryModel = {
+                id: data.Id,
+                name: data.Name,
+                description: data.Description
+            }
+            
+            this.categoriesList.push(categoryModel);
+            this.vm.exercise.categoryids.push(categoryModel.id);
+            this.toggleAddCategoryForm();
+            
+            this.notify.success("Create category '" + categoryModel.name + "' succeeded.");
+        })
+        .catch(err => {
+            this.notify.error("Create category '" + categoryModel.name + "' failed.")
+        })
+    }
+    
+    getCategories() {
+        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/';
+        
+        this.http.fetch('List')
+            .then(response => response.json())
+            .then(data => {
+                this.categoriesList = [];
+                              
+                for (let category of data) {
+                    let categoryModel = {
+                        id: category.Id,
+                        name: category.Name,
+                        description: category.Description
+                    }
+
+                    this.categoriesList.push(categoryModel);
+                }
+            })
+            .catch(err => {
+                this.notify.error("Get Exercise Categories failed.")
+            })
+    }
+    
+    toggleAddCategoryForm() {
+        this.showAddCategoryForm = !this.showAddCategoryForm;
     }
 }
