@@ -31,16 +31,16 @@
                 <button type="submit" class="btn btn-success">Create Exercise</button>
             </form>
         </div>
-        <div class="col-lg-4 col-lg-offset1">
+        <div class="col-lg-2 col-lg-offset1">
             <h1>Categories</h1>
                 <form submit.trigger="addCategory()">
                     <div class="form-group">
-                        <select class="form-control" value.bind="vm.exercise.categoryids" multiple>
+                        <select class="form-control" value.bind="vm.exercise.categoryids" multiple size="10">
                             <option repeat.for="category of categoriesList" value.bind="category.id">${category.name}</option>
                         </select>
                     </div>
                 </form>
-            <p>Add new <a click.delegate="toggleAddCategoryForm()">category</a></p>
+            <p>Category not listed? Add a new <a click.delegate="toggleAddCategoryForm()">category</a></p>
             <form submit.trigger="createCategory()" if.bind="showAddCategoryForm">
                 <div class="form-group">
                     <label for="exerciseCategoryName">Name</label>

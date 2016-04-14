@@ -118,7 +118,6 @@ export class create {
             }
             
             this.categoriesList.push(categoryModel);
-            this.vm.exercise.categoryids.push(categoryModel.id);
             this.toggleAddCategoryForm();
             
             this.notify.success("Create category '" + categoryModel.name + "' succeeded.");
