@@ -1,15 +1,18 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
+import toastr from 'toastr';
 
 @inject(HttpClient)
 export class details {
         constructor(http) {
         var loc = window.location;
         
-        
         this.heading = "Exercise Details";
         this.baseUrl = loc.protocol + "//" + loc.host;
+        
+        this.notify = toastr;
+        this.notify.options.progressBar = true;
         
         http.configure(config => {
            config.useStandardConfiguration()
@@ -28,7 +31,8 @@ export class details {
                 initialCode: "",
                 className: "",
                 mainMethodName: ""
-            }
+            },
+            exerciseCategories: []
         };
     }
     
@@ -39,12 +43,12 @@ export class details {
               this.vm.exercise.name = data.Name;
               this.vm.exercise.guidance = data.Guidance;
               this.vm.exercise.categoryids = data.CategoryIds;
-              
-              console.log("Exercise Details")
-              console.log(data);
           })
           .then(() => {
               this.getExerciseTemplate(params.id, params.exerciseTemplateId)
+          })
+          .then(() => {
+              this.getExerciseCategoriesForExercise(this.vm.exercise.categoryids);
           })
           .catch(err => {
               console.log(err);
@@ -62,7 +66,28 @@ export class details {
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
           })
           .catch(err => {
-              console.log(err);
+              this.notify.error("Failed to get Exercise Template for Exercise.")
           });
+    }
+    
+    getExerciseCategoriesForExercise(categoryIds) {
+        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/'
+        
+        for(let categoryId of categoryIds) {
+
+            this.http.fetch('details/' + categoryId)
+                .then(response => response.json())
+                .then(data => {
+                    let category = {
+                        name: data.Name,
+                        description: data.Description
+                    };
+                    
+                    this.vm.exerciseCategories.push(category);
+                })
+                .catch(err => {
+                    this.notify.error("Failed to get Categories for Exercise.");
+                })
+        }
     }
 }
