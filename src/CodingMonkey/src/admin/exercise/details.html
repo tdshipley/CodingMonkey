@@ -15,7 +15,7 @@
         </div>
         <div class="col-lg-2">
             <h2>In Categories</h2>
-            <ul repeat.for="exerciseCategory of vm.exerciseCategories">
+            <ul if.bind="hasCategories" repeat.for="exerciseCategory of vm.exerciseCategories">
                 <li>${exerciseCategory.name}</li>
                 <p><i>${exerciseCategory.description}</i></p>
             </ul>

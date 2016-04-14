@@ -21,6 +21,7 @@ export class details {
         
         this.http = http;
         
+        this.hasCategories = false;
         this.vm = {
             exercise: {
                 name: "",
@@ -72,6 +73,10 @@ export class details {
     
     getExerciseCategoriesForExercise(categoryIds) {
         this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/'
+        
+        if(categoryIds.count !== 0) {
+            this.hasCategories = true;
+        }
         
         for(let categoryId of categoryIds) {
 
