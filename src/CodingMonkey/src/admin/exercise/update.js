@@ -13,8 +13,7 @@ export class update {
         this.notify.options.progressBar = true;
         
         this.heading = "Update Exercise";
-        this.exerciseCreateFailMessage = "";
-        this.exerciseCreateFail = false;
+
         this.baseUrl = loc.protocol + "//" + loc.host;
         this.appRouter = router;
         
@@ -52,8 +51,6 @@ export class update {
               this.vm.exercise.name = data.Name;
               this.vm.exercise.guidance = data.Guidance;
               this.vm.exercise.categoryids = data.CategoryIds;
-              
-              console.log(this.vm);
           })
           .then(() => {
               this.getExerciseTemplate(params.id, params.exerciseTemplateId)
@@ -129,7 +126,6 @@ export class update {
         })
         .catch(err => {
             this.notify.error("Update Exercise Template for Exercise failed.")
-            console.log(err);
         })
     }
     

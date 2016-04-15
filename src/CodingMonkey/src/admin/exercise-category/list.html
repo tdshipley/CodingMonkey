@@ -18,6 +18,8 @@
                     <td>${exerciseCategory.description}</td>
                     <td><a route-href="route: AdminExerciseCategoryDetails;
                                        params.bind: {id: exerciseCategory.id}">Details</a></td>
+                    <td><a route-href="route: AdminExerciseCategoryUpdate;
+                                       params.bind: {id: exerciseCategory.id}">Update</a></td>
                     <td><a click.delegate="delete(exerciseCategory.name, exerciseCategory.id)">Delete</a></td>
                 </tr>
             </table>
