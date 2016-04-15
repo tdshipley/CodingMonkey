@@ -1,0 +1,17 @@
+<template>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h1>${vm.exerciseCategory.name}</h1>
+            <p>${vm.exerciseCategory.description}</p>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h2>In Exercises</h2>
+            <ul if.bind="hasExercises" repeat.for="exercise of vm.exercises">
+                <li>${exercise.name}</li>
+                <p><i>${exercise.guidance}</i></p>
+            </ul>
+        </div>
+    </div>
+</template>

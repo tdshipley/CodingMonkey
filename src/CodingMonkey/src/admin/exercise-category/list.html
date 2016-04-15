@@ -16,6 +16,8 @@
                     <td>${exerciseCategory.id}</td>
                     <td>${exerciseCategory.name}</td>
                     <td>${exerciseCategory.description}</td>
+                    <td><a route-href="route: AdminExerciseCategoryDetails;
+                                       params.bind: {id: exerciseCategory.id}">Details</a></td>
                     <td><a click.delegate="delete(exerciseCategory.name, exerciseCategory.id)">Delete</a></td>
                 </tr>
             </table>

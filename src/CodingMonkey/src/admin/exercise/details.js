@@ -76,9 +76,8 @@ export class details {
         
         if(categoryIds.count !== 0) {
             this.hasCategories = true;
-        }
-        
-        for(let categoryId of categoryIds) {
+            
+            for(let categoryId of categoryIds) {
 
             this.http.fetch('details/' + categoryId)
                 .then(response => response.json())
@@ -93,6 +92,7 @@ export class details {
                 .catch(err => {
                     this.notify.error("Failed to get Categories for Exercise.");
                 })
+            }
         }
     }
 }
