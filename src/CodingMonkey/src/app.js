@@ -65,6 +65,16 @@ export class App {
                 moduleId: './admin/exercise/list',
                 nav: true,
                 title: 'Exercise List'
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/categories',
+                name: 'AdminExerciseCategories',
+                moduleId: './admin/exercise-category/list',
+                nav: true,
+                title: 'Exercise Category List'
             }
     ]);
 

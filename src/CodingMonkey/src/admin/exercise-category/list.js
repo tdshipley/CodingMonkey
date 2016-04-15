@@ -14,44 +14,44 @@ export class list {
         this.notify.options.progressBar = true;
         
         var loc = window.location;
-        this.heading = "Exercises";
+        this.heading = "Exercise Categories";
         this.baseUrl = loc.protocol + "//" + loc.host;
 
         http.configure(config => {
             config.useStandardConfiguration()
-                .withBaseUrl(this.baseUrl + '/api/Exercise/');
+                .withBaseUrl(this.baseUrl + '/api/ExerciseCategory/');
         });
 
         this.http = http;
 
-        this.exerciseList = [];
+        this.exerciseCategoryList = [];
     }
 
     activate() {
         this.http.fetch('list')
           .then(response => response.json())
           .then(data => {
-              for (let exercise of data) {
+              for (let exerciseCatgeory of data) {
                   var vm = {
-                      id: exercise.Id,
-                      exerciseTemplateId: exercise.ExerciseTemplateId,
-                      name: exercise.Name,
-                      guidance: exercise.Guidance,
-                      categoryids: exercise.CategoryIds
+                      id: exerciseCatgeory.Id,
+                      name: exerciseCatgeory.Name,
+                      description: exerciseCatgeory.Description,
+                      exerciseids: exerciseCatgeory.ExerciseIds
                   };
 
-                  this.exerciseList.push(vm);
+                  this.exerciseCategoryList.push(vm);
               }
             })
           .catch(err => {
-              this.notify.error("Failed to get exercises.")
+              this.notify.error("Failed to get exercise categories")
           });
     }
     
-    delete(exerciseName, exerciseId)
+    delete(exerciseCategoryName, exerciseCategoryId)
     {
-        var question = "Are you sure you want to delete exercise '" + exerciseName + "'?";
-        var questionHeader = "Confirm Delete Exercise";
+        var question = "Are you sure you want to delete Exercise Category '" + exerciseCategoryName + "'? " + 
+            "This will also remove the Category from existing Exercises";
+        var questionHeader = "Confirm Delete Exercise Category";
         
         var dialogPromptModel = {
             question: question,
@@ -62,22 +62,23 @@ export class list {
         
         this.dialogService.open({ viewModel: DialogPrompt, model: dialogPromptModel}).then(response => {
             if (!response.wasCancelled) {
-                this.http.fetch('delete/' + exerciseId, {
+                this.http.fetch('delete/' + exerciseCategoryId, {
                     method: "delete"
                 })
                 .then(response => response.json())
                 .then(data => {
                     if(!data.deleted)
                     {
-                        this.notify.error("Deleteing Exercise '" + exerciseName + "' failed.");
+                        this.notify.error("Deleteing Exercise Category '" + exerciseCategoryName + "' failed.");
                     }
                     else
                     {
-                        this.exerciseList = this.exerciseList.filter(function( exercise ) {
-                            return exercise.id !== exerciseId;
+                        // Removing Exercise Category from list
+                        this.exerciseCategoryList = this.exerciseCategoryList.filter(function( exerciseCatgeory ) {
+                            return exerciseCatgeory.id !== exerciseCategoryId;
                         });
                         
-                        this.notify.success("Deleteing Exercise '" + exerciseName + "' was successful.");
+                        this.notify.success("Deleteing Exercise Category '" + exerciseCatgeoryName + "' was successful.");
                     }
                 });
             }
