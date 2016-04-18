@@ -1,0 +1,28 @@
+﻿<template>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>${heading}</h1>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr repeat.for="exerciseCategory of exerciseCategoryList">
+                    <td>${exerciseCategory.id}</td>
+                    <td>${exerciseCategory.name}</td>
+                    <td>${exerciseCategory.description}</td>
+                    <td><a route-href="route: AdminExerciseCategoryDetails;
+                                       params.bind: {id: exerciseCategory.id}">Details</a></td>
+                    <td><a route-href="route: AdminExerciseCategoryUpdate;
+                                       params.bind: {id: exerciseCategory.id}">Update</a></td>
+                    <td><a click.delegate="delete(exerciseCategory.name, exerciseCategory.id)">Delete</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</template>

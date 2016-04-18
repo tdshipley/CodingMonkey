@@ -1,0 +1,13 @@
+<template>
+  <ai-dialog>
+    <ai-dialog-body>
+      <h3>${vm.questionHeader}</h3>
+      <p>${vm.question}</p>
+    </ai-dialog-body>
+
+    <ai-dialog-footer>
+      <button type="button" class="btn btn-default" click.trigger="controller.cancel()">${vm.dismissText}</button>
+      <button type="button" class="btn btn-primary" click.trigger="controller.ok(vm)">${vm.confirmText}</button>
+    </ai-dialog-footer>
+  </ai-dialog>
+</template>

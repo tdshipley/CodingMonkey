@@ -1,0 +1,24 @@
+<template>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h1>${vm.exercise.name}</h1>
+            <p>${vm.exercise.guidance}</p>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-6 col-lg-offset-1">
+            <h2>Exercise Template</h2>
+            <p><b>Initial Code</b>:</p>
+            <p>${vm.exerciseTemplate.initialCode}</p>
+            <p><b>Expected Class Name</b>: ${vm.exerciseTemplate.className}</p>
+            <p><b>Expected Main Method Name</b>: ${vm.exerciseTemplate.mainMethodName}</p>
+        </div>
+        <div class="col-lg-2">
+            <h2>In Categories</h2>
+            <ul if.bind="hasCategories" repeat.for="exerciseCategory of vm.exerciseCategories">
+                <li>${exerciseCategory.name}</li>
+                <p><i>${exerciseCategory.description}</i></p>
+            </ul>
+        </div>
+    </div>
+</template>

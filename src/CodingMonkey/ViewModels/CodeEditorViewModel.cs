@@ -6,6 +6,11 @@ namespace CodingMonkey.ViewModels
 {
     public class CodeEditorViewModel
     {
+        public CodeEditorViewModel()
+        {
+            Errors = new List<CompilerErrorViewModel>();
+        }
+        
         public string Code { get; set; }
         public bool HasErrors { get; set; }
         public IList<CompilerErrorViewModel> Errors { get; set; }

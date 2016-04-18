@@ -21,14 +21,27 @@
         public JsonResult List()
         {
             var exercises = CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories);
-            
+
+
             List<ExerciseViewModel> vm = new List<ExerciseViewModel>();
             
             foreach (var exercise in exercises)
             {
+                var exerciseTemplate =
+                    CodingMonkeyContext.ExerciseTemplates.Include(et => et.Exercise)
+                        .SingleOrDefault(et => et.Exercise.ExerciseId == exercise.ExerciseId);
+
+                int exerciseTemplateId = 0;
+
+                if (exerciseTemplate != null)
+                {
+                    exerciseTemplateId = exerciseTemplate.ExerciseTemplateId;
+                }
+
                 vm.Add(new ExerciseViewModel()
                         {
                             Id = exercise.ExerciseId,
+                            ExerciseTemplateId = exerciseTemplateId,
                             Guidance = exercise.Guidance,
                             Name = exercise.Name,
                             CategoryIds = GetExerciseCategoryIdsForExercise(exercise.ExerciseId, exercise)
