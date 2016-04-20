@@ -2,7 +2,7 @@
     <div class="row top-buffer">
         <div class="col-lg-6 col-lg-offset-1">
             <h1>${heading}</h1>
-            <form submit.trigger="createExerciseTest()">
+            <form submit.trigger="createTest()">
                 <div class="form-group">
                     <label for="testDescription">Description</label>
                     <textarea value.bind="vm.test.description" class="form-control" rows="5" id="testDescription" placeholder="Description"></textarea>
@@ -28,7 +28,7 @@
                 </div>
                 <h2>Test Inputs</h2>
                 <p if.bind="vm.test.testInputs.length === 0">This test has no inputs. Click the button below to add one.</p>
-                <template if.bind="vm.test.testInputs.length > 0" repeat.for="testInput of vm.test.testInputs">
+                <template repeat.for="testInput of vm.test.testInputs">
                     <div class="form-group">
                         <label for="testInputArgumentName${$index}">Argument Name</label>
                         <input value.bind="testInput.argumentName" type="text" class="form-control" id="testInputArgumentName${$index}" placeholder="Argument Name">
