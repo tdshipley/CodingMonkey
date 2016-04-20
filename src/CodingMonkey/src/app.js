@@ -95,6 +95,16 @@ export class App {
                 moduleId: './admin/exercise-category/update',
                 nav: false,
                 title: 'Exercise Category Update'
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/create',
+                name: 'AdminExerciseTestCreate',
+                moduleId: './admin/test/create',
+                nav: false,
+                title: 'Test Create'
             }
     ]);
 

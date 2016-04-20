@@ -11,6 +11,7 @@
                     <th>Actions</th>
                     <th></th>
                     <th></th>
+                    <th></th>
                 </tr>
                 <tr repeat.for="exercise of exerciseList">
                     <td>${exercise.id}</td>
@@ -21,6 +22,8 @@
                     <td><a route-href="route: AdminExerciseUpdate;
                                        params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Update</a></td>
                     <td><a click.delegate="delete(exercise.name, exercise.id)">Delete</a></td>
+                    <td><a route-href="route: AdminExerciseTestCreate;
+                                       params.bind: {exerciseId: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Add Test</a></td>
                 </tr>
             </table>
         </div>

@@ -52,7 +52,7 @@ export class details {
               this.getExerciseCategoriesForExercise(this.vm.exercise.categoryids);
           })
           .catch(err => {
-              console.log(err);
+              this.notify.error("Failed to get exercise.")
           });
     }
     
