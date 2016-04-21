@@ -1,0 +1,43 @@
+<template>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h1>${heading}</h1>
+            <p>Test Description</p>
+            <p><i>${vm.exercise.guidance}</i></p>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-8 col-lg-offset-1">
+            <h2>Test Inputs</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th>Id</th>
+                    <th>Argument Name</th>
+                    <th>Value Type</th>
+                    <th>Value</th>
+                </tr>
+                <tr repeat.for="testInput of vm.test.testInputs">
+                    <td>${testInput.id}</td>
+                    <td>${testInput.argumentName}</td>
+                    <td>${testInput.valueType}</td>
+                    <td>${testInput.value}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-lg-8 col-lg-offset-1">
+            <h2>Test Outputs</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th>Id</th>
+                    <th>Expected Value Type</th>
+                    <th>Expected Value</th>
+                </tr>
+                <tr>
+                    <td>${vm.test.testOutput.id}</td>
+                    <td>${vm.test.testOutput.valueType}</td>
+                    <td>${vm.test.testOutput.value}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</template>

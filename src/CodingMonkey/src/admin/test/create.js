@@ -119,6 +119,7 @@ export class create {
             this.vm.test.testInputs = data.TestInputs;
             this.vm.test.testOutput = data.TestOutput;
             this.notify.success("Create Exercise Test succeeded.");
+            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/test/" + this.vm.test.id);
         })
         .catch(err => {
             this.notify.error("Create Exercise Test failed.")
@@ -131,5 +132,13 @@ export class create {
             valueType: "",
             value: ""
         });
+        return false;
+    }
+    
+    removeTestInput(index) {
+        if(index > -1) {
+            this.vm.test.testInputs.splice(index, 1);
+        }
+        return false;
     }
 }

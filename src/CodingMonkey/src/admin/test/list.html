@@ -14,7 +14,8 @@
                 <tr repeat.for="test of testList">
                     <td>${test.id}</td>
                     <td>${test.description}</td>
-                    <td>Details</td>
+                    <td><a route-href="route: AdminExerciseTestDetails;
+                                       params.bind: {id: test.id, exerciseId: exerciseId, exerciseTemplateId: exerciseTemplateId}">Details</a></td>
                     <td>Update</td>
                     <td><a click.delegate="delete(test.id)">Delete</a></td>
                 </tr>
