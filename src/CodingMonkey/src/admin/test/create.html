@@ -1,6 +1,6 @@
 <template>
     <div class="row top-buffer">
-        <div class="col-lg-6 col-lg-offset-1">
+        <div class="col-lg-5 col-lg-offset-1">
             <h1>${heading}</h1>
             <form submit.trigger="createTest()">
                 <div class="form-group">
@@ -17,7 +17,8 @@
                 <div class="form-group">
                     <label for="testOutputValue">Expected Value</label>
                     <template if.bind="vm.test.testOutput.valueType === 'Boolean'">  
-                        <select class="form-control" value.bind="vm.test.testOutput.valueType">
+                        <select class="form-control" value.bind="vm.test.testOutput.value">
+                            <option selected="selected" disabled="disabled"></option>
                             <option>true</option>
                             <option>false</option>
                         </select>
@@ -44,7 +45,8 @@
                     <div class="form-group">
                         <label for="testInputValue${$index}">Expected Value</label>
                         <template if.bind="testInput.valueType === 'Boolean'">  
-                            <select class="form-control" value.bind="testInput.valueType">
+                            <select class="form-control" value.bind="testInput.value">
+                                <option selected="selected" disabled="disabled"></option>
                                 <option>true</option>
                                 <option>false</option>
                             </select>
@@ -56,6 +58,17 @@
                 </template>
                 <button click.delegate="addTestInput()" type="submit" class="btn btn-success">Add Test Input</button> <button type="submit" class="btn btn-success">Create Test</button>
             </form>
+        </div>
+        <div class="col-lg-3 col-lg-offset-1">
+            <h1>${vm.exercise.name} Details</h1>
+            <p><i>${vm.exercise.guidance}</i></p>
+            
+            <h2>Exercise Template</h2>
+            <p>Expected Class Name: <i>${vm.exerciseTemplate.className}</i></p>
+            <p>Expected Main Method Name: <i>${vm.exerciseTemplate.mainMethodName}</i></p>
+            <h3>Initial Code</h3>
+            <p>${vm.exerciseTemplate.initialCode}</p>
+            
         </div>
     </div>
 </template>

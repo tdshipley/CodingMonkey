@@ -88,17 +88,17 @@ export class create {
     }
     
     createTest() {
-        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.id + '/Test';
+        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.id + '/Test/';
         
         let testOutputToCreate = {
-            ValueType: this.vm.test.valueType,
-            Value: this.vm.test.value
+            ValueType: this.vm.test.testOutput.valueType,
+            Value: this.vm.test.testOutput.value
         }
         
-        let testInputToCreate = []
+        var testInputsToCreate = [];
         
         for (let testInput of this.vm.test.testInputs) {
-            this.testInputToCreate.push({
+            testInputsToCreate.push({
                 ArgumentName: testInput.argumentName,
                 ValueType: testInput.valueType,
                 Value: testInput.value
@@ -118,6 +118,7 @@ export class create {
             this.vm.test.id = data.Id;
             this.vm.test.testInputs = data.TestInputs;
             this.vm.test.testOutput = data.TestOutput;
+            this.notify.success("Create Exercise Test succeeded.");
         })
         .catch(err => {
             this.notify.error("Create Exercise Test failed.")

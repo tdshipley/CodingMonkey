@@ -69,7 +69,7 @@ export class list {
                 .then(data => {
                     if(!data.deleted)
                     {
-                        this.notify.error("Deleteing Exercise '" + exerciseName + "' failed.");
+                        this.notify.error("Deleting Exercise '" + exerciseName + "' failed.");
                     }
                     else
                     {
@@ -77,7 +77,7 @@ export class list {
                             return exercise.id !== exerciseId;
                         });
                         
-                        this.notify.success("Deleteing Exercise '" + exerciseName + "' was successful.");
+                        this.notify.success("Deleting Exercise '" + exerciseName + "' was successful.");
                     }
                 });
             }
