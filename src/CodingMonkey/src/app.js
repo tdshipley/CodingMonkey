@@ -126,6 +126,16 @@ export class App {
                 nav: false,
                 title: "Test Details"
             },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id/update',
+                name: 'AdminExerciseTestUpdate',
+                moduleId: './admin/test/update',
+                nav: false,
+                title: "Test Update"
+            }
     ]);
 
     this.router = router;

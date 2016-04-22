@@ -16,7 +16,8 @@
                     <td>${test.description}</td>
                     <td><a route-href="route: AdminExerciseTestDetails;
                                        params.bind: {id: test.id, exerciseId: exerciseId, exerciseTemplateId: exerciseTemplateId}">Details</a></td>
-                    <td>Update</td>
+                    <td><a route-href="route: AdminExerciseTestUpdate;
+                                       params.bind: {id: test.id, exerciseId: exerciseId, exerciseTemplateId: exerciseTemplateId}">Update</a></td>
                     <td><a click.delegate="delete(test.id)">Delete</a></td>
                 </tr>
             </table>

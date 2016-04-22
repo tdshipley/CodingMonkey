@@ -12,7 +12,7 @@ export class create {
         this.notify = toastr;
         this.notify.options.progressBar = true;
         
-        this.heading = "Create Exercise Test";
+        this.heading = "Update Exercise Test";
         this.baseUrl = loc.protocol + "//" + loc.host;
         this.appRouter = router;
         
@@ -21,16 +21,12 @@ export class create {
         });
         
         this.http = http;
-
+        
         this.vm = {
             test: {
                 id: 0,
                 description: "",
-                testOutput: {
-                    id: 0,
-                    valueType: "",
-                    value: ""
-                },
+                testOutput: {},
                 testInputs: []
             },
             exercise: {
@@ -45,13 +41,52 @@ export class create {
                 className: "",
                 mainMethodName: ""
             }
-        };
+        }
     }
     
     activate(params) {
+        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + params.exerciseId + '/Test/';
+        
+        this.http.fetch('details/' + params.id)
+          .then(response => response.json())
+          .then(data => {
+              this.vm.test.id = data.Id
+              this.vm.test.description = data.Description;
+              this.vm.test.testOutput = {
+                    id: data.TestOutput.Id,
+                    valueType: data.TestOutput.ValueType,
+                    value: data.TestOutput.Value
+              }
+              
+              for (let testInput of data.TestInputs) {
+                  let testInputToShow = {
+                      id: testInput.Id,
+                      argumentName: testInput.ArgumentName,
+                      valueType: testInput.ValueType,
+                      value: testInput.Value
+                  }
+                  
+                  this.vm.test.testInputs.push(testInputToShow);
+              }
+          })
+          .then(() => {
+              this.getExercise(params.exerciseId);
+          })
+          .then(() => {
+              this.getExerciseTemplate(params.exerciseId, params.exerciseTemplateId);
+          })
+          .catch(err => {
+              console.log(err);
+              this.notify.error("Failed to get test.")
+          });
+          
+          this.valueTypeList = ["Boolean", "Integer", "String"];
+    }
+    
+    getExercise(exerciseId) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/';
         
-        this.http.fetch('details/' + params.exerciseId)
+        this.http.fetch('details/' + exerciseId)
           .then(response => response.json())
           .then(data => {
               this.vm.exercise.id = data.Id
@@ -59,14 +94,9 @@ export class create {
               this.vm.exercise.guidance = data.Guidance;
               this.vm.exercise.categoryids = data.CategoryIds;
           })
-          .then(() => {
-              this.getExerciseTemplate(params.exerciseId, params.exerciseTemplateId)
-          })
           .catch(err => {
-              this.notify.error("Failed to get Exercise and Exercise Template")
-          });
-          
-          this.valueTypeList = ["Boolean", "Integer", "String"];
+              this.notify.error("Failed to get Exercise for Exercise Test.")
+          })
     }
     
     getExerciseTemplate(exerciseId, exerciseTemplateId) {
@@ -81,50 +111,49 @@ export class create {
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
           })
           .catch(err => {
-              this.notify.error("Failed to get Exercise Template for Exercise.")
+              this.notify.error("Failed to get Exercise Template for Exercise Test.")
           });
           
           this.heading = "Create Test for Exercise: " + this.vm.exercise.name;
     }
     
-    createTest() {
-        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.id + '/Test/';
+    updateTest() {
+        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.exerciseId + '/Test/';
         
-        let testOutputToCreate = {
-            ValueType: this.vm.test.testOutput.valueType,
-            Value: this.vm.test.testOutput.value
-        }
+        let testInputsToUpdate = [];
         
-        var testInputsToCreate = [];
-        
-        for (let testInput of this.vm.test.testInputs) {
-            testInputsToCreate.push({
+        for(let testInput of this.vm.test.testInputs) {
+            testInputsToUpdate.push({
+                Id: testInput.id,
                 ArgumentName: testInput.argumentName,
                 ValueType: testInput.valueType,
                 Value: testInput.value
-            })
+            });
         }
         
-        this.http.fetch('create', {
+        this.http.fetch('update/' + this.vm.test.id, {
             method: 'post',
             body: json({
+                Id: this.vm.test.id,
                 Description: this.vm.test.description,
-                TestInputs: testInputsToCreate,
-                TestOutput: testOutputToCreate
+                TestOutput: {
+                    Id: this.vm.test.testOutput.id,
+                    Value: this.vm.test.testOutput.value,
+                    ValueType: this.vm.test.testOutput.valueType
+                },
+                TestInputs: testInputsToUpdate
             })
         })
         .then(response => response.json())
         .then(data => {
-            this.vm.test.id = data.Id;
-            this.vm.test.testInputs = data.TestInputs;
-            this.vm.test.testOutput = data.TestOutput;
-            this.notify.success("Create Exercise Test succeeded.");
+            this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
             this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
         })
         .catch(err => {
-            this.notify.error("Create Exercise Test failed.")
-        });
+            this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.");
+        })
     }
+    
     
     addTestInput() {      
         this.vm.test.testInputs.push({

@@ -20,7 +20,6 @@ export class details {
         
         this.http = http;
         
-        this.hasCategories = false;
         this.vm = {
             test: {
                 id: 0,
