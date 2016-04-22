@@ -118,7 +118,7 @@ export class create {
     }
     
     updateTest() {
-        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.exerciseId + '/Test/';
+        this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.id + '/Test/';
         
         let testInputsToUpdate = [];
         
@@ -146,8 +146,14 @@ export class create {
         })
         .then(response => response.json())
         .then(data => {
-            this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
-            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+            console.log(data);
+            console.log(this.vm);
+            if(data.updated == false) {
+                this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.")
+            } else {
+                this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+            }
         })
         .catch(err => {
             this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.");
