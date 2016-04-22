@@ -2,8 +2,8 @@
     <div class="row top-buffer">
         <div class="col-lg-8 col-lg-offset-1">
             <h1>${heading}</h1>
-            <p>Test Description</p>
-            <p><i>${vm.exercise.guidance}</i></p>
+            <h2>Test Description</h2>
+            <p><i>${vm.test.description}</i></p>
         </div>
     </div>
     <div class="row top-buffer">
@@ -38,6 +38,12 @@
                     <td>${vm.test.testOutput.value}</td>
                 </tr>
             </table>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <hr />
+            <button class="btn btn-primary" click.delegate="goToTestList()">Go To Test List</button>
         </div>
     </div>
 </template>
