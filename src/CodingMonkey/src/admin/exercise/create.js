@@ -153,4 +153,8 @@ export class create {
     toggleAddCategoryForm() {
         this.showAddCategoryForm = !this.showAddCategoryForm;
     }
+    
+    goToExerciseList() {
+        this.appRouter.navigate("admin/exercises");
+    }
 }

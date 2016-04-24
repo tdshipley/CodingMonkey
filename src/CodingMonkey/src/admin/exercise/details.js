@@ -105,4 +105,8 @@ export class details {
     goToTestList() {
         this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
     }
+    
+    goToExerciseList() {
+        this.appRouter.navigate("admin/exercises");
+    }
 }
