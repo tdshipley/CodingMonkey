@@ -224,14 +224,12 @@
             {
                 try
                 {
-                    exerciseToDelete.ExerciseExerciseCategories.Clear();
                     CodingMonkeyContext.Exercises.Remove(exerciseToDelete);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    result["excep"] = ex;
                     result["deleted"] = false;
                     result["reason"] = "exception thrown";
                 }

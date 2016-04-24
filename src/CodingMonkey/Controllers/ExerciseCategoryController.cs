@@ -176,10 +176,6 @@ namespace CodingMonkey.Controllers
             {
                 try
                 {
-                    //Remove category assignments
-                    exerciseCategoryToDelete.ExerciseExerciseCategories.RemoveAll(
-                        x => x.ExerciseCategoryId == exerciseCategoryToDelete.ExerciseCategoryId);
-
                     CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategoryToDelete);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;

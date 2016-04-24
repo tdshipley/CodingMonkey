@@ -78,7 +78,7 @@ export class list {
                             return exerciseCatgeory.id !== exerciseCategoryId;
                         });
                         
-                        this.notify.success("Deleting Exercise Category '" + exerciseCatgeoryName + "' was successful.");
+                        this.notify.success("Deleting Exercise Category '" + exerciseCategoryName + "' was successful.");
                     }
                 });
             }
