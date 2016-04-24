@@ -229,8 +229,9 @@
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    result["excep"] = ex;
                     result["deleted"] = false;
                     result["reason"] = "exception thrown";
                 }

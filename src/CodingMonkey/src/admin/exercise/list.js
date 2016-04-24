@@ -69,6 +69,7 @@ export class list {
                 .then(data => {
                     if(!data.deleted)
                     {
+                        console.log(data);
                         this.notify.error("Deleting Exercise '" + exerciseName + "' failed.");
                     }
                     else
