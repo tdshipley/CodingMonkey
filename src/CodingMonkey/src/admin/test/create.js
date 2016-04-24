@@ -87,7 +87,7 @@ export class create {
           this.heading = "Create Test for Exercise: " + this.vm.exercise.name;
     }
     
-    createTest() {
+    createTest(addAnotherTest) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + this.vm.exercise.id + '/Test/';
         
         let testOutputToCreate = {
@@ -119,7 +119,21 @@ export class create {
             this.vm.test.testInputs = data.TestInputs;
             this.vm.test.testOutput = data.TestOutput;
             this.notify.success("Create Exercise Test succeeded.");
-            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+            if(addAnotherTest) {
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/test/create");
+                this.vm.test = {
+                    id: 0,
+                    description: "",
+                    testOutput: {
+                        id: 0,
+                        valueType: "Boolean",
+                        value: ""
+                    },
+                    testInputs: []
+                };
+            } else {
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+            }
         })
         .catch(err => {
             this.notify.error("Create Exercise Test failed.")
@@ -140,5 +154,9 @@ export class create {
             this.vm.test.testInputs.splice(index, 1);
         }
         return false;
+    }
+    
+    goToTestList() {
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
     }
 }

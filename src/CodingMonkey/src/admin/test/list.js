@@ -1,14 +1,16 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
+import {Router} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {DialogPrompt} from '../../dialog-prompt';
 import toastr from 'toastr';
 
-@inject(HttpClient, DialogService)
+@inject(HttpClient, DialogService, Router)
 export class list {
-    constructor(http, dialogService) {
+    constructor(http, dialogService, router) {
         this.dialogService = dialogService;
+        this.appRouter = router;
 
         this.notify = toastr;
         this.notify.options.progressBar = true;
@@ -103,5 +105,13 @@ export class list {
                 });
             }
         });
+    }
+    
+    goToCreateTest() {
+        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/" + this.exerciseTemplateId + "/test/create");
+    }
+    
+    goToExercise() {
+        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/" + this.exerciseTemplateId);
     }
 }

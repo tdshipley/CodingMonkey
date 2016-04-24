@@ -176,4 +176,8 @@ export class create {
         }
         return false;
     }
+    
+    goToTestList() {
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+    }
 }
