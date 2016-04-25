@@ -42,4 +42,8 @@ export class categories {
               this.notify.error("Failed to get exercise categories.")
           });
     }
+    
+    goToExercisesInCategory(categoryId) {
+        this.appRouter.navigate("category/" + categoryId + "/exercises");
+    }
 }
