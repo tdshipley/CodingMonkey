@@ -1,16 +1,18 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
+import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 
-@inject(HttpClient)
+@inject(HttpClient, Router)
 export class details {
-        constructor(http) {
+        constructor(http, router) {
         var loc = window.location;
         
         this.heading = "Exercise Category Details";
         this.baseUrl = loc.protocol + "//" + loc.host;
         
+        this.appRouter = router;
         this.notify = toastr;
         this.notify.options.progressBar = true;
         
@@ -73,5 +75,9 @@ export class details {
                 })
             }
         }
+    }
+    
+    goToExerciseCategoryList() {
+        this.appRouter.navigate("admin/exercise/categories");
     }
 }

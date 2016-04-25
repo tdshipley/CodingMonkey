@@ -24,11 +24,19 @@
 
 /* ### Boostrap Additional ### */
 .top-buffer {
-    margin-top:20px;
+    margin-top:20px !important;
+}
+
+.bottom-buffer {
+    margin-bottom:20px !important;
 }
 
 .small-top-buffer {
-    margin-top: 5px;
+    margin-top: 5px !important;
+}
+
+.small-bottom-buffer {
+    margin-bottom: 5px !important; 
 }
 
 @media (min-width: 979px) {

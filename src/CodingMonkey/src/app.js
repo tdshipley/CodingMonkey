@@ -95,6 +95,46 @@ export class App {
                 moduleId: './admin/exercise-category/update',
                 nav: false,
                 title: 'Exercise Category Update'
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/create',
+                name: 'AdminExerciseTestCreate',
+                moduleId: './admin/test/create',
+                nav: false,
+                title: 'Test Create'
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/tests',
+                name: 'AdminExerciseTests',
+                moduleId: './admin/test/list',
+                nav: false,
+                title: 'Exercise Tests List'
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id',
+                name: 'AdminExerciseTestDetails',
+                moduleId: './admin/test/details',
+                nav: false,
+                title: "Test Details"
+            },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id/update',
+                name: 'AdminExerciseTestUpdate',
+                moduleId: './admin/test/update',
+                nav: false,
+                title: "Test Update"
             }
     ]);
 

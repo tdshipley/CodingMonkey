@@ -1,16 +1,18 @@
 import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
+import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 
-@inject(HttpClient)
+@inject(HttpClient, Router)
 export class details {
-        constructor(http) {
+        constructor(http, router) {
         var loc = window.location;
         
         this.heading = "Exercise Details";
         this.baseUrl = loc.protocol + "//" + loc.host;
         
+        this.appRouter = router;
         this.notify = toastr;
         this.notify.options.progressBar = true;
         
@@ -24,11 +26,13 @@ export class details {
         this.hasCategories = false;
         this.vm = {
             exercise: {
+                id: 0,
                 name: "",
                 guidance: "",
                 categoryids: []
             },
             exerciseTemplate: {
+                id: 0,
                 initialCode: "",
                 className: "",
                 mainMethodName: ""
@@ -41,6 +45,7 @@ export class details {
         this.http.fetch('details/' + params.id)
           .then(response => response.json())
           .then(data => {
+              this.vm.exercise.id = data.Id;
               this.vm.exercise.name = data.Name;
               this.vm.exercise.guidance = data.Guidance;
               this.vm.exercise.categoryids = data.CategoryIds;
@@ -52,7 +57,7 @@ export class details {
               this.getExerciseCategoriesForExercise(this.vm.exercise.categoryids);
           })
           .catch(err => {
-              console.log(err);
+              this.notify.error("Failed to get exercise.")
           });
     }
     
@@ -62,6 +67,7 @@ export class details {
         this.http.fetch('details/' + exerciseTemplateId)
           .then(response => response.json())
           .then(data => {
+              this.vm.exerciseTemplate.id = data.Id;
               this.vm.exerciseTemplate.initialCode = data.InitialCode;
               this.vm.exerciseTemplate.className = data.ClassName;
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
@@ -94,5 +100,13 @@ export class details {
                 })
             }
         }
+    }
+    
+    goToTestList() {
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+    }
+    
+    goToExerciseList() {
+        this.appRouter.navigate("admin/exercises");
     }
 }

@@ -72,7 +72,7 @@ namespace CodingMonkey.Migrations
                         column: x => x.ExerciseExerciseId,
                         principalTable: "Exercise",
                         principalColumn: "ExerciseId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.CreateTable(
                 name: "ExerciseExerciseCategory",
@@ -116,7 +116,7 @@ namespace CodingMonkey.Migrations
                         column: x => x.TestTestId,
                         principalTable: "Test",
                         principalColumn: "TestId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.CreateTable(
                 name: "TestOutput",
