@@ -36,6 +36,16 @@ export class App {
                 nav: true,
                 title: 'Exercise Categories'
             },
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'category/:exerciseCategoryId/exercises',  
+                name: 'CategoryExercises',
+                moduleId: './exercise-selector/exercises',
+                nav: false,
+                title: 'Exercises in Category'
+            },
             // Admin Routes
             {
                 settings: {

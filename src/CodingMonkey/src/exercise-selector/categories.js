@@ -4,7 +4,7 @@ import {Router} from 'aurelia-router';
 import 'fetch';
 
 @inject(HttpClient, Router)
-export class create {
+export class categories {
     constructor(http, router) {
         this.heading = "Select a Category";
         

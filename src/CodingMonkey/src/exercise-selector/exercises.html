@@ -1,0 +1,19 @@
+<template>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>${heading}</h1>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-md-2 col-lg-offset-1">
+            <div repeat.for="exercise of vm.exercises" class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">${exercise.name}</h3>
+                </div>
+                <div class="panel-body">
+                    ${exercise.guidance}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
