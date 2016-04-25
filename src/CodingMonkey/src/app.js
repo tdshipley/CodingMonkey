@@ -5,9 +5,10 @@ export class App {
     config.title = 'Coding Monkey';
     config.map(
         [
+            // User Routes
             {
                 settings: {
-                    group: 'root'
+                    group: 'user'
                 },
                 route: ['', 'welcome'],
                 name: 'welcome',
@@ -17,7 +18,7 @@ export class App {
             },
             {
                 settings: {
-                    group: 'root'
+                    group: 'user'
                 },
                 route: 'code/editor',  
                 name: 'CodeEditor',
@@ -25,7 +26,17 @@ export class App {
                 nav: true,
                 title: 'Code Editor'
             },
-            // Admin
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'categories',  
+                name: 'Categories',
+                moduleId: './exercise-selector/categories',
+                nav: true,
+                title: 'Exercise Categories'
+            },
+            // Admin Routes
             {
                 settings: {
                     group: 'admin'
