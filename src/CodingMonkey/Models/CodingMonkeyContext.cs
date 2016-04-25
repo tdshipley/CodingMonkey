@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 
 namespace CodingMonkey.Models
 {
@@ -17,7 +18,8 @@ namespace CodingMonkey.Models
             modelBuilder.Entity<Exercise>()
                 .HasOne(t => t.Template)
                 .WithOne(e => e.Exercise)
-                .HasForeignKey<ExerciseTemplate>(tfk => tfk.ExerciseForeignKey);
+                .HasForeignKey<ExerciseTemplate>(tfk => tfk.ExerciseForeignKey)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Exercise / Exercise Category Many to Many Relationships
             // EF 7 Doesn't yet support creating Join tables itself
@@ -28,22 +30,25 @@ namespace CodingMonkey.Models
             modelBuilder.Entity<ExerciseExerciseCategory>()
                 .HasOne(e => e.Exercise)
                 .WithMany(ec => ec.ExerciseExerciseCategories)
-                .HasForeignKey(eid => eid.ExerciseId);
+                .HasForeignKey(eid => eid.ExerciseId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ExerciseExerciseCategory>()
                 .HasOne(ec => ec.ExerciseCategory)
                 .WithMany(c => c.ExerciseExerciseCategories)
-                .HasForeignKey(ecid => ecid.ExerciseCategoryId);
+                .HasForeignKey(ecid => ecid.ExerciseCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Exercise>().HasMany(t => t.Tests).WithOne(e => e.Exercise);
+            modelBuilder.Entity<Exercise>().HasMany(t => t.Tests).WithOne(e => e.Exercise).OnDelete(DeleteBehavior.Cascade);
 
             // Test Relationships
             modelBuilder.Entity<Test>()
                 .HasOne(to => to.TestOutput)
                 .WithOne(t => t.Test)
-                .HasForeignKey<TestOutput>(tofk => tofk.TestForeignKey);
+                .HasForeignKey<TestOutput>(tofk => tofk.TestForeignKey)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Test>().HasMany(ti => ti.TestInputs).WithOne(t => t.Test);
+            modelBuilder.Entity<Test>().HasMany(ti => ti.TestInputs).WithOne(t => t.Test).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -91,7 +91,7 @@ export class create {
         })
         .then(() => {
             this.notify.success("Created Exercise '" + this.vm.exercise.name + "'");
-            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id);
+            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/test/create");
         })
         .catch(err => {
             this.notify.error("Create Exercise Template for Exercise failed.")
@@ -152,5 +152,9 @@ export class create {
     
     toggleAddCategoryForm() {
         this.showAddCategoryForm = !this.showAddCategoryForm;
+    }
+    
+    goToExerciseList() {
+        this.appRouter.navigate("admin/exercises");
     }
 }

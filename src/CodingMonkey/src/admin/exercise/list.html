@@ -2,13 +2,17 @@
     <div class="row top-buffer">
         <div class="col-lg-10 col-lg-offset-1">
             <h1>${heading}</h1>
-
+            <hr/>
+            <button class="btn btn-primary" click.delegate="goToCreateExercise()">Create Exercise</button>
+            <hr/>
             <table class="table table-striped">
                 <tr>
                     <th>Id</th>
                     <th>Name</th>
                     <th>Guidance</th>
                     <th>Actions</th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -21,6 +25,10 @@
                     <td><a route-href="route: AdminExerciseUpdate;
                                        params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Update</a></td>
                     <td><a click.delegate="delete(exercise.name, exercise.id)">Delete</a></td>
+                    <td><a route-href="route: AdminExerciseTestCreate;
+                                       params.bind: {exerciseId: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Add Test</a></td>
+                    <td><a route-href="route: AdminExerciseTests;
+                                       params.bind: {exerciseId: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">View Tests</a></td>
                 </tr>
             </table>
         </div>

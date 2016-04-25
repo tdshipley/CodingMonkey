@@ -311,15 +311,6 @@
             {
                 try
                 {
-                    // Remove test inputs
-                    foreach (var testInput in testToDelete.TestInputs)
-                    {
-                        CodingMonkeyContext.TestInputs.Remove(testInput);
-                    }
-
-                    // Remove test output
-                    CodingMonkeyContext.TestOutputs.Remove(testToDelete.TestOutput);
-
                     CodingMonkeyContext.Tests.Remove(testToDelete);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;

@@ -224,7 +224,6 @@
             {
                 try
                 {
-                    exerciseToDelete.ExerciseExerciseCategories.Clear();
                     CodingMonkeyContext.Exercises.Remove(exerciseToDelete);
                     CodingMonkeyContext.SaveChanges();
                     result["deleted"] = true;

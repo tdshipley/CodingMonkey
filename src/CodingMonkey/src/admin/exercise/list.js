@@ -1,17 +1,20 @@
 ﻿import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
+import {Router} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {DialogPrompt} from '../../dialog-prompt';
 import toastr from 'toastr';
 
-@inject(HttpClient, DialogService)
+@inject(HttpClient, DialogService, Router)
 export class list {
-    constructor(http, dialogService) {
+    constructor(http, dialogService, router) {
         this.dialogService = dialogService;
 
         this.notify = toastr;
         this.notify.options.progressBar = true;
+        
+        this.appRouter = router;
         
         var loc = window.location;
         this.heading = "Exercises";
@@ -69,7 +72,8 @@ export class list {
                 .then(data => {
                     if(!data.deleted)
                     {
-                        this.notify.error("Deleteing Exercise '" + exerciseName + "' failed.");
+                        console.log(data);
+                        this.notify.error("Deleting Exercise '" + exerciseName + "' failed.");
                     }
                     else
                     {
@@ -77,10 +81,14 @@ export class list {
                             return exercise.id !== exerciseId;
                         });
                         
-                        this.notify.success("Deleteing Exercise '" + exerciseName + "' was successful.");
+                        this.notify.success("Deleting Exercise '" + exerciseName + "' was successful.");
                     }
                 });
             }
         });
+    }
+    
+    goToCreateExercise() {
+        this.appRouter.navigate("admin/exercise/create");
     }
 }
