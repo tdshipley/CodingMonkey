@@ -2,23 +2,51 @@
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
 import 'ace';
+import toastr from 'toastr';
 
 @inject(HttpClient)
-export class Editor {
+export class Editor {    
     constructor(http) {
+        this.heading = "";
+
+        var loc = window.location;
+        this.baseUrl = loc.protocol + "//" + loc.host;
+        
+        this.notify = toastr;
+        this.notify.options.progressBar = true;
+        
         http.configure(config => {
             config
-                .useStandardConfiguration()
-                .withBaseUrl('http://localhost:9000/api/CodeExecution/');
+                .useStandardConfiguration();
         });
 
         this.http = http;
         this.vm = this;
         this.markedLines = [];
+        
+        this.vm = {
+            exercise: {
+                id: 0,
+                name: "",
+                guidance: "",
+                categoryids: []
+            },
+            exerciseTemplate: {
+                id: 0,
+                initialCode: "",
+                className: "",
+                mainMethodName: ""
+            }
+        }
+        
+        this.exerciseId = 0;
     }
 
-    // Run this code after page has loaded
-    attached() {
+    activate(params) {      
+        this.exerciseId = params.exerciseId;
+    }
+
+    attached(params) {
         //Config for ace - https://github.com/jspm/registry/issues/38#issuecomment-168572405
         let base = System.normalizeSync('ace');
         base = base.substr(0, base.length - 3);
@@ -28,12 +56,53 @@ export class Editor {
         this.codeEditor = ace.edit("aceEditor");
         this.codeEditor.setTheme("ace/theme/monokai");
         this.codeEditor.getSession().setMode("ace/mode/csharp");
+        
+        this.getExerciseTemplate(this.exerciseId);
+    }
+    
+    getExerciseTemplate(exerciseId) {
+        this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/"
 
-        //Set Value
-        this.codeEditor.setValue("public class Numbers  \n{\n    public int ReturnNumber6()\n    {\n        return 6;\n    }\n}", -1);
+        this.http.fetch('details')
+            .then(response => response.json())
+            .then(data => {
+                this.vm.exerciseTemplate.id = data.Id;
+                this.vm.exerciseTemplate.initialCode = data.InitialCode;
+                this.vm.exerciseTemplate.className = data.ClassName;
+                this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
+            })
+            .then(() => {
+                this.codeEditor.setValue(this.vm.exerciseTemplate.initialCode, -1);
+                this.getExercise(this.exerciseId);
+            })
+            .catch(err => {
+            console.log(err);
+                this.notify.error('Failed to get exercise template.')
+            });
+    }
+    
+    getExercise(exerciseId) {
+        this.http.baseUrl = this.baseUrl + "/api/Exercise/";
+        
+        this.http.fetch('details/' + exerciseId)
+            .then(response => response.json())
+            .then(data => {
+                this.vm.exercise.id = data.Id;
+                this.vm.exercise.name = data.Name;
+                this.vm.exercise.guidance = data.Guidance;
+                this.vm.exercise.categoryids = data.CategoryIds;
+            })
+            .then(() => {
+                this.heading = this.vm.exercise.name;
+            })
+            .catch(err => {
+                this.notify.error('Failed to get exercise.')
+            });
     }
 
     submitCodeToExecute() {
+        this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
+
         this.http.fetch('Execute', {
             method: 'post',
             body: json({code: this.codeEditor.getValue()})
@@ -49,6 +118,8 @@ export class Editor {
     }
 
     submitCodeToCompile() {
+        this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
+        
         this.http.fetch('Compile', {
             method: 'post',
             body: json({code: this.codeEditor.getValue()})
