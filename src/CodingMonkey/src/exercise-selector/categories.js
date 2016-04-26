@@ -2,6 +2,7 @@ import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
+import toastr from 'toastr';
 
 @inject(HttpClient, Router)
 export class categories {
@@ -11,6 +12,9 @@ export class categories {
         var loc = window.location;
         this.baseUrl = loc.protocol + "//" + loc.host;
         this.appRouter = router;
+        
+        this.notify = toastr;
+        this.notify.options.progressBar = true;
         
         http.configure(config => {
            config.useStandardConfiguration()

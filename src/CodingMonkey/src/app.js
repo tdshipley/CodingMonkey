@@ -20,10 +20,10 @@ export class App {
                 settings: {
                     group: 'user'
                 },
-                route: 'code/editor',  
+                route: 'code/editor/:exerciseId',  
                 name: 'CodeEditor',
                 moduleId: './code/editor',
-                nav: true,
+                nav: false,
                 title: 'Code Editor'
             },
             {
@@ -61,7 +61,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:id/:exerciseTemplateId',
+                route: 'admin/exercise/:id/',
                 name: 'AdminExerciseDetails',
                 moduleId: './admin/exercise/details',
                 nav: false,
@@ -71,7 +71,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:id/:exerciseTemplateId/update',
+                route: 'admin/exercise/:id/update',
                 name: 'AdminExerciseUpdate',
                 moduleId: './admin/exercise/update',
                 nav: false,
@@ -121,7 +121,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/create',
+                route: 'admin/exercise/:exerciseId/test/create',
                 name: 'AdminExerciseTestCreate',
                 moduleId: './admin/test/create',
                 nav: false,
@@ -131,7 +131,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/tests',
+                route: 'admin/exercise/:exerciseId/tests',
                 name: 'AdminExerciseTests',
                 moduleId: './admin/test/list',
                 nav: false,
@@ -141,7 +141,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id',
+                route: 'admin/exercise/:exerciseId/test/:id',
                 name: 'AdminExerciseTestDetails',
                 moduleId: './admin/test/details',
                 nav: false,
@@ -151,7 +151,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id/update',
+                route: 'admin/exercise/:exerciseId/test/:id/update',
                 name: 'AdminExerciseTestUpdate',
                 moduleId: './admin/test/update',
                 nav: false,

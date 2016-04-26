@@ -60,7 +60,7 @@ export class create {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.exerciseId, params.exerciseTemplateId)
+              this.getExerciseTemplate(params.exerciseId)
           })
           .catch(err => {
               this.notify.error("Failed to get Exercise and Exercise Template")
@@ -69,10 +69,10 @@ export class create {
           this.valueTypeList = ["Boolean", "Integer", "String"];
     }
     
-    getExerciseTemplate(exerciseId, exerciseTemplateId) {
+    getExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
         
-        this.http.fetch('details/' + exerciseTemplateId)
+        this.http.fetch('details')
           .then(response => response.json())
           .then(data => {
               this.vm.exerciseTemplate.id = data.Id;
@@ -120,7 +120,7 @@ export class create {
             this.vm.test.testOutput = data.TestOutput;
             this.notify.success("Create Exercise Test succeeded.");
             if(addAnotherTest) {
-                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/test/create");
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/test/create");
                 this.vm.test = {
                     id: 0,
                     description: "",
@@ -132,7 +132,7 @@ export class create {
                     testInputs: []
                 };
             } else {
-                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
             }
         })
         .catch(err => {
@@ -157,6 +157,6 @@ export class create {
     }
     
     goToTestList() {
-        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
     }
 }

@@ -28,12 +28,10 @@ export class list {
         this.testList = [];
         
         this.exerciseId = 0;
-        this.exerciseTemplateId = 0;
     }
 
     activate(params) {
         this.exerciseId = params.exerciseId;
-        this.exerciseTemplateId = params.exerciseTemplateId;
         
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + params.exerciseId + '/Test/';
         
@@ -108,10 +106,10 @@ export class list {
     }
     
     goToCreateTest() {
-        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/" + this.exerciseTemplateId + "/test/create");
+        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/test/create");
     }
     
     goToExercise() {
-        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/" + this.exerciseTemplateId);
+        this.appRouter.navigate("admin/exercise/" + this.exerciseId);
     }
 }

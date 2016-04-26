@@ -18,12 +18,11 @@ namespace CodingMonkey.Controllers
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
         [HttpGet]
-        [Route("{id}")]
-        public JsonResult Details(int exerciseId, int id)
+        public JsonResult Details(int exerciseId)
         {
             var exerciseTemplate =
                 CodingMonkeyContext.ExerciseTemplates.Include(e => e.Exercise)
-                    .SingleOrDefault(e => e.ExerciseTemplateId == id);
+                    .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
             if (exerciseTemplate == null)
             {
@@ -92,8 +91,7 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpPost]
-        [Route("{id}")]
-        public JsonResult Update(int exerciseId, int id, [FromBody] ExerciseTemplateViewModel vm)
+        public JsonResult Update(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
             if (vm == null)
             {
@@ -103,7 +101,7 @@ namespace CodingMonkey.Controllers
             var exceptionResult = new Dictionary<string, dynamic>();
             var exerciseTemplate =
                 CodingMonkeyContext.ExerciseTemplates.Include(et => et.Exercise)
-                    .SingleOrDefault(e => e.ExerciseTemplateId == id);
+                    .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
             if (exerciseTemplate == null)
             {
@@ -139,12 +137,11 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
-        public JsonResult Delete(int id)
+        public JsonResult Delete(int exerciseId)
         {
             var result = new Dictionary<string, dynamic>();
             var exerciseTemplate = CodingMonkeyContext.ExerciseTemplates.SingleOrDefault(
-                e => e.ExerciseTemplateId == id);
+                e => e.Exercise.ExerciseId == exerciseId);
 
             if (exerciseTemplate == null)
             {

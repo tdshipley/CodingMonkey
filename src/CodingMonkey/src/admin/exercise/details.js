@@ -51,7 +51,7 @@ export class details {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.id, params.exerciseTemplateId)
+              this.getExerciseTemplate(params.id)
           })
           .then(() => {
               this.getExerciseCategoriesForExercise(this.vm.exercise.categoryids);
@@ -61,10 +61,10 @@ export class details {
           });
     }
     
-    getExerciseTemplate(exerciseId, exerciseTemplateId) {
+    getExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
         
-        this.http.fetch('details/' + exerciseTemplateId)
+        this.http.fetch('details')
           .then(response => response.json())
           .then(data => {
               this.vm.exerciseTemplate.id = data.Id;
@@ -103,7 +103,7 @@ export class details {
     }
     
     goToTestList() {
-        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
     }
     
     goToExerciseList() {

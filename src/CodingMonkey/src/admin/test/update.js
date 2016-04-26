@@ -73,7 +73,7 @@ export class create {
               this.getExercise(params.exerciseId);
           })
           .then(() => {
-              this.getExerciseTemplate(params.exerciseId, params.exerciseTemplateId);
+              this.getExerciseTemplate(params.exerciseId);
           })
           .catch(err => {
               console.log(err);
@@ -99,10 +99,10 @@ export class create {
           })
     }
     
-    getExerciseTemplate(exerciseId, exerciseTemplateId) {
+    getExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
         
-        this.http.fetch('details/' + exerciseTemplateId)
+        this.http.fetch('details')
           .then(response => response.json())
           .then(data => {
               this.vm.exerciseTemplate.id = data.Id;
@@ -152,7 +152,7 @@ export class create {
                 this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.")
             } else {
                 this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
-                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
             }
         })
         .catch(err => {
@@ -178,6 +178,6 @@ export class create {
     }
     
     goToTestList() {
-        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id + "/tests");
+        this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
     }
 }
