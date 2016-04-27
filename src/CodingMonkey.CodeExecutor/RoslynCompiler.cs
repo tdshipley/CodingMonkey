@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 
 namespace CodingMonkey.CodeExecutor
 {
+    using System.Threading;
+
     public struct TestInput
     {
         public string ArgumentName;
@@ -20,20 +22,18 @@ namespace CodingMonkey.CodeExecutor
 
     public class RoslynCompiler
     {
-        private static ScriptState<object> scriptState = null;
-
-        public static IList<CompilerError> Compile(string code)
+        public IList<CompilerError> Compile(string code)
         {
             var script = CSharpScript.Create(code);
             IList<Diagnostic> errorsFromSource = script.Compile();
             return errorsFromSource.Select(error => new CompilerError(error)).ToList();
         }
 
-        public static object Execute(string code, string className, string mainMethodName, List<TestInput> inputs)
+        public async Task<object> Execute(string code, string className, string mainMethodName, List<TestInput> inputs)
         {
-            ExecuteCode(code);
-
-            string executionCode = $"new {className}().{mainMethodName}(";
+            // Statements need a return in front of them to get the value see:
+            // https://github.com/dotnet/roslyn/issues/5279
+            string executionCode = $"return new {className}().{mainMethodName}(";
 
             foreach(var input in inputs)
             {
@@ -49,15 +49,9 @@ namespace CodingMonkey.CodeExecutor
 
             executionCode = executionCode.TrimEnd(',') + ");";
 
-            return ExecuteCode(executionCode);
-        }
+            var script = CSharpScript.Create(code).ContinueWith(executionCode);
 
-        private static object ExecuteCode(string code)
-        {
-            scriptState = scriptState == null ? CSharpScript.RunAsync(code).Result : scriptState.ContinueWithAsync(code).Result;
-            if (scriptState.ReturnValue != null && !string.IsNullOrEmpty(scriptState.ReturnValue.ToString()))
-                return scriptState.ReturnValue;
-            return null;
+            return (await script.RunAsync()).ReturnValue;
         }
     }
 }

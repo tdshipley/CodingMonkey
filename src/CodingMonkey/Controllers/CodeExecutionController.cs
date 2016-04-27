@@ -6,6 +6,7 @@
     using Microsoft.AspNet.Mvc;
     using CodingMonkey.CodeExecutor;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Microsoft.Data.Entity;
 
@@ -18,7 +19,7 @@
         [HttpPost]
         public JsonResult Compile(int id, [FromBody] CodeEditorViewModel model)
         {
-            var result = RoslynCompiler.Compile(model.Code);
+            var result = new RoslynCompiler().Compile(model.Code);
 
             if (result == null || result.Count == 0)
             {
@@ -50,7 +51,7 @@
         }
 
         [HttpPost]
-        public JsonResult Execute(int id, [FromBody] CodeEditorViewModel model)
+        public async Task<JsonResult> Execute(int id, [FromBody] CodeEditorViewModel model)
         {
             var exercise = CodingMonkeyContext.Exercises
                                               .Include(e => e.Template)
@@ -108,10 +109,12 @@
                 }
             }
 
-            model.Output = RoslynCompiler.Execute(model.Code,
-                                                  exercise.Template.ClassName,
-                                                  exercise.Template.MainMethodName,
-                                                  inputs);
+
+            var compiler = new RoslynCompiler();
+            model.Output = await compiler.Execute(model.Code,
+                                            exercise.Template.ClassName,
+                                            exercise.Template.MainMethodName,
+                                            inputs);
 
             return Json(model);
         }
