@@ -16,7 +16,6 @@ namespace CodingMonkey.ViewModels
         public bool HasErrors { get; set; }
         public IList<CompilerErrorViewModel> Errors { get; set; }
         public IList<TestResultViewModel> TestResults { get; set; }
-        public object Output { get; set; }
     }
 
     public class TestResultViewModel
@@ -26,11 +25,12 @@ namespace CodingMonkey.ViewModels
         public IList<TestResultInputViewModel> Inputs { get; set; } 
         public object ExpectedOutput { get; set; }
         public object ActualOutput { get; set; }
+        public bool TestPassed { get; set; }
     }
 
     public struct TestResultInputViewModel
     {
-        public string Argumentname { get; set; }
-        public string Value { get; set; }
+        public string ArgumentName { get; set; }
+        public object Value { get; set; }
     }
 }

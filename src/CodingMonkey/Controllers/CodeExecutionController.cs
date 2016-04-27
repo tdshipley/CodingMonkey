@@ -10,6 +10,8 @@
 
     using Microsoft.Data.Entity;
 
+    using TestInput = CodingMonkey.Models.TestInput;
+
     [Route("api/[controller]/[action]/{id}")]
     public class CodeExecutionController : Controller
     {
@@ -56,6 +58,7 @@
             var exercise = CodingMonkeyContext.Exercises
                                               .Include(e => e.Template)
                                               .Include(e => e.Tests).ThenInclude(t => t.TestInputs)
+                                              .Include(e => e.Tests).ThenInclude(t => t.TestOutput)
                                               .SingleOrDefault(e => e.ExerciseId == id);
 
             if (exercise == null || exercise.Template == null)
@@ -63,60 +66,133 @@
                 return Json(string.Empty);
             }
 
-            // Just *testing* (ha) that this works
-            var firstTest = exercise.Tests.First();
-            
-            List<CodingMonkey.CodeExecutor.TestInput> inputs = new List<CodingMonkey.CodeExecutor.TestInput>(); 
-            foreach (var item in firstTest.TestInputs)
+            model.TestResults = new List<TestResultViewModel>();
+
+            // Run Tests
+            foreach (var test in exercise.Tests)
             {
-                switch (item.ValueType)
+                // Create View Model for result
+                TestResultViewModel testResult = new TestResultViewModel()
                 {
-                  case "String":
-                  {
-                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
-                          Value = item.Value,
-                          ValueType = item.ValueType,
-                          ArgumentName = item.ArgumentName
-                      });
-                      break;
-                  }
-                  case "Integer":
-                  {
-                      int inputValue;
-                      int.TryParse(item.Value, out inputValue);
-                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
-                          Value = inputValue,
-                          ValueType = item.ValueType,
-                          ArgumentName = item.ArgumentName
-                      });
-                      break;
-                  }
-                  case "Boolean":
-                  {
-                      bool inputValue;
-                      bool.TryParse(item.Value, out inputValue);
-                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
-                          Value = inputValue,
-                          ValueType = item.ValueType,
-                          ArgumentName = item.ArgumentName
-                      });
-                      break;
-                  }
-                  default:
-                  {
-                      return Json(string.Empty);
-                  }
+                    Description = test.Description,
+                    Inputs = new List<TestResultInputViewModel>()
+                };
+
+                List<CodingMonkey.CodeExecutor.TestInput> testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
+                foreach (var testInput in test.TestInputs)
+                {
+
+                    if (!GetTestInputForCodeExecutor(testInput, testResult, testInputs))
+                    {
+                        return Json(string.Empty);
+                    }
+                }
+
+                // Run the code to get test result
+                var compiler = new RoslynCompiler();
+                object codeOutput = await compiler.Execute(model.Code,
+                                                exercise.Template.ClassName,
+                                                exercise.Template.MainMethodName,
+                                                testInputs);
+
+                testResult.ActualOutput = codeOutput;
+
+                model.TestResults.Add(testResult);
+
+                switch (test.TestOutput.ValueType)
+                {
+                    case "String":
+                        {
+                            testResult.ExpectedOutput = test.TestOutput.Value;
+                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+                            break;
+                        }
+                    case "Integer":
+                        {
+                            int outputValue;
+                            int.TryParse(test.TestOutput.Value, out outputValue);
+
+                            testResult.ExpectedOutput = outputValue;
+                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+
+                            break;
+                        }
+                    case "Boolean":
+                        {
+                            bool outputValue;
+                            bool.TryParse(test.TestOutput.Value, out outputValue);
+
+                            testResult.ExpectedOutput = outputValue;
+                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+                            break;
+                        }
+                    default:
+                        {
+                            return null;
+                        }
                 }
             }
 
-
-            var compiler = new RoslynCompiler();
-            model.Output = await compiler.Execute(model.Code,
-                                            exercise.Template.ClassName,
-                                            exercise.Template.MainMethodName,
-                                            inputs);
-
             return Json(model);
+        }
+
+        private static bool GetTestInputForCodeExecutor(TestInput testInput, TestResultViewModel testResult, List<CodeExecutor.TestInput> testInputs)
+        {
+            switch (testInput.ValueType)
+            {
+                case "String":
+                    {
+                        testResult.Inputs.Add(
+                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = testInput.Value });
+
+                        testInputs.Add(
+                            new CodeExecutor.TestInput()
+                                {
+                                    Value = testInput.Value,
+                                    ValueType = testInput.ValueType,
+                                    ArgumentName = testInput.ArgumentName
+                                });
+                        return true;
+                    }
+                case "Integer":
+                    {
+                        int inputValue;
+                        int.TryParse(testInput.Value, out inputValue);
+
+                        testResult.Inputs.Add(
+                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = inputValue });
+
+                        testInputs.Add(
+                            new CodeExecutor.TestInput()
+                                {
+                                    Value = inputValue,
+                                    ValueType = testInput.ValueType,
+                                    ArgumentName = testInput.ArgumentName
+                                });
+                        return true;
+                    }
+                case "Boolean":
+                    {
+                        bool inputValue;
+                        bool.TryParse(testInput.Value, out inputValue);
+
+                        testResult.Inputs.Add(
+                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = inputValue });
+
+                        testInputs.Add(
+                            new CodeExecutor.TestInput()
+                                {
+                                    Value = inputValue,
+                                    ValueType = testInput.ValueType,
+                                    ArgumentName = testInput.ArgumentName
+                                });
+                        return true;
+                    }
+                default:
+                    {
+                        return false;
+                    }
+            }
         }
     }
 }
