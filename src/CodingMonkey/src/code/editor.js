@@ -36,7 +36,8 @@ export class Editor {
                 initialCode: "",
                 className: "",
                 mainMethodName: ""
-            }
+            },
+            testResults: []
         }
         
         this.exerciseId = 0;
@@ -109,9 +110,31 @@ export class Editor {
         })
         .then(response => response.json())
         .then(data => {
-            this.vm = data;
             this.vm.SubmittedCode = true;
-        })
+
+            for (let testResult of data.TestResults) {
+                var testVM = {
+                    actualOutput: testResult.ActualOutput,
+                    description: testResult.Description,
+                    expectedOutput: testResult.ExpectedOutput,
+                    testPassed: testResult.TestPassed,
+                    inputs: []
+                };
+
+                for (let testInput of testResult.Inputs) {
+                    var inputVM = {
+                        argumentName: testInput.ArgumentName,
+                        value: testInput.Value
+                    }
+
+                    testVM.inputs.push(inputVM);
+                }
+
+                this.vm.testResults.push(testVM);
+            }
+
+                console.log(this.vm);
+            })
         .catch(err => {
             console.log(err);
         });
