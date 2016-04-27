@@ -103,7 +103,7 @@ export class Editor {
     submitCodeToExecute() {
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
 
-        this.http.fetch('Execute', {
+        this.http.fetch('Execute/' + this.exerciseId, {
             method: 'post',
             body: json({code: this.codeEditor.getValue()})
         })

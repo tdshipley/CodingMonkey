@@ -12,6 +12,7 @@ namespace CodingMonkey.ViewModels
         }
         
         public string Code { get; set; }
+
         public bool HasErrors { get; set; }
         public IList<CompilerErrorViewModel> Errors { get; set; }
         public object Output { get; set; }

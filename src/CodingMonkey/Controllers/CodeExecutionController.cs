@@ -2,14 +2,21 @@
 {
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
+    using CodingMonkey.Models;
     using Microsoft.AspNet.Mvc;
     using CodingMonkey.CodeExecutor;
+    using System.Linq;
 
-    [Route("api/[controller]/[action]")]
+    using Microsoft.Data.Entity;
+
+    [Route("api/[controller]/[action]/{id}")]
     public class CodeExecutionController : Controller
     {
+        [FromServices]
+        public CodingMonkeyContext CodingMonkeyContext { get; set; }
+
         [HttpPost]
-        public JsonResult Compile([FromBody] CodeEditorViewModel model)
+        public JsonResult Compile(int id, [FromBody] CodeEditorViewModel model)
         {
             var result = RoslynCompiler.Compile(model.Code);
 
@@ -43,9 +50,57 @@
         }
 
         [HttpPost]
-        public JsonResult Execute([FromBody] CodeEditorViewModel model)
+        public JsonResult Execute(int id, [FromBody] CodeEditorViewModel model)
         {
-            model.Output = RoslynCompiler.Execute(model.Code);
+            var exercise = CodingMonkeyContext.Exercises
+                                              .Include(e => e.Template)
+                                              .Include(e => e.Tests).ThenInclude(t => t.TestInputs)
+                                              .SingleOrDefault(e => e.ExerciseId == id);
+
+            if (exercise == null || exercise.Template == null)
+            {
+                return Json(string.Empty);
+            }
+
+            // Just *testing* (ha) that this works
+            var firstTest = exercise.Tests.First();
+            
+            Dictionary<string, object> inputs = new Dictionary<string, dynamic>(); 
+            foreach (var item in firstTest.TestInputs)
+            {
+                switch (item.ValueType)
+                {
+                  case "String":
+                  {
+                      inputs.Add(item.ArgumentName, item.ValueType);
+                      break;
+                  }
+                  case "Integer":
+                  {
+                      int inputValue;
+                      int.TryParse(item.Value, out inputValue);
+                      inputs.Add(item.ArgumentName, inputValue);
+                      break;
+                  }
+                  case "Boolean":
+                  {
+                      bool inputValue;
+                      bool.TryParse(item.Value, out inputValue);
+                      inputs.Add(item.ArgumentName, inputValue);
+                      break;
+                  }
+                  default:
+                  {
+                      return Json(string.Empty);
+                  }
+                }
+                inputs.Add(item.ArgumentName, item.Value);
+            }
+
+            model.Output = RoslynCompiler.Execute(model.Code,
+                                                  exercise.Template.ClassName,
+                                                  exercise.Template.MainMethodName,
+                                                  inputs);
 
             return Json(model);
         }

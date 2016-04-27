@@ -22,12 +22,22 @@ namespace CodingMonkey.CodeExecutor
             return errorsFromSource.Select(error => new CompilerError(error)).ToList();
         }
 
-        public static object Execute(string code)
+        public static object Execute(string code, string className, string mainMethodName, Dictionary<string, dynamic> inputs)
         {
             ExecuteCode(code);
-            return ExecuteCode("new Numbers().ReturnNumber6()");
+
+            string executionCode = $"new {className}().{mainMethodName}(";
+
+            foreach(var input in inputs)
+            {
+                executionCode += $"{input.Key}: {input.Value.ToString()},";
+            }
+
+            executionCode = executionCode.TrimEnd(',') + ");";
+
+            return ExecuteCode(executionCode);
         }
-        
+
         private static object ExecuteCode(string code)
         {
             scriptState = scriptState == null ? CSharpScript.RunAsync(code).Result : scriptState.ContinueWithAsync(code).Result;
