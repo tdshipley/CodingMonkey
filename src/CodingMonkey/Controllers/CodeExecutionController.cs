@@ -65,28 +65,40 @@
             // Just *testing* (ha) that this works
             var firstTest = exercise.Tests.First();
             
-            Dictionary<string, object> inputs = new Dictionary<string, dynamic>(); 
+            List<CodingMonkey.CodeExecutor.TestInput> inputs = new List<CodingMonkey.CodeExecutor.TestInput>(); 
             foreach (var item in firstTest.TestInputs)
             {
                 switch (item.ValueType)
                 {
                   case "String":
                   {
-                      inputs.Add(item.ArgumentName, item.ValueType);
+                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
+                          Value = item.Value,
+                          ValueType = item.ValueType,
+                          ArgumentName = item.ArgumentName
+                      });
                       break;
                   }
                   case "Integer":
                   {
                       int inputValue;
                       int.TryParse(item.Value, out inputValue);
-                      inputs.Add(item.ArgumentName, inputValue);
+                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
+                          Value = inputValue,
+                          ValueType = item.ValueType,
+                          ArgumentName = item.ArgumentName
+                      });
                       break;
                   }
                   case "Boolean":
                   {
                       bool inputValue;
                       bool.TryParse(item.Value, out inputValue);
-                      inputs.Add(item.ArgumentName, inputValue);
+                      inputs.Add(new CodingMonkey.CodeExecutor.TestInput(){
+                          Value = inputValue,
+                          ValueType = item.ValueType,
+                          ArgumentName = item.ArgumentName
+                      });
                       break;
                   }
                   default:
@@ -94,7 +106,6 @@
                       return Json(string.Empty);
                   }
                 }
-                inputs.Add(item.ArgumentName, item.Value);
             }
 
             model.Output = RoslynCompiler.Execute(model.Code,

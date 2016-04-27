@@ -11,6 +11,13 @@ using Newtonsoft.Json;
 
 namespace CodingMonkey.CodeExecutor
 {
+    public struct TestInput
+    {
+        public string ArgumentName;
+        public dynamic Value;
+        public string ValueType;
+    }
+
     public class RoslynCompiler
     {
         private static ScriptState<object> scriptState = null;
@@ -22,7 +29,7 @@ namespace CodingMonkey.CodeExecutor
             return errorsFromSource.Select(error => new CompilerError(error)).ToList();
         }
 
-        public static object Execute(string code, string className, string mainMethodName, Dictionary<string, dynamic> inputs)
+        public static object Execute(string code, string className, string mainMethodName, List<TestInput> inputs)
         {
             ExecuteCode(code);
 
@@ -30,7 +37,14 @@ namespace CodingMonkey.CodeExecutor
 
             foreach(var input in inputs)
             {
-                executionCode += $"{input.Key}: {input.Value.ToString()},";
+                if(input.ValueType == "String")
+                {
+                    executionCode += $"{input.ArgumentName}: \"{input.Value.ToString()}\",";
+                }
+                else
+                {
+                    executionCode += $"{input.ArgumentName}: {input.Value.ToString()},";
+                }
             }
 
             executionCode = executionCode.TrimEnd(',') + ");";
