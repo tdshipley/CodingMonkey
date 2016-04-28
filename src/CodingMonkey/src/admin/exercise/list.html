@@ -21,14 +21,14 @@
                     <td>${exercise.name}</td>
                     <td>${exercise.guidance}</td>
                     <td><a route-href="route: AdminExerciseDetails;
-                                       params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Details</a></td>
+                                       params.bind: {id: exercise.id}">Details</a></td>
                     <td><a route-href="route: AdminExerciseUpdate;
-                                       params.bind: {id: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Update</a></td>
+                                       params.bind: {id: exercise.id}">Update</a></td>
                     <td><a click.delegate="delete(exercise.name, exercise.id)">Delete</a></td>
                     <td><a route-href="route: AdminExerciseTestCreate;
-                                       params.bind: {exerciseId: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">Add Test</a></td>
+                                       params.bind: {exerciseId: exercise.id}">Add Test</a></td>
                     <td><a route-href="route: AdminExerciseTests;
-                                       params.bind: {exerciseId: exercise.id, exerciseTemplateId: exercise.exerciseTemplateId}">View Tests</a></td>
+                                       params.bind: {exerciseId: exercise.id}">View Tests</a></td>
                 </tr>
             </table>
         </div>

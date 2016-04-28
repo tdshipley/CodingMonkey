@@ -53,7 +53,7 @@ export class update {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.id, params.exerciseTemplateId)
+              this.getExerciseTemplate(params.id)
               this.heading = "Update Exercise: " + this.vm.exercise.name;
           })
           .then(() => {
@@ -64,10 +64,10 @@ export class update {
           });
     }
     
-    getExerciseTemplate(exerciseId, exerciseTemplateId) {
+    getExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
         
-        this.http.fetch('details/' + exerciseTemplateId)
+        this.http.fetch('details')
           .then(response => response.json())
           .then(data => {
               this.vm.exerciseTemplate.id = data.Id;
@@ -106,7 +106,7 @@ export class update {
     updateExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + exerciseId + '/ExerciseTemplate/';
         
-        this.http.fetch('update/' + this.vm.exerciseTemplate.id, {
+        this.http.fetch('update', {
             method: 'post',
             body: json({
                 ExerciseId: exerciseId,
@@ -122,7 +122,7 @@ export class update {
         })
         .then(() => {
             this.notify.success("Updated Exercise '" + this.vm.exercise.name + "'");
-            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/" + this.vm.exerciseTemplate.id);
+            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id);
         })
         .catch(err => {
             this.notify.error("Update Exercise Template for Exercise failed.")

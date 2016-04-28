@@ -70,7 +70,7 @@
       "ace": "github:ajaxorg/ace-builds@^1.2.3",
       "aurelia-animator-css": "npm:aurelia-animator-css@^1.0.0-beta.1.1.0",
       "aurelia-binding": "npm:aurelia-binding@^1.0.0-beta.1.3.1",
-      "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^1.0.0-beta.1.1.1",
+      "aurelia-bootstrapper": "npm:aurelia-bootstrapper@^1.0.0-beta.1.2.0",
       "aurelia-dependency-injection": "npm:aurelia-dependency-injection@^1.0.0-beta.1.2.0",
       "aurelia-dialog": "npm:aurelia-dialog@^0.5.10",
       "aurelia-fetch-client": "npm:aurelia-fetch-client@^1.0.0-beta.1.1.0",

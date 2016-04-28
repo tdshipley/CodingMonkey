@@ -5,9 +5,10 @@ export class App {
     config.title = 'Coding Monkey';
     config.map(
         [
+            // User Routes
             {
                 settings: {
-                    group: 'root'
+                    group: 'user'
                 },
                 route: ['', 'welcome'],
                 name: 'welcome',
@@ -17,15 +18,35 @@ export class App {
             },
             {
                 settings: {
-                    group: 'root'
+                    group: 'user'
                 },
-                route: 'code/editor',  
+                route: 'code/editor/:exerciseId',  
                 name: 'CodeEditor',
                 moduleId: './code/editor',
-                nav: true,
+                nav: false,
                 title: 'Code Editor'
             },
-            // Admin
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'categories',  
+                name: 'Categories',
+                moduleId: './exercise-selector/categories',
+                nav: true,
+                title: 'Exercise Categories'
+            },
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'category/:exerciseCategoryId/exercises',  
+                name: 'CategoryExercises',
+                moduleId: './exercise-selector/exercises',
+                nav: false,
+                title: 'Exercises in Category'
+            },
+            // Admin Routes
             {
                 settings: {
                     group: 'admin'
@@ -40,7 +61,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:id/:exerciseTemplateId',
+                route: 'admin/exercise/:id/',
                 name: 'AdminExerciseDetails',
                 moduleId: './admin/exercise/details',
                 nav: false,
@@ -50,7 +71,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:id/:exerciseTemplateId/update',
+                route: 'admin/exercise/:id/update',
                 name: 'AdminExerciseUpdate',
                 moduleId: './admin/exercise/update',
                 nav: false,
@@ -100,7 +121,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/create',
+                route: 'admin/exercise/:exerciseId/test/create',
                 name: 'AdminExerciseTestCreate',
                 moduleId: './admin/test/create',
                 nav: false,
@@ -110,7 +131,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/tests',
+                route: 'admin/exercise/:exerciseId/tests',
                 name: 'AdminExerciseTests',
                 moduleId: './admin/test/list',
                 nav: false,
@@ -120,7 +141,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id',
+                route: 'admin/exercise/:exerciseId/test/:id',
                 name: 'AdminExerciseTestDetails',
                 moduleId: './admin/test/details',
                 nav: false,
@@ -130,7 +151,7 @@ export class App {
                 settings: {
                     group: 'admin'
                 },
-                route: 'admin/exercise/:exerciseId/:exerciseTemplateId/test/:id/update',
+                route: 'admin/exercise/:exerciseId/test/:id/update',
                 name: 'AdminExerciseTestUpdate',
                 moduleId: './admin/test/update',
                 nav: false,

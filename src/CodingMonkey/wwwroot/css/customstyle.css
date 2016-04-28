@@ -45,6 +45,12 @@
   }
 }
 
+.fixed-panel {
+  min-height: 100px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
 /* ### Ace Editor ### */
 #aceEditor {
     width: 80%;

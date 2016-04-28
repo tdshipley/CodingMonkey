@@ -1,29 +1,29 @@
 ﻿<template>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <h1>${heading}</h1>
+            <p>${vm.exercise.guidance}</p>
+        </div>
+    </div>
     <div class="row top-buffer" id="editor-toolbar">
         <div class="col-lg-8 col-lg-offset-1">
             <div class="btn-group btn-group-sm">
-                <button type="button" class="btn" click.trigger="submitCodeToCompile()">Compile</button>
-                <button type="button" class="btn" click.trigger="submitCodeToExecute()">Compile and Run</button>
+                <button type="button" class="btn" click.trigger="submitCode()">Submit Exercise</button>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-8 col-lg-offset-1">
             <div id="aceEditor" value.bind="code">
-                //Enter code here
+                // Loading...
             </div>
         </div>
     </div>
     <div class="row top-buffer">
         <div class="col-lg-8 col-lg-offset-1">
             <div class="row">
-                <h3>Error List</h3>
-                <div if.bind="!vm.HasErrors && vm.SubmittedCode" class="col-lg-8 col-lg-offset-1">
-                    <h4>No Errors!</h4>
-                </div>
-            </div>
-            <div class="row">
-                <div if.bind="vm.HasErrors" class="row top-buffer" id="editor-errorlist">
+                <div if.bind="vm.HasErrors && vm.SubmittedCode" class="col-lg-9">
+                    <h3>Compiler Errors</h3>
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -39,6 +39,28 @@
                             <td>${Error.Message}</td>
                         </tr>
                         </tbody>
+                    </table>
+                </div>
+                <div if.bind="!vm.HasErrors && vm.SubmittedCode" class="col-lg-9">
+                    <h2>Test Results</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Test Passed</th>
+                            <th>Description</th>
+                            <th>Expected Result</th>
+                            <th>Actual Result</th>
+                        </tr>
+                        <tr repeat.for="testResult of vm.testResults">
+                            <template if.bind="testResult.testPassed">
+                                <td style="background-color: greenyellow"></td>
+                            </template>
+                            <template if.bind="!testResult.testPassed">
+                                <td style="background-color: red"></td>
+                            </template>
+                            <td>${testResult.description}</td>
+                            <td>${testResult.expectedOutput}</td>
+                            <td>${testResult.actualOutput}</td>
+                        </tr>
                     </table>
                 </div>
             </div>

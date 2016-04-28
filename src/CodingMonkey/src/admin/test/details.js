@@ -32,12 +32,10 @@ export class details {
         }
         
         this.exerciseId = 0;
-        this.exerciseTemplateId = 0;
     }
     
     activate(params) {
         this.exerciseId = params.exerciseId;
-        this.exerciseTemplateId = params.exerciseTemplateId;
         
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + params.exerciseId + '/Test/';
         
@@ -69,6 +67,6 @@ export class details {
     }
     
     goToTestList() {
-        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/" + this.exerciseTemplateId + "/tests");
+        this.appRouter.navigate("admin/exercise/" + this.exerciseId + "/tests");
     }
 }
