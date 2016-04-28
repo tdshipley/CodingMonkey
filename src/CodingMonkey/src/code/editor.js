@@ -41,6 +41,7 @@ export class Editor {
         }
         
         this.exerciseId = 0;
+        this.codeHasErrors = false;
     }
 
     activate(params) {      
@@ -62,7 +63,7 @@ export class Editor {
     }
     
     getExerciseTemplate(exerciseId) {
-        this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/"
+        this.http.baseUrl = this.baseUrl + "/api/Exercise/" + exerciseId + "/ExerciseTemplate/";
 
         this.http.fetch('details')
             .then(response => response.json())
@@ -78,7 +79,7 @@ export class Editor {
             })
             .catch(err => {
             console.log(err);
-                this.notify.error('Failed to get exercise template.')
+                this.notify.error('Failed to get exercise template.');
             });
     }
     
@@ -97,51 +98,11 @@ export class Editor {
                 this.heading = this.vm.exercise.name;
             })
             .catch(err => {
-                this.notify.error('Failed to get exercise.')
+                this.notify.error('Failed to get exercise.');
             });
     }
 
-    submitCodeToExecute() {
-        this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
-
-        this.http.fetch('Execute/' + this.exerciseId, {
-            method: 'post',
-            body: json({code: this.codeEditor.getValue()})
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.vm.SubmittedCode = true;
-            this.vm.testResults = [];
-
-            for (let testResult of data.TestResults) {
-                var testVM = {
-                    actualOutput: testResult.ActualOutput,
-                    description: testResult.Description,
-                    expectedOutput: testResult.ExpectedOutput,
-                    testPassed: testResult.TestPassed,
-                    inputs: []
-                };
-
-                for (let testInput of testResult.Inputs) {
-                    var inputVM = {
-                        argumentName: testInput.ArgumentName,
-                        value: testInput.Value
-                    }
-
-                    testVM.inputs.push(inputVM);
-                }
-
-                this.vm.testResults.push(testVM);
-            }
-
-                console.log(this.vm);
-            })
-        .catch(err => {
-            console.log(err);
-        });
-    }
-
-    submitCodeToCompile() {
+    submitCode() {
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
         this.http.fetch('Compile/' + this.exerciseId, {
@@ -152,30 +113,32 @@ export class Editor {
         .then(data => {
             this.vm = data;
             this.vm.SubmittedCode = true;
-
+            this.codeHasErrors = data.HasErrors;
             this.highlightErrors(data);
         })
+        .then(() => {
+            this.executeCode();
+        })
         .catch(err => {
-            console.log(err);
+            this.notify.error("Failed to submit code to test.");
         });
     }
 
     highlightErrors(data) {
-        if (data.HasErrors)
-        {
+        if (this.codeHasErrors) {
+            this.notify.warning("The code has compiler errors. Fix them then submit again.");
             for (let error of data.Errors) {
                 this.highlightError(error.LineNumberStart, error.LineNumberEnd, 0, error.ColEnd);
             }
         }
-        else
-        {
+        else {
             this.unhighlightError();
         }
     }
 
     highlightError(startLine, endLine, startCol, endCol) {
         this.unhighlightError();
-        var Range = ace.require("ace/range").Range
+        var Range = ace.require("ace/range").Range;
         this.markedLines.push(this.codeEditor.session.addMarker(new Range(startLine - 1, startCol, endLine - 1, endCol), "errorHighlight", "fullLine"));
     }
 
@@ -185,5 +148,57 @@ export class Editor {
         }
 
         this.markedLines = [];
+    }
+
+    executeCode() {
+        if (this.codeHasErrors === false) {
+            let testsPassed = true;
+
+            this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
+
+            this.http.fetch('Execute/' + this.exerciseId, {
+                    method: 'post',
+                    body: json({ code: this.codeEditor.getValue() })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.vm.SubmittedCode = true;
+                    this.vm.testResults = [];
+
+                    for (let testResult of data.TestResults) {
+                        var testVM = {
+                            actualOutput: testResult.ActualOutput,
+                            description: testResult.Description,
+                            expectedOutput: testResult.ExpectedOutput,
+                            testPassed: testResult.TestPassed,
+                            inputs: []
+                        };
+
+                        for (let testInput of testResult.Inputs) {
+                            var inputVM = {
+                                argumentName: testInput.ArgumentName,
+                                value: testInput.Value
+                            }
+
+                            testVM.inputs.push(inputVM);
+                        }
+
+                        if (testsPassed) {
+                            testsPassed = testVM.testPassed;
+                        }
+
+                        this.vm.testResults.push(testVM);
+                    }
+
+                    if (testsPassed) {
+                        this.notify.success("All tests passed!");
+                    } else {
+                        this.notify.warning("Tests Failed. Have a look at the results and try again.");
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
     }
 }
