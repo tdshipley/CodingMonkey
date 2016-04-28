@@ -111,7 +111,6 @@ export class Editor {
         })
         .then(response => response.json())
         .then(data => {
-            this.vm = data;
             this.vm.SubmittedCode = true;
             this.codeHasErrors = data.HasErrors;
             this.highlightErrors(data);
