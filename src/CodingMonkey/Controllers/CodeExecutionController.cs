@@ -113,7 +113,7 @@
                             int.TryParse(test.TestOutput.Value, out outputValue);
 
                             testResult.ExpectedOutput = outputValue;
-                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+                            testResult.TestPassed = (int)testResult.ActualOutput == (int)testResult.ExpectedOutput;
 
                             break;
                         }
@@ -123,7 +123,7 @@
                             bool.TryParse(test.TestOutput.Value, out outputValue);
 
                             testResult.ExpectedOutput = outputValue;
-                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+                            testResult.TestPassed = (bool)testResult.ActualOutput == (bool)testResult.ExpectedOutput;
                             break;
                         }
                     default:

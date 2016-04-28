@@ -111,6 +111,7 @@ export class Editor {
         .then(response => response.json())
         .then(data => {
             this.vm.SubmittedCode = true;
+            this.vm.testResults = [];
 
             for (let testResult of data.TestResults) {
                 var testVM = {
@@ -143,7 +144,7 @@ export class Editor {
     submitCodeToCompile() {
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
-        this.http.fetch('Compile', {
+        this.http.fetch('Compile/' + this.exerciseId, {
             method: 'post',
             body: json({code: this.codeEditor.getValue()})
         })
