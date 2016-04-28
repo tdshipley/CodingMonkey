@@ -63,6 +63,10 @@
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 identityContext =>
                     {
+                        identityContext.Password.RequireDigit = false;
+                        identityContext.Password.RequireUppercase = false;
+                        identityContext.Password.RequiredLength = 6;
+
                         identityContext.Cookies
                                        .ApplicationCookie
                                        .Events = new CookieAuthenticationEvents()
@@ -87,10 +91,11 @@
             services.AddMvc();
 
             // Add application services.
+            services.AddTransient<CodingMonkeyContextSeedData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public async void Configure(IApplicationBuilder app, CodingMonkeyContextSeedData seeder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -124,6 +129,8 @@
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            await seeder.EnsureSeedDataAsync();
         }
 
         // Entry point for the application.
