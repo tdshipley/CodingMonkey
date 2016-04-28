@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
-namespace skeleton_navigation_es2016_vs
+﻿namespace skeleton_navigation_es2016_vs
 {
     using System.IO;
 
     using CodingMonkey.Models;
 
+    using Microsoft.AspNet.Identity.EntityFramework;
     using Microsoft.Extensions.PlatformAbstractions;
+
+    using Microsoft.AspNet.Builder;
+    using Microsoft.AspNet.Hosting;
+    using Microsoft.Data.Entity;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     public class Startup
     {
@@ -43,10 +44,6 @@ namespace skeleton_navigation_es2016_vs
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-            
-            services.AddMvc();
-
-            // Add application services.
 
             // Add Db
             var path = PlatformServices.Default.Application.ApplicationBasePath;
@@ -56,7 +53,15 @@ namespace skeleton_navigation_es2016_vs
                 .AddSqlite()
                 .AddDbContext<CodingMonkeyContext>(
                     options =>
-                        { options.UseSqlite(connection); });
+                    { options.UseSqlite(connection); });
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<CodingMonkeyContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddMvc();
+
+            // Add application services.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,6 +88,8 @@ namespace skeleton_navigation_es2016_vs
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
+
+            app.UseIdentity();
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 

@@ -1,9 +1,10 @@
-﻿using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Metadata;
-
-namespace CodingMonkey.Models
+﻿namespace CodingMonkey.Models
 {
-    public class CodingMonkeyContext : DbContext
+    using Microsoft.Data.Entity;
+    using Microsoft.Data.Entity.Metadata;
+    using Microsoft.AspNet.Identity.EntityFramework;
+
+    public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseTemplate> ExerciseTemplates { get; set; }
@@ -14,6 +15,9 @@ namespace CodingMonkey.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Call base to create ASP.NET Identity tables first
+            base.OnModelCreating(modelBuilder);
+
             // Exercise Relationships
             modelBuilder.Entity<Exercise>()
                 .HasOne(t => t.Template)
