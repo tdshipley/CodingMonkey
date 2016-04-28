@@ -41,7 +41,6 @@ export class Editor {
         }
         
         this.exerciseId = 0;
-        this.codeHasErrors = false;
     }
 
     activate(params) {      
@@ -112,7 +111,8 @@ export class Editor {
         .then(response => response.json())
         .then(data => {
             this.vm.SubmittedCode = true;
-            this.codeHasErrors = data.HasErrors;
+            this.vm.codeHasErrors = data.HasErrors;
+            this.vm.errors = data.Errors;
             this.highlightErrors(data);
         })
         .then(() => {
@@ -124,7 +124,7 @@ export class Editor {
     }
 
     highlightErrors(data) {
-        if (this.codeHasErrors) {
+        if (this.vm.codeHasErrors) {
             this.notify.warning("The code has compiler errors. Fix them then submit again.");
             for (let error of data.Errors) {
                 this.highlightError(error.LineNumberStart, error.LineNumberEnd, 0, error.ColEnd);
@@ -150,7 +150,7 @@ export class Editor {
     }
 
     executeCode() {
-        if (this.codeHasErrors === false) {
+        if (this.vm.codeHasErrors === false) {
             let testsPassed = true;
 
             this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';

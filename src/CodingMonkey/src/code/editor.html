@@ -5,13 +5,6 @@
             <p>${vm.exercise.guidance}</p>
         </div>
     </div>
-    <div class="row top-buffer" id="editor-toolbar">
-        <div class="col-lg-8 col-lg-offset-1">
-            <div class="btn-group btn-group-sm">
-                <button type="button" class="btn" click.trigger="submitCode()">Submit Exercise</button>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-lg-8 col-lg-offset-1">
             <div id="aceEditor" value.bind="code">
@@ -20,9 +13,14 @@
         </div>
     </div>
     <div class="row top-buffer">
+        <div class="col-lg-7 col-lg-offset-1">
+            <button type="button" class="btn btn-primary" click.trigger="submitCode()">Submit Exercise</button>
+        </div>
+    </div>
+    <div class="row top-buffer">
         <div class="col-lg-8 col-lg-offset-1">
             <div class="row">
-                <div if.bind="vm.HasErrors && vm.SubmittedCode" class="col-lg-9">
+                <div if.bind="vm.codeHasErrors && vm.SubmittedCode" class="col-lg-9">
                     <h3>Compiler Errors</h3>
                     <table class="table table-striped">
                         <thead>
@@ -33,15 +31,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr repeat.for="Error of vm.Errors" value.two-way="vm.Errors">
-                            <td>${Error.Id}</td>
-                            <td>${Error.LineNumberStart}</td>
-                            <td>${Error.Message}</td>
+                        <tr repeat.for="error of vm.errors" value.two-way="vm.errors">
+                            <td>${error.Id}</td>
+                            <td>${error.LineNumberStart}</td>
+                            <td>${error.Message}</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                <div if.bind="!vm.HasErrors && vm.SubmittedCode" class="col-lg-9">
+                <div if.bind="!vm.codeHasErrors && vm.SubmittedCode" class="col-lg-9">
                     <h2>Test Results</h2>
                     <table class="table table-striped">
                         <tr>
