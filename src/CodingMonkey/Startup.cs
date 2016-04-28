@@ -1,14 +1,19 @@
 ﻿namespace skeleton_navigation_es2016_vs
 {
     using System.IO;
+    using System.Net;
+    using System.Runtime.InteropServices.ComTypes;
+    using System.Threading.Tasks;
 
     using CodingMonkey.Models;
 
+    using Microsoft.AspNet.Authentication.Cookies;
     using Microsoft.AspNet.Identity.EntityFramework;
     using Microsoft.Extensions.PlatformAbstractions;
 
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
+    using Microsoft.AspNet.Http;
     using Microsoft.Data.Entity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +60,27 @@
                     options =>
                     { options.UseSqlite(connection); });
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(
+                identityContext =>
+                    {
+                        identityContext.Cookies
+                                       .ApplicationCookie
+                                       .Events = new CookieAuthenticationEvents()
+                                                    {
+                                                        OnRedirectToLogin = ctx =>
+                                                            {
+                                                                if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+                                                                {
+                                                                    ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                                                }
+                                                                else
+                                                                {
+                                                                    ctx.Response.Redirect(ctx.RedirectUri);
+                                                                }
+                                                                return Task.FromResult(0);
+                                                            }
+                                                    };
+                    })
                 .AddEntityFrameworkStores<CodingMonkeyContext>()
                 .AddDefaultTokenProviders();
 
