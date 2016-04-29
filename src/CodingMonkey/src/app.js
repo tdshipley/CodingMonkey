@@ -57,6 +57,16 @@ export class App {
                 nav: false,
                 title: 'Login'
             },
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'logout',  
+                name: 'Logout',
+                moduleId: './authentication/logout',
+                nav: false,
+                title: 'Logout'
+            },
             // Admin Routes
             {
                 settings: {

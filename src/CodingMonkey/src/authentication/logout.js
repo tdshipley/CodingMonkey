@@ -5,7 +5,7 @@ import 'fetch';
 import toastr from 'toastr';
 
 @inject(HttpClient, Router)
-export class login {
+export class logout {
     constructor(http, router) {
         var loc = window.location;
 
@@ -22,32 +22,22 @@ export class login {
 
         this.http = http;
 
-        this.vm = {
-            username: "",
-            password: ""
-        }
-    }
+        let logoutErrorMessage = "There was a problem logging you out. Try clearing your cache.";
 
-    login() {
-        this.http.fetch('login', {
-            method: 'post',
-            body: json({
-                Username: this.vm.username,
-                Password: this.vm.password
-            })
+        this.http.fetch('logout', {
+            method: 'post'
         })
         .then(response => response.json())
         .then(data => {
-            if (data.LoginSucceeded === true) {
-                this.notify.remove();
-                this.notify.success("Login successful.");
-                this.appRouter.navigate("admin/exercises");
+            if (data.LogoutSucceeded === true) {
+                this.notify.success("Logout successful.");
+                this.appRouter.navigate("/");
             } else {
-                this.notify.error("Your Username or Password was incorrect.");
+                this.notify.error(logoutErrorMessage);
             }
         })
         .catch(err => {
-            this.notify.error("There was a problem logging you in.");
+            this.notify.error(logoutErrorMessage);
         });
     }
 }
