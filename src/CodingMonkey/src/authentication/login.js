@@ -40,7 +40,7 @@ export class login {
         .then(data => {
             if (data.LoginSucceeded === true) {
                 this.notify.remove();
-                this.notify.success("Login successful.");
+                location.reload();
                 this.appRouter.navigate("admin/exercises");
             } else {
                 this.notify.error("Your Username or Password was incorrect.");

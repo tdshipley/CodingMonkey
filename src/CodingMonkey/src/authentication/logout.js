@@ -30,7 +30,7 @@ export class logout {
         .then(response => response.json())
         .then(data => {
             if (data.LogoutSucceeded === true) {
-                this.notify.success("Logout successful.");
+                location.reload();
                 this.appRouter.navigate("/");
             } else {
                 this.notify.error(logoutErrorMessage);
