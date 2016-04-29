@@ -104,7 +104,7 @@
                     case "String":
                         {
                             testResult.ExpectedOutput = test.TestOutput.Value;
-                            testResult.TestPassed = testResult.ActualOutput == testResult.ExpectedOutput;
+                            testResult.TestPassed = testResult.ActualOutput.ToString() == testResult.ExpectedOutput.ToString();
                             break;
                         }
                     case "Integer":
