@@ -31,7 +31,7 @@ export class NavBar {
 
     attached() {
         this.getCurrentUser();
-        sessionStorage.setItem("currentUser", this.vm.user);
+        sessionStorage.setItem("currentUser", JSON.stringify(this.vm.user));
     }
 
     detached() {
@@ -47,18 +47,30 @@ export class NavBar {
             .then(data => {
                 if (data.GetUserSucceeded) {
                     this.vm.user.isLoggedIn = true;
-                    this.vm.user.username = data.username;
-                    this.vm.user.roles = data.roles;
+                    this.vm.user.username = data.Username;
+                    this.vm.user.roles = data.Roles;
+                } else {
+                    this.vm.user.isLoggedIn = false;
+                    this.vm.user.username = "";
+                    this.vm.user.roles = [];
                 }
+
+                this.setCurrentUserInSessionStorage();
             })
             .catch(err => {
                 this.vm.user.isLoggedIn = false;
                 this.vm.user.username = "";
                 this.vm.user.roles = [];
+
+                this.setCurrentUserInSessionStorage();
             });
     }
 
     logout() {
         this.router.navigate("logout");
+    }
+
+    setCurrentUserInSessionStorage() {
+        sessionStorage.setItem("currentUser", JSON.stringify(this.vm.user));
     }
 }
