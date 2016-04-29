@@ -31,10 +31,12 @@ export class NavBar {
 
     attached() {
         this.getCurrentUser();
+        sessionStorage.setItem("currentUser", this.vm.user);
     }
 
     detached() {
         this.getCurrentUser();
+        sessionStorage.removeItem("currentUser");
     }
 
     getCurrentUser() {
@@ -51,7 +53,8 @@ export class NavBar {
             })
             .catch(err => {
                 this.vm.user.isLoggedIn = false;
-                console.log(err);
+                this.vm.user.username = "";
+                this.vm.user.roles = [];
             });
     }
 

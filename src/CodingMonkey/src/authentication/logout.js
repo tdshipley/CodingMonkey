@@ -30,6 +30,7 @@ export class logout {
         .then(response => response.json())
         .then(data => {
             if (data.LogoutSucceeded === true) {
+                sessionStorage.removeItem("currentUser");
                 location.reload();
                 this.appRouter.navigate("/");
             } else {

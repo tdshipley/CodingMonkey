@@ -16,8 +16,7 @@ export class login {
         this.appRouter = router;
 
         http.configure(config => {
-            config.useStandardConfiguration()
-                .withBaseUrl(this.baseUrl + '/api/Authentication/');
+            config.useStandardConfiguration();
         });
 
         this.http = http;
@@ -29,6 +28,8 @@ export class login {
     }
 
     login() {
+        this.http.baseUrl = this.baseUrl + '/api/Authentication/';
+
         this.http.fetch('login', {
             method: 'post',
             body: json({
