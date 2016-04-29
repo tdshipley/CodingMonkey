@@ -6,6 +6,7 @@
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
 
+    using Microsoft.AspNet.Authorization;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Mvc;
 
@@ -34,6 +35,7 @@
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<JsonResult> Logout()
         {
             var response = new LoginResultViewModel();

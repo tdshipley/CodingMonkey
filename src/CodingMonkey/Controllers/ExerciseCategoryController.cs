@@ -9,6 +9,7 @@ namespace CodingMonkey.Controllers
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.AspNet.Authorization;
     using Microsoft.Data.Entity;
 
     [Route("api/[controller]/[action]")]
@@ -67,6 +68,7 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult Create([FromBody] ExerciseCategoryViewModel vm)
         {
             var exceptionResult = new Dictionary<string, dynamic>();
@@ -111,6 +113,7 @@ namespace CodingMonkey.Controllers
 
         [HttpPost]
         [Route("{id}")]
+        [Authorize]
         public JsonResult Update(int id, [FromBody] ExerciseCategoryViewModel vm)
         {
             if (vm == null)
@@ -160,6 +163,7 @@ namespace CodingMonkey.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize]
         public JsonResult Delete(int id)
         {
             var result = new Dictionary<string, dynamic>();
