@@ -9,8 +9,15 @@ import toastr from 'toastr';
 @inject(HttpClient, DialogService, Router)
 export class list {
     constructor(http, dialogService, router) {
-        this.dialogService = dialogService;
         this.appRouter = router;
+        // Check there is a logged in user or kick them to homepage
+        var currentUser = this.getCurrentUserInSessionStorage();
+
+        if (!currentUser.isLoggedIn) {
+            this.appRouter.navigate("/");
+        }
+
+        this.dialogService = dialogService;
 
         this.notify = toastr;
         this.notify.options.progressBar = true;
@@ -64,8 +71,8 @@ export class list {
             })
           .catch(err => {
               console.log(err);
-              this.notify.error("Failed to get tests.")
-          });
+                this.notify.error("Failed to get tests.");
+            });
     }
     
     delete(testId)
@@ -111,5 +118,12 @@ export class list {
     
     goToExercise() {
         this.appRouter.navigate("admin/exercise/" + this.exerciseId);
+    }
+
+    getCurrentUserInSessionStorage() {
+        let currentUserRaw = sessionStorage.getItem("currentUser");
+        let currentUser = JSON.parse(currentUserRaw);
+
+        return currentUser;
     }
 }

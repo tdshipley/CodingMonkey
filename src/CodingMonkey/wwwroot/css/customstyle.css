@@ -3,6 +3,11 @@
     margin-top: 10%;
 }
 
+#aceEditor {
+    border: #DADDDF solid 1px;
+    font-size: 14px;
+}
+
 #editor-toolbar {
     margin-bottom: 2px;
 }

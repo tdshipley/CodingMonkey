@@ -55,7 +55,7 @@ export class Editor {
 
         //Ace settings
         this.codeEditor = ace.edit("aceEditor");
-        this.codeEditor.setTheme("ace/theme/monokai");
+        this.codeEditor.setTheme("ace/theme/dreamweaver");
         this.codeEditor.getSession().setMode("ace/mode/csharp");
         
         this.getExerciseTemplate(this.exerciseId);

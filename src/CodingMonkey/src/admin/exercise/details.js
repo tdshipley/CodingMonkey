@@ -6,13 +6,21 @@ import toastr from 'toastr';
 
 @inject(HttpClient, Router)
 export class details {
-        constructor(http, router) {
+    constructor(http, router) {
+        this.appRouter = router;
+
+        // Check there is a logged in user or kick them to homepage
+        var currentUser = this.getCurrentUserInSessionStorage();
+
+        if (!currentUser.isLoggedIn) {
+            this.appRouter.navigate("/");
+        }
+
         var loc = window.location;
         
         this.heading = "Exercise Details";
         this.baseUrl = loc.protocol + "//" + loc.host;
         
-        this.appRouter = router;
         this.notify = toastr;
         this.notify.options.progressBar = true;
         
@@ -108,5 +116,12 @@ export class details {
     
     goToExerciseList() {
         this.appRouter.navigate("admin/exercises");
+    }
+
+    getCurrentUserInSessionStorage() {
+        let currentUserRaw = sessionStorage.getItem("currentUser");
+        let currentUser = JSON.parse(currentUserRaw);
+
+        return currentUser;
     }
 }
