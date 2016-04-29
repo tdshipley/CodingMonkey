@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.AspNet.Authorization;
     using Microsoft.Data.Entity;
 
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
@@ -18,6 +19,7 @@
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
         [HttpGet]
+        [Authorize]
         public JsonResult List(int exerciseId)
         {
             var tests =
@@ -64,6 +66,7 @@
         }
 
         [HttpGet]
+        [Authorize]
         [Route("{id}")]
         public JsonResult Details(int exerciseId, int id)
         {
@@ -110,6 +113,7 @@
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult Create(int exerciseId, [FromBody] TestViewModel vm)
         {
             var exceptionResult = new Dictionary<string, dynamic>();
@@ -197,6 +201,7 @@
         }
 
         [HttpPost]
+        [Authorize]
         [Route("{id}")]
         public JsonResult Update(int exerciseId, int id, [FromBody] TestViewModel vm)
         {
@@ -293,6 +298,7 @@
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public JsonResult Delete(int id)
         {

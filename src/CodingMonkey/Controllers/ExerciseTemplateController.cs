@@ -9,6 +9,7 @@ namespace CodingMonkey.Controllers
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.AspNet.Authorization;
     using Microsoft.Data.Entity;
 
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
@@ -42,6 +43,7 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult Create(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
             if (vm == null)
@@ -91,6 +93,7 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult Update(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
             if (vm == null)
@@ -137,6 +140,7 @@ namespace CodingMonkey.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         public JsonResult Delete(int exerciseId)
         {
             var result = new Dictionary<string, dynamic>();

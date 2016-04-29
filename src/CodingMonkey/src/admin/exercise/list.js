@@ -11,10 +11,17 @@ export class list {
     constructor(http, dialogService, router) {
         this.dialogService = dialogService;
 
+        this.appRouter = router;
+
+        // Check there is a logged in user or kick them to homepage
+        var currentUser = this.getCurrentUserInSessionStorage();
+
+        if (!currentUser.isLoggedIn) {
+            this.appRouter.navigate("/");
+        }
+
         this.notify = toastr;
         this.notify.options.progressBar = true;
-        
-        this.appRouter = router;
         
         var loc = window.location;
         this.heading = "Exercises";
@@ -90,5 +97,12 @@ export class list {
     
     goToCreateExercise() {
         this.appRouter.navigate("admin/exercise/create");
+    }
+
+    getCurrentUserInSessionStorage() {
+        let currentUserRaw = sessionStorage.getItem("currentUser");
+        let currentUser = JSON.parse(currentUserRaw);
+
+        return currentUser;
     }
 }

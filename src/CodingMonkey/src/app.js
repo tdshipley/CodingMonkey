@@ -46,6 +46,27 @@ export class App {
                 nav: false,
                 title: 'Exercises in Category'
             },
+            // Authentication Routes
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'login',  
+                name: 'Login',
+                moduleId: './authentication/login',
+                nav: false,
+                title: 'Login'
+            },
+            {
+                settings: {
+                    group: 'user'
+                },
+                route: 'logout',  
+                name: 'Logout',
+                moduleId: './authentication/logout',
+                nav: false,
+                title: 'Logout'
+            },
             // Admin Routes
             {
                 settings: {

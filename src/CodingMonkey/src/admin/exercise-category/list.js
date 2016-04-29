@@ -1,13 +1,22 @@
 ﻿import {inject} from 'aurelia-framework';
+import {Router} from 'aurelia-router';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
 import {DialogService} from 'aurelia-dialog';
 import {DialogPrompt} from '../../dialog-prompt';
 import toastr from 'toastr';
 
-@inject(HttpClient, DialogService)
+@inject(HttpClient, DialogService, Router)
 export class list {
-    constructor(http, dialogService) {
+    constructor(http, dialogService, router) {
+        this.appRouter = router;
+        // Check there is a logged in user or kick them to homepage
+        var currentUser = this.getCurrentUserInSessionStorage();
+
+        if (!currentUser.isLoggedIn) {
+            this.appRouter.navigate("/");
+        }
+
         this.dialogService = dialogService;
 
         this.notify = toastr;
@@ -83,5 +92,12 @@ export class list {
                 });
             }
         });
+    }
+
+    getCurrentUserInSessionStorage() {
+        let currentUserRaw = sessionStorage.getItem("currentUser");
+        let currentUser = JSON.parse(currentUserRaw);
+
+        return currentUser;
     }
 }

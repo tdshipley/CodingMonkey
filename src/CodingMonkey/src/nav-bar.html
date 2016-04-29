@@ -1,4 +1,4 @@
-<template bindable="router">
+<template>
   <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#skeleton-navigation-navbar-collapse">
@@ -20,7 +20,7 @@
                 </li>
             </template>
 
-            <li class="dropdown">
+            <li if.bind="vm.user.isLoggedIn" class="dropdown">
                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <template repeat.for="row of router.navigation">
@@ -32,7 +32,11 @@
             </li>
         </ul>
 
-      <ul class="nav navbar-nav navbar-right">
+        <ul if.bind="vm.user.isLoggedIn" class="nav navbar-nav navbar-right">
+            <li><a href="#" click.delegate="logout()">Logout</a></li>     
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
         <li class="loader" if.bind="router.isNavigating">
           <i class="fa fa-spinner fa-spin fa-2x"></i>
         </li>

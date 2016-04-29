@@ -1,17 +1,23 @@
-﻿using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.Data.Entity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
-namespace skeleton_navigation_es2016_vs
+﻿namespace skeleton_navigation_es2016_vs
 {
     using System.IO;
+    using System.Net;
+    using System.Runtime.InteropServices.ComTypes;
+    using System.Threading.Tasks;
 
     using CodingMonkey.Models;
 
+    using Microsoft.AspNet.Authentication.Cookies;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using Microsoft.Extensions.PlatformAbstractions;
+
+    using Microsoft.AspNet.Builder;
+    using Microsoft.AspNet.Hosting;
+    using Microsoft.AspNet.Http;
+    using Microsoft.Data.Entity;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     public class Startup
     {
@@ -43,10 +49,6 @@ namespace skeleton_navigation_es2016_vs
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-            
-            services.AddMvc();
-
-            // Add application services.
 
             // Add Db
             var path = PlatformServices.Default.Application.ApplicationBasePath;
@@ -56,11 +58,44 @@ namespace skeleton_navigation_es2016_vs
                 .AddSqlite()
                 .AddDbContext<CodingMonkeyContext>(
                     options =>
-                        { options.UseSqlite(connection); });
+                    { options.UseSqlite(connection); });
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(
+                identityContext =>
+                    {
+                        identityContext.Password.RequireDigit = false;
+                        identityContext.Password.RequireUppercase = false;
+                        identityContext.Password.RequiredLength = 6;
+
+                        identityContext.Cookies
+                                       .ApplicationCookie
+                                       .Events = new CookieAuthenticationEvents()
+                                                    {
+                                                        OnRedirectToLogin = ctx =>
+                                                            {
+                                                                if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+                                                                {
+                                                                    ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                                                }
+                                                                else
+                                                                {
+                                                                    ctx.Response.Redirect(ctx.RedirectUri);
+                                                                }
+                                                                return Task.FromResult(0);
+                                                            }
+                                                    };
+                    })
+                .AddEntityFrameworkStores<CodingMonkeyContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddMvc();
+
+            // Add application services.
+            services.AddTransient<CodingMonkeyContextSeedData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public async void Configure(IApplicationBuilder app, CodingMonkeyContextSeedData seeder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -84,6 +119,8 @@ namespace skeleton_navigation_es2016_vs
 
             app.UseStaticFiles();
 
+            app.UseIdentity();
+
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 
             app.UseMvc(routes =>
@@ -92,6 +129,8 @@ namespace skeleton_navigation_es2016_vs
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            await seeder.EnsureSeedDataAsync();
         }
 
         // Entry point for the application.

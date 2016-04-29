@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.AspNet.Authorization;
     using Microsoft.Data.Entity;
 
     [Route("api/[controller]/[action]")]
@@ -78,6 +79,7 @@
         }
 
         [HttpPost]
+        [Authorize]
         public JsonResult Create([FromBody] ExerciseViewModel vm)
         {
             var exceptionResult = new Dictionary<string, dynamic>();
@@ -126,6 +128,7 @@
 
         [HttpPost]
         [Route("{id}")]
+        [Authorize]
         public JsonResult Update(int id, [FromBody] ExerciseViewModel vm)
         {
             if (vm == null)
@@ -207,6 +210,7 @@
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public JsonResult Delete(int id)
         {
