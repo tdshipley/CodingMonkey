@@ -53,7 +53,7 @@ export class create {
         var exerciseId;
                   
         this.http.baseUrl = this.baseUrl + '/api/Exercise/';
-        
+
         this.http.fetch('Create', {
             method: 'post',
             body: json({
@@ -68,9 +68,9 @@ export class create {
         })
         .then(() => this.createExerciseTemplate(this.vm.exercise.id))
         .catch(err => {
-            this.notify.error("Create Exercise failed.")
+            this.notify.error("Create Exercise failed.");
             console.log(err);
-        })
+        });
     }
     
     createExerciseTemplate(exerciseId) {

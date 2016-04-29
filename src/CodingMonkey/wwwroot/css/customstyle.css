@@ -1,7 +1,7 @@
 ﻿/* ### Styles ### */
-/*.page-host {
-    background-color: #F8F8FF;
-}*/
+#loginForm {
+    margin-top: 10%;
+}
 
 #editor-toolbar {
     margin-bottom: 2px;
