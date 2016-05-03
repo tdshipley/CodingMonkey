@@ -51,9 +51,9 @@
     "**.vspscc"
   ],
   "scripts": {
-    "prepublish": [ "npm install jspm -g", "npm install", "bower install", "jspm install -y", "gulp clean", "gulp export" ],
+    "prepublish": [ "npm install jspm -g",  "npm install", "bower install", "jspm install -y", "gulp clean", "gulp export" ],
     "watch": [ "gulp watch" ]
   },
   "userSecretsId": "codingmonkey-6df5fca9-b862-4931-8867-c46d52bbed68",
-  "version": "1.0.0-*"
+  "version": "1.0.1-*"
 }
