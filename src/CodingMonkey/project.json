@@ -1,6 +1,6 @@
 {
   "commands": {
-    "web": "Microsoft.AspNet.Server.Kestrel --server.urls=http://*:9000/",
+    "web": "Microsoft.AspNet.Server.Kestrel",
     "ef": "EntityFramework.Commands"
   },
   "compilationOptions": {
@@ -51,7 +51,7 @@
     "**.vspscc"
   ],
   "scripts": {
-    "prepublish": [ "npm install", "bower install", "gulp clean", "gulp min" ],
+    "prepublish": [ "npm install", "bower install", "gulp clean", "gulp export" ],
     "watch": [ "gulp watch" ]
   },
   "userSecretsId": "codingmonkey-6df5fca9-b862-4931-8867-c46d52bbed68",
