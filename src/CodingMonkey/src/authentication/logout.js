@@ -4,7 +4,6 @@ import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 
-@inlineView("<template></template>")
 @inject(HttpClient, Router)
 export class logout {
     constructor(http, router) {
