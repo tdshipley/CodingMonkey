@@ -64,6 +64,23 @@
             {
                 var user = await this.GetCurrentUserAsync();
 
+                bool currentPasswordCorrect = await _userManager.CheckPasswordAsync(user, vm.CurrentPassword);
+
+                if (!currentPasswordCorrect)
+                {
+                    vm.ChangeFailureReason = ChangePasswordViewModel.FailureReason.ValidationError;
+                    vm.ChangePasswordErrors = new List<IdentityError>()
+                                                  {
+                                                      new IdentityError()
+                                                          {
+                                                              Code = "PasswordMismatch",
+                                                              Description = "Current password is incorrect."
+                                                          }
+                                                  };
+
+                    return Json(vm);
+                }
+
                 if (user != null)
                 {
                     var resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);

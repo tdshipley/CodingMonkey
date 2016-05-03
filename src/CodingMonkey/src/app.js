@@ -67,6 +67,16 @@ export class App {
                 nav: false,
                 title: 'Logout'
             },
+            {
+                settings: {
+                    group: 'admin'
+                },
+                route: 'authentication/changepassword',
+                name: 'ChangePassword',
+                moduleId: './authentication/changepassword',
+                nav: true,
+                title: 'Change Password'
+            },
             // Admin Routes
             {
                 settings: {
