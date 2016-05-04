@@ -8,14 +8,18 @@ namespace CodingMonkey.ViewModels
     {
         public CodeEditorViewModel()
         {
-            Errors = new List<CompilerErrorViewModel>();
+            this.CompilerErrors = new List<CompilerErrorViewModel>();
+            this.TestResults = new List<TestResultViewModel>();
         }
         
         public string Code { get; set; }
 
-        public bool HasErrors { get; set; }
-        public IList<CompilerErrorViewModel> Errors { get; set; }
+        public bool HasCompilerErrors { get; set; }
+        public bool HasRuntimeError { get; set; }
+        public IList<CompilerErrorViewModel> CompilerErrors { get; set; }
+        public RuntimeErrorViewModel RuntimeError { get; set; } 
         public IList<TestResultViewModel> TestResults { get; set; }
+
     }
 
     public class TestResultViewModel
