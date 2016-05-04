@@ -25,17 +25,17 @@
 
             if (result == null || result.Count == 0)
             {
-                model.HasErrors = false;
-                model.Errors = null;
+                model.HasCompilerErrors = false;
+                model.CompilerErrors = null;
             }
             else
             {
-                model.HasErrors = true;
-                model.Errors = new List<CompilerErrorViewModel>();
+                model.HasCompilerErrors = true;
+                model.CompilerErrors = new List<CompilerErrorViewModel>();
 
                 foreach (var resultError in result)
                 {
-                    model.Errors.Add(new CompilerErrorViewModel()
+                    model.CompilerErrors.Add(new CompilerErrorViewModel()
                     {
                         Id = resultError.Id,
                         Severity = resultError.Severity,
@@ -53,7 +53,7 @@
         }
 
         [HttpPost]
-        public async Task<JsonResult> Execute(int id, [FromBody] CodeEditorViewModel model)
+        public async Task<JsonResult> Execute(int id, [FromBody] CodeEditorViewModel vm)
         {
             var exercise = CodingMonkeyContext.Exercises
                                               .Include(e => e.Template)
@@ -66,7 +66,7 @@
                 return Json(string.Empty);
             }
 
-            model.TestResults = new List<TestResultViewModel>();
+            vm.TestResults = new List<TestResultViewModel>();
 
             // Run Tests
             foreach (var test in exercise.Tests)
@@ -90,14 +90,30 @@
 
                 // Run the code to get test result
                 var compiler = new RoslynCompiler();
-                object codeOutput = await compiler.Execute(model.Code,
+                ExecutionResult executionResult = await compiler.ExecuteAsync(vm.Code,
                                                 exercise.Template.ClassName,
                                                 exercise.Template.MainMethodName,
                                                 testInputs);
 
-                testResult.ActualOutput = codeOutput;
+                if (!executionResult.Successful)
+                {
+                    vm.TestResults = null;
+                    vm.CompilerErrors = null;
+                    vm.HasCompilerErrors = false;
+                    vm.HasRuntimeError = true;
 
-                model.TestResults.Add(testResult);
+                    vm.RuntimeError = new RuntimeErrorViewModel()
+                                          {
+                                              Message = executionResult.Error.Message,
+                                              HelpLink = executionResult.Error.HelpLink
+                                          };
+
+                    return Json(vm);
+                }
+
+                testResult.ActualOutput = executionResult.Value;
+
+                vm.TestResults.Add(testResult);
 
                 switch (test.TestOutput.ValueType)
                 {
@@ -133,7 +149,7 @@
                 }
             }
 
-            return Json(model);
+            return Json(vm);
         }
 
         private static bool GetTestInputForCodeExecutor(TestInput testInput, TestResultViewModel testResult, List<CodeExecutor.TestInput> testInputs)

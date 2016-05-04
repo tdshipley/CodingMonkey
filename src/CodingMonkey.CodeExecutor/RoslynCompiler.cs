@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 namespace CodingMonkey.CodeExecutor
 {
+    using System;
     using System.Threading;
 
     public struct TestInput
@@ -18,6 +19,13 @@ namespace CodingMonkey.CodeExecutor
         public string ArgumentName;
         public dynamic Value;
         public string ValueType;
+    }
+
+    public struct ExecutionResult
+    {
+        public bool Successful;
+        public object Value;
+        public Exception Error;
     }
 
     public class RoslynCompiler
@@ -29,7 +37,7 @@ namespace CodingMonkey.CodeExecutor
             return errorsFromSource.Select(error => new CompilerError(error)).ToList();
         }
 
-        public async Task<object> Execute(string code, string className, string mainMethodName, List<TestInput> inputs)
+        public async Task<ExecutionResult> ExecuteAsync(string code, string className, string mainMethodName, List<TestInput> inputs)
         {
             // Statements need a return in front of them to get the value see:
             // https://github.com/dotnet/roslyn/issues/5279
@@ -49,9 +57,20 @@ namespace CodingMonkey.CodeExecutor
 
             executionCode = executionCode.TrimEnd(',') + ");";
 
-            var script = CSharpScript.Create(code).ContinueWith(executionCode);
 
-            return (await script.RunAsync()).ReturnValue;
+            try
+            {
+                var script = CSharpScript.Create(code).ContinueWith(executionCode);
+
+                object returnValue = (await script.RunAsync()).ReturnValue;
+
+                return new ExecutionResult() { Successful = true, Value = returnValue, Error = null };
+            }
+            catch (Exception ex)
+            {
+                return new ExecutionResult() { Successful = false, Value = null, Error = ex };
+                throw;
+            }
         }
     }
 }

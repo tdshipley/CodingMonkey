@@ -111,8 +111,10 @@ export class Editor {
         .then(response => response.json())
         .then(data => {
             this.vm.SubmittedCode = true;
-            this.vm.codeHasErrors = data.HasErrors;
-            this.vm.errors = data.Errors;
+            this.vm.codeHasCompilerErrors = data.HasCompilerErrors;
+            this.vm.codeHasRuntimeError = data.HasRuntimeError;
+            this.vm.compilerErrors = data.CompilerErrors;
+            this.vm.runtimeError = data.RuntimeError;
             this.highlightErrors(data);
         })
         .then(() => {
@@ -124,10 +126,10 @@ export class Editor {
     }
 
     highlightErrors(data) {
-        if (this.vm.codeHasErrors) {
+        if (this.vm.codeHasCompilerErrors) {
             this.notify.warning("The code has compiler errors. Fix them then submit again.");
-            for (let error of data.Errors) {
-                this.highlightError(error.LineNumberStart, error.LineNumberEnd, 0, error.ColEnd);
+            for (let compilerError of data.CompilerErrors) {
+                this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
             }
         }
         else {
@@ -150,7 +152,7 @@ export class Editor {
     }
 
     executeCode() {
-        if (this.vm.codeHasErrors === false) {
+        if (this.vm.codeHasCompilerErrors === false) {
             let testsPassed = true;
 
             this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
@@ -164,35 +166,42 @@ export class Editor {
                     this.vm.SubmittedCode = true;
                     this.vm.testResults = [];
 
-                    for (let testResult of data.TestResults) {
-                        var testVM = {
-                            actualOutput: testResult.ActualOutput,
-                            description: testResult.Description,
-                            expectedOutput: testResult.ExpectedOutput,
-                            testPassed: testResult.TestPassed,
-                            inputs: []
-                        };
+                    this.vm.codeHasRuntimeError = data.HasRuntimeError;
+                    this.vm.runtimeError = data.RuntimeError;
 
-                        for (let testInput of testResult.Inputs) {
-                            var inputVM = {
-                                argumentName: testInput.ArgumentName,
-                                value: testInput.Value
+                    if (!data.HasRuntimeError) {
+                        for (let testResult of data.TestResults) {
+                            var testVM = {
+                                actualOutput: testResult.ActualOutput,
+                                description: testResult.Description,
+                                expectedOutput: testResult.ExpectedOutput,
+                                testPassed: testResult.TestPassed,
+                                inputs: []
+                            };
+
+                            for (let testInput of testResult.Inputs) {
+                                var inputVM = {
+                                    argumentName: testInput.ArgumentName,
+                                    value: testInput.Value
+                                }
+
+                                testVM.inputs.push(inputVM);
                             }
 
-                            testVM.inputs.push(inputVM);
+                            if (testsPassed) {
+                                testsPassed = testVM.testPassed;
+                            }
+
+                            this.vm.testResults.push(testVM);
                         }
 
                         if (testsPassed) {
-                            testsPassed = testVM.testPassed;
+                            this.notify.success("All tests passed!");
+                        } else {
+                            this.notify.warning("Tests Failed. Review the results and try again.");
                         }
-
-                        this.vm.testResults.push(testVM);
-                    }
-
-                    if (testsPassed) {
-                        this.notify.success("All tests passed!");
                     } else {
-                        this.notify.warning("Tests Failed. Have a look at the results and try again.");
+                        this.notify.warning("There was an error running your code. Review the error and try again.");
                     }
                 })
                 .catch(err => {

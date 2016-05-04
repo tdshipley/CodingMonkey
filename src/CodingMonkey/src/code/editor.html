@@ -20,8 +20,8 @@
     <div class="row top-buffer">
         <div class="col-lg-8 col-lg-offset-1">
             <div class="row">
-                <div if.bind="vm.codeHasErrors && vm.SubmittedCode" class="col-lg-9">
-                    <h3>Compiler Errors</h3>
+                <div if.bind="vm.codeHasCompilerErrors && vm.SubmittedCode" class="col-lg-9">
+                    <h2>Compiler Errors</h2>
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -31,7 +31,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr repeat.for="error of vm.errors" value.two-way="vm.errors">
+                        <tr repeat.for="error of vm.compilerErrors" value.two-way="vm.compilerErrors">
                             <td>${error.Id}</td>
                             <td>${error.LineNumberStart}</td>
                             <td>${error.Message}</td>
@@ -39,7 +39,24 @@
                         </tbody>
                     </table>
                 </div>
-                <div if.bind="!vm.codeHasErrors && vm.SubmittedCode" class="col-lg-9">
+                <div if.bind="vm.codeHasRuntimeError && vm.SubmittedCode" class="col-lg-9">
+                    <h2>Runtime Error</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Error Message</th>
+                                <th>Help Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${vm.runtimeError.Message}</td>
+                                <td>${error.runtimeError.HelpLink}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div if.bind="!vm.codeHasCompilerErrors && !vm.codeHasRuntimeError && vm.SubmittedCode" class="col-lg-9">
                     <h2>Test Results</h2>
                     <table class="table table-striped">
                         <tr>
