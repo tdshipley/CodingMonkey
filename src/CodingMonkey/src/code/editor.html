@@ -49,12 +49,8 @@
                             <th>Actual Result</th>
                         </tr>
                         <tr repeat.for="testResult of vm.testResults">
-                            <template if.bind="testResult.testPassed">
-                                <td style="background-color: greenyellow"></td>
-                            </template>
-                            <template if.bind="!testResult.testPassed">
-                                <td style="background-color: red"></td>
-                            </template>
+                            <td if.bind="testResult.testPassed" style="background-color: greenyellow"></td>
+                            <td if.bind="!testResult.testPassed" style="background-color: red"></td>
                             <td>${testResult.description}</td>
                             <td>${testResult.expectedOutput}</td>
                             <td>${testResult.actualOutput}</td>
