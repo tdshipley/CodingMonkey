@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 namespace CodingMonkey.CodeExecutor
 {
     using System;
-    using System.Threading;
 
     public struct TestInput
     {
@@ -30,8 +29,17 @@ namespace CodingMonkey.CodeExecutor
 
     public class RoslynCompiler
     {
+        public PreExecutionSecurity Security { get; set; }
+
+        public RoslynCompiler()
+        {
+            this.Security = new PreExecutionSecurity();
+        }
+
         public IList<CompilerError> Compile(string code)
         {
+            code = this.Security.SanitiseCode(code);
+
             var script = CSharpScript.Create(code);
             IList<Diagnostic> errorsFromSource = script.Compile();
             return errorsFromSource.Select(error => new CompilerError(error)).ToList();
@@ -39,6 +47,8 @@ namespace CodingMonkey.CodeExecutor
 
         public async Task<ExecutionResult> ExecuteAsync(string code, string className, string mainMethodName, List<TestInput> inputs)
         {
+            code = this.Security.SanitiseCode(code);
+
             // Statements need a return in front of them to get the value see:
             // https://github.com/dotnet/roslyn/issues/5279
             string executionCode = $"return new {className}().{mainMethodName}(";
