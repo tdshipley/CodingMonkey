@@ -64,7 +64,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div if.bind="!vm.codeHasCompilerErrors && !vm.codeHasRuntimeError && !vm.processingCode && vm.SubmittedCode" class="col-lg-9">
+                <div if.bind="!vm.codeHasCompilerErrors && !vm.codeHasRuntimeError && !vm.processingCode && vm.SubmittedCode && vm.testResults.length > 0" class="col-lg-9">
                     <h2>Test Results</h2>
                     <table class="table table-striped">
                         <tr>
