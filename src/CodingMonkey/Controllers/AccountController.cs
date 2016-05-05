@@ -41,7 +41,7 @@
                     response.GetUserSucceeded = false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 response.GetUserSucceeded = false;
             }
@@ -107,7 +107,7 @@
                     return Json(vm);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 vm.PasswordChangeSuccessful = false;
                 vm.ChangeFailureReason = ChangePasswordViewModel.FailureReason.Unknown;

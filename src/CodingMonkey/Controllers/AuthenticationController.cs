@@ -26,7 +26,7 @@
                 var result = await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, vm.RememberMe, lockoutOnFailure: false);
                 response.LoginSucceeded = result.Succeeded;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 response.LoginSucceeded = false;
             }
