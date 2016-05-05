@@ -6,6 +6,11 @@
         </div>
     </div>
     <div class="row">
+        <div if.bind="vm.pageLoading" class="col-lg-1 col-lg-offset-5">
+            <i class="fa fa-spinner fa-spin fa-5x"></i>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-lg-8 col-lg-offset-1">
             <div id="aceEditor" value.bind="code">
                 // Loading...

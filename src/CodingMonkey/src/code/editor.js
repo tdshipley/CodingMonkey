@@ -38,7 +38,8 @@ export class Editor {
                 mainMethodName: ""
             },
             testResults: [],
-            processingCode: false
+            processingCode: false,
+            pageLoading: true
         }
         
         this.exerciseId = 0;
@@ -76,6 +77,7 @@ export class Editor {
             .then(() => {
                 this.codeEditor.setValue(this.vm.exerciseTemplate.initialCode, -1);
                 this.getExercise(this.exerciseId);
+                this.vm.pageLoading = false;
             })
             .catch(err => {
                 this.notify.error('Failed to get exercise template.');

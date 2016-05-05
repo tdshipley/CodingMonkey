@@ -29,38 +29,37 @@ export class exercises {
                 name: "",
                 description: "",
                 exerciseids: []
-            }
+            },
+            pageLoading: true
         };
     }
     
     activate(params) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/';
-        
+
         this.http.fetch('list')
-          .then(response => response.json())
-          .then(data => {
+            .then(response => response.json())
+            .then(data => {
                 for (let exercise of data) {
-                    if(exercise.CategoryIds.includes(Number(params.exerciseCategoryId))) {
+                    if (exercise.CategoryIds.includes(Number(params.exerciseCategoryId))) {
                         var vm = {
-                        id: exercise.Id,
-                        exerciseTemplateId: exercise.ExerciseTemplateId,
-                        name: exercise.Name,
-                        guidance: exercise.Guidance,
-                        categoryids: exercise.CategoryIds
+                            id: exercise.Id,
+                            exerciseTemplateId: exercise.ExerciseTemplateId,
+                            name: exercise.Name,
+                            guidance: exercise.Guidance,
+                            categoryids: exercise.CategoryIds
                         };
 
                         this.vm.exercises.push(vm);
                     }
                 }
-          })
-          .then(() => {
-              this.getCategories(params.exerciseCategoryId);
-          })
-          .catch(err => {
+            })
+            .then(() => {
+                this.getCategories(params.exerciseCategoryId);
+            })
+            .catch(err => {
                 this.notify.error("Failed to get exercises.");
             });
-        
-        this.heading = this.vm.exerciseCategory.name + " Exercises";
     }
     
     
@@ -74,10 +73,14 @@ export class exercises {
                 this.vm.exerciseCategory.name = data.Name;
                 this.vm.exerciseCategory.description = data.Description;
                 this.vm.exerciseCategory.exerciseids = data.ExerciseIds;
+                
+                this.heading = this.vm.exerciseCategory.name + " Exercises";
+
+                this.vm.pageLoading = false;
             })
             .catch(err => {
-                this.notify.error('Failed to get category.')
-        });
+                this.notify.error('Failed to get category.');
+            });
     }
     
     goToCatgeories() {

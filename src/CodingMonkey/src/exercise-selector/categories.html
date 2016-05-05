@@ -5,7 +5,10 @@
         </div>
     </div>
     <div class="row top-buffer">
-        <div repeat.for="category of vm.categories" class="col-md-4 col-lg-offset-1">
+        <div if.bind="vm.pageLoading" class="col-lg-1 col-lg-offset-5">
+            <i class="fa fa-spinner fa-spin fa-5x"></i>
+        </div>
+        <div repeat.for="category of vm.categories" class="col-lg-4 col-lg-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">${category.name}</h3>

@@ -24,11 +24,12 @@ export class categories {
         this.http = http;
 
         this.vm = {
-            categories: []
+            categories: [],
+            pageLoading: true
         };
     }
     
-    activate() {        
+    activate() {
         this.http.fetch('list')
           .then(response => response.json())
           .then(data => {
@@ -41,10 +42,12 @@ export class categories {
 
                   this.vm.categories.push(vm);
               }
+
+                this.vm.pageLoading = false;
             })
           .catch(err => {
-              this.notify.error("Failed to get exercise categories.")
-          });
+                this.notify.error("Failed to get exercise categories.");
+            });
     }
     
     goToExercisesInCategory(categoryId) {
