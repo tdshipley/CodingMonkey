@@ -214,6 +214,7 @@ export class Editor {
                 })
                 .catch(err => {
                     this.notify.error("Failed to execute code");
+                    this.vm.processingCode = false;
                 });
         }
     }
