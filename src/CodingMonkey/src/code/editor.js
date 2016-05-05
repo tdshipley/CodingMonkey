@@ -37,7 +37,8 @@ export class Editor {
                 className: "",
                 mainMethodName: ""
             },
-            testResults: []
+            testResults: [],
+            processingCode: false
         }
         
         this.exerciseId = 0;
@@ -102,6 +103,8 @@ export class Editor {
     }
 
     submitCode() {
+        this.vm.processingCode = true;
+
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
         this.http.fetch('Compile/' + this.exerciseId, {
@@ -116,6 +119,7 @@ export class Editor {
             this.vm.compilerErrors = data.CompilerErrors;
             this.vm.runtimeError = data.RuntimeError;
             this.highlightErrors(data);
+            this.vm.processingCode = false;
         })
         .then(() => {
             this.executeCode();

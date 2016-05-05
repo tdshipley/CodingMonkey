@@ -14,7 +14,10 @@
     </div>
     <div class="row top-buffer">
         <div class="col-lg-7 col-lg-offset-1">
-            <button type="button" class="btn btn-primary" click.trigger="submitCode()">Submit Exercise</button>
+            <button type="button" disabled.bind="vm.processingCode" class="btn btn-primary" click.trigger="submitCode()">
+                Submit Exercise
+                <i if.bind="vm.processingCode" class="fa fa-cog fa-spin fa-2x"></i>
+            </button>
         </div>
     </div>
     <div class="row top-buffer">
@@ -43,16 +46,16 @@
                     <h2>Runtime Error</h2>
                     <table class="table table-striped">
                         <thead>
-                            <tr>
-                                <th>Error Message</th>
-                                <th>Help Link</th>
-                            </tr>
+                        <tr>
+                            <th>Error Message</th>
+                            <th>Help Link</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>${vm.runtimeError.Message}</td>
-                                <td>${error.runtimeError.HelpLink}</td>
-                            </tr>
+                        <tr>
+                            <td>${vm.runtimeError.Message}</td>
+                            <td>${error.runtimeError.HelpLink}</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
