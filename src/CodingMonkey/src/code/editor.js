@@ -134,6 +134,8 @@ export class Editor {
             for (let compilerError of data.CompilerErrors) {
                 this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
             }
+
+            this.vm.processingCode = false;
         }
         else {
             this.unhighlightError();
