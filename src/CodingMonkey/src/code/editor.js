@@ -127,6 +127,7 @@ export class Editor {
 
     highlightErrors(data) {
         if (this.vm.codeHasCompilerErrors) {
+            this.unhighlightError();
             this.notify.warning("The code has compiler errors. Fix them then submit again.");
             for (let compilerError of data.CompilerErrors) {
                 this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
@@ -138,7 +139,6 @@ export class Editor {
     }
 
     highlightError(startLine, endLine, startCol, endCol) {
-        this.unhighlightError();
         var Range = ace.require("ace/range").Range;
         this.markedLines.push(this.codeEditor.session.addMarker(new Range(startLine - 1, startCol, endLine - 1, endCol), "errorHighlight", "fullLine"));
     }

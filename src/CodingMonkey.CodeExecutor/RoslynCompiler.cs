@@ -39,7 +39,17 @@
 
             var script = CSharpScript.Create(code);
             IList<Diagnostic> errorsFromSource = script.Compile();
-            return errorsFromSource.Select(error => new CompilerError(error)).ToList();
+            var errors = errorsFromSource.Select(error => new CompilerError(error)).ToList();
+
+            // The user doesn't see using statements added by pre security checks
+            // so move the error line numbers to the right place.
+            foreach (var error in errors)
+            {
+                error.StartLineNumber = error.StartLineNumber - this.Security.LinesOfCodeAdded;
+                error.EndLineNumber = error.EndLineNumber - this.Security.LinesOfCodeAdded;
+            }
+
+            return errors;
         }
 
         public async Task<ExecutionResult> ExecuteAsync(string code, string className, string mainMethodName, List<TestInput> inputs)

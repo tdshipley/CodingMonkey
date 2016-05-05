@@ -9,6 +9,8 @@
 
     public class PreExecutionSecurity
     {
+        public int LinesOfCodeAdded => AllowedNamespaces.Count;
+
         /// <summary>
         /// A list of namespaces which are allowed to be included in using statements by
         /// user submitted code.
@@ -20,6 +22,7 @@
                      "System.Collections",
                      "System.Collections.Generic"
                  });
+
 
         private IList<string> BannedNamespaces => this.GetBannedNamespaces();
 
@@ -41,6 +44,7 @@
 
             const string UsingPattern = "using.+;";
             sanitisedCode = Regex.Replace(sanitisedCode, UsingPattern, "");
+            sanitisedCode = sanitisedCode.TrimStart('\n');
 
             IList<string> usingStatements = this.AllowedUsingStatements;
 
