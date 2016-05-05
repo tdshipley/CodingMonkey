@@ -77,34 +77,32 @@ export class create {
         .then(() => this.createExerciseTemplate(this.vm.exercise.id))
         .catch(err => {
             this.notify.error("Create Exercise failed.");
-            console.log(err);
         });
     }
     
     createExerciseTemplate(exerciseId) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/' + exerciseId + '/ExerciseTemplate/';
-        
+
         this.http.fetch('Create', {
-            method: 'post',
-            body: json({
-                ExerciseId: exerciseId,
-                InitialCode: this.vm.exerciseTemplate.initialCode,
-                ClassName: this.vm.exerciseTemplate.className,
-                MainMethodName: this.vm.exerciseTemplate.mainMethodName
+                method: 'post',
+                body: json({
+                    ExerciseId: exerciseId,
+                    InitialCode: this.vm.exerciseTemplate.initialCode,
+                    ClassName: this.vm.exerciseTemplate.className,
+                    MainMethodName: this.vm.exerciseTemplate.mainMethodName
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.vm.exerciseTemplate.id = data.Id;
-        })
-        .then(() => {
-            this.notify.success("Created Exercise '" + this.vm.exercise.name + "'");
-            this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/test/create");
-        })
-        .catch(err => {
-            this.notify.error("Create Exercise Template for Exercise failed.")
-            console.log(err);
-        })
+            .then(response => response.json())
+            .then(data => {
+                this.vm.exerciseTemplate.id = data.Id;
+            })
+            .then(() => {
+                this.notify.success("Created Exercise '" + this.vm.exercise.name + "'");
+                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/test/create");
+            })
+            .catch(err => {
+                this.notify.error("Create Exercise Template for Exercise failed.");
+            });
     }
     
     createCategory() {

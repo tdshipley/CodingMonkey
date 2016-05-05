@@ -83,9 +83,8 @@ export class create {
               this.getExerciseTemplate(params.exerciseId);
           })
           .catch(err => {
-              console.log(err);
-              this.notify.error("Failed to get test.")
-          });
+                this.notify.error("Failed to get test.");
+            });
           
           this.valueTypeList = ["Boolean", "Integer", "String"];
     }
@@ -137,34 +136,32 @@ export class create {
                 Value: testInput.value
             });
         }
-        
+
         this.http.fetch('update/' + this.vm.test.id, {
-            method: 'post',
-            body: json({
-                Id: this.vm.test.id,
-                Description: this.vm.test.description,
-                TestOutput: {
-                    Id: this.vm.test.testOutput.id,
-                    Value: this.vm.test.testOutput.value,
-                    ValueType: this.vm.test.testOutput.valueType
-                },
-                TestInputs: testInputsToUpdate
+                method: 'post',
+                body: json({
+                    Id: this.vm.test.id,
+                    Description: this.vm.test.description,
+                    TestOutput: {
+                        Id: this.vm.test.testOutput.id,
+                        Value: this.vm.test.testOutput.value,
+                        ValueType: this.vm.test.testOutput.valueType
+                    },
+                    TestInputs: testInputsToUpdate
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            console.log(this.vm);
-            if(data.updated == false) {
-                this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.")
-            } else {
-                this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
-                this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
-            }
-        })
-        .catch(err => {
-            this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.");
-        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.updated === false) {
+                    this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.");
+                } else {
+                    this.notify.success("Updated Exercise Test '" + this.vm.test.id + "'");
+                    this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
+                }
+            })
+            .catch(err => {
+                this.notify.error("Failed update Exercise Test '" + this.vm.test.id + "'.");
+            });
     }
     
     

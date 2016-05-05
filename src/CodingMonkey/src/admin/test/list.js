@@ -70,7 +70,6 @@ export class list {
               }
             })
           .catch(err => {
-              console.log(err);
                 this.notify.error("Failed to get tests.");
             });
     }

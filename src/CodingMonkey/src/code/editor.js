@@ -78,7 +78,6 @@ export class Editor {
                 this.getExercise(this.exerciseId);
             })
             .catch(err => {
-            console.log(err);
                 this.notify.error('Failed to get exercise template.');
             });
     }
@@ -210,7 +209,7 @@ export class Editor {
                     this.vm.processingCode = false;
                 })
                 .catch(err => {
-                    console.log(err);
+                    this.notify.error("Failed to execute code");
                 });
         }
     }

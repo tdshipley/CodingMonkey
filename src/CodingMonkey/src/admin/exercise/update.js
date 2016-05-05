@@ -61,15 +61,15 @@ export class update {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.id)
+                this.getExerciseTemplate(params.id);
               this.heading = "Update Exercise: " + this.vm.exercise.name;
           })
           .then(() => {
               this.getCategories();
           })
           .catch(err => {
-              console.log(err);
-          });
+                this.notify.error("Failed to get exercise");
+            });
     }
     
     getExerciseTemplate(exerciseId) {
@@ -84,31 +84,30 @@ export class update {
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
           })
           .catch(err => {
-              console.log(err);
-          });
+                this.notify.error("Failed to get exercise template");
+            });
     }
     
     updateExercise() {
         this.http.baseUrl = this.baseUrl + "/api/Exercise/";
-        
+
         this.http.fetch('update/' + this.vm.exercise.id, {
-            method: 'post',
-            body: json({
-                Name: this.vm.exercise.name,
-                Guidance: this.vm.exercise.guidance,
-                CategoryIds: this.vm.exercise.categoryids
+                method: 'post',
+                body: json({
+                    Name: this.vm.exercise.name,
+                    Guidance: this.vm.exercise.guidance,
+                    CategoryIds: this.vm.exercise.categoryids
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.vm.exercise.id = data.Id;
-        })
-        .then(() => this.updateExerciseTemplate(this.vm.exercise.id))
-        .catch(err => {
-            this.notify.error("Update Exercise failed.")
-            console.log(err);
-        })
-        
+            .then(response => response.json())
+            .then(data => {
+                this.vm.exercise.id = data.Id;
+            })
+            .then(() => this.updateExerciseTemplate(this.vm.exercise.id))
+            .catch(err => {
+                this.notify.error("Update Exercise failed.");
+            });
+
     }
     
     updateExerciseTemplate(exerciseId) {
@@ -125,7 +124,6 @@ export class update {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             this.vm.exerciseTemplate.id = data.Id;
         })
         .then(() => {

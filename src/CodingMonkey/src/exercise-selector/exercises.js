@@ -40,7 +40,6 @@ export class exercises {
           .then(response => response.json())
           .then(data => {
                 for (let exercise of data) {
-                    console.log(exercise);
                     if(exercise.CategoryIds.includes(Number(params.exerciseCategoryId))) {
                         var vm = {
                         id: exercise.Id,
@@ -58,9 +57,8 @@ export class exercises {
               this.getCategories(params.exerciseCategoryId);
           })
           .catch(err => {
-              console.log(err);
-              this.notify.error("Failed to get exercises.")
-          });
+                this.notify.error("Failed to get exercises.");
+            });
         
         this.heading = this.vm.exerciseCategory.name + " Exercises";
     }
