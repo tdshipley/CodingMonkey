@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using CodingMonkey.CodeExecutor.Models;
-using Newtonsoft.Json;
-
-namespace CodingMonkey.CodeExecutor
+﻿namespace CodingMonkey.CodeExecutor
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Scripting;
+    using Microsoft.CodeAnalysis.Scripting;
+    using CodingMonkey.CodeExecutor.Models;
 
     public struct TestInput
     {
@@ -70,9 +67,11 @@ namespace CodingMonkey.CodeExecutor
 
             try
             {
+
+                ScriptOptions scriptOptions = this.GetScriptOptions();
                 var script = CSharpScript.Create(code).ContinueWith(executionCode);
 
-                object returnValue = (await script.RunAsync()).ReturnValue;
+                object returnValue = (await script.WithOptions(scriptOptions).RunAsync()).ReturnValue;
 
                 return new ExecutionResult() { Successful = true, Value = returnValue, Error = null };
             }
@@ -81,6 +80,25 @@ namespace CodingMonkey.CodeExecutor
                 return new ExecutionResult() { Successful = false, Value = null, Error = ex };
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets a script options for rosyln to use when running code.
+        /// Sets up the dlls which we allow the code to run with
+        /// and a custom metadata resolver to stop it trying to find
+        /// missing assemblies. 
+        /// </summary>
+        /// <returns>Script options to use when running code</returns>
+        private ScriptOptions GetScriptOptions()
+        {
+            ScriptOptions scriptOptions = ScriptOptions.Default;
+            scriptOptions = scriptOptions.WithMetadataResolver(new CodingMonkeyMetadataReferenceResolver());
+
+            //Add reference to mscorlib & system core
+            var mscorlib = typeof(object).GetTypeInfo().Assembly;
+            var systemCore = typeof(Enumerable).GetTypeInfo().Assembly;
+
+            return scriptOptions.WithReferences(mscorlib, systemCore);
         }
     }
 }
