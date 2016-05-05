@@ -113,7 +113,7 @@
             else
             {
                 int timeoutInSeconds = timeoutMilliseconds / 1000;
-                throw new TimeoutException($"Task failed to complete before timeout of {timeoutInSeconds.ToString()} seconds.");
+                throw new TimeoutException($"Code failed to complete execution before timeout of {timeoutInSeconds.ToString()} seconds.");
             }
 
             return returnValue;

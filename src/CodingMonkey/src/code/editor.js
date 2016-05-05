@@ -119,7 +119,6 @@ export class Editor {
             this.vm.compilerErrors = data.CompilerErrors;
             this.vm.runtimeError = data.RuntimeError;
             this.highlightErrors(data);
-            this.vm.processingCode = false;
         })
         .then(() => {
             this.executeCode();
@@ -207,6 +206,8 @@ export class Editor {
                     } else {
                         this.notify.warning("There was an error running your code. Review the error and try again.");
                     }
+
+                    this.vm.processingCode = false;
                 })
                 .catch(err => {
                     console.log(err);
