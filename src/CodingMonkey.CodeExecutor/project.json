@@ -17,6 +17,7 @@
     "Microsoft.CSharp": "4.0.0",
     "Newtonsoft.Json": "8.0.2",
     "System.Collections": "4.0.11-beta-23516",
-    "System.Text.RegularExpressions": "4.0.11-beta-23516"
+    "System.Text.RegularExpressions": "4.0.11-beta-23516",
+    "System.Diagnostics.Contracts": "4.0.1-beta-23516"
   }
 }

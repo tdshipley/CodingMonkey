@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Text.RegularExpressions;
 
     public class PreExecutionSecurity
@@ -16,14 +17,20 @@
             (new List<string>()
                  {
                      "System",
+                     "System.Collections",
                      "System.Collections.Generic"
                  });
+
+        private IList<string> BannedNamespaces => this.GetBannedNamespaces();
+
+        private IList<string> AllowedUsingStatements => AllowedNamespaces.Select(x => x = "using " + x + ";").ToList();
 
         public string SanitiseCode(string codeToSanitise)
         {
             string sanitisedCode;
 
             sanitisedCode = SanitiseUsings(codeToSanitise);
+            sanitisedCode = SanitiseNamespaces(sanitisedCode);
 
             return sanitisedCode;
         }
@@ -35,7 +42,7 @@
             const string UsingPattern = "using.+;";
             sanitisedCode = Regex.Replace(sanitisedCode, UsingPattern, "");
 
-            IList<string> usingStatements = this.GetAllowedUsingStatements();
+            IList<string> usingStatements = this.AllowedUsingStatements;
 
             string usingStatementsFlaterned = string.Join(Environment.NewLine, usingStatements);
 
@@ -44,9 +51,34 @@
             return sanitisedCode;
         }
 
-        private IList<string> GetAllowedUsingStatements()
+        private string SanitiseNamespaces(string codeToSanitise)
         {
-            return AllowedNamespaces.Select(x => x = "using " + x + ";").ToList();
+            string sanitisedCode = codeToSanitise;
+            foreach (var bannedNamespace in this.BannedNamespaces)
+            {
+                sanitisedCode = sanitisedCode.Replace(bannedNamespace + ".", "");
+                sanitisedCode = sanitisedCode.Replace(bannedNamespace, "");
+            }
+
+            return sanitisedCode;
         }
+
+        private IList<string> GetBannedNamespaces()
+        {
+            List<string> bannedNamespacesList = new List<string>();
+
+            var mscorlib = typeof(object).GetTypeInfo().Assembly;
+            var systemCore = typeof(Enumerable).GetTypeInfo().Assembly;
+
+            var mscorlibTypes = mscorlib.GetTypes().Select(t => t.Namespace).Where(t => !AllowedNamespaces.Contains(t)).Distinct().ToList();
+            var systemCoreTypes = systemCore.GetTypes().Select(t => t.Namespace).Where(t => !AllowedNamespaces.Contains(t)).Distinct().ToList();
+
+            bannedNamespacesList.AddRange(mscorlibTypes);
+            bannedNamespacesList.AddRange(systemCoreTypes);
+            bannedNamespacesList.RemoveAll(x => x == null);
+
+            return bannedNamespacesList.Distinct().ToList();
+
+        } 
     }
 }
