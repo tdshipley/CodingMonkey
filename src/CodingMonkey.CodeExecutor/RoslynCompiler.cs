@@ -77,12 +77,8 @@
 
             try
             {
-
-                ScriptOptions scriptOptions = this.GetScriptOptions();
-                var script = CSharpScript.Create(code).ContinueWith(executionCode);
-
-                object returnValue = (await script.WithOptions(scriptOptions).RunAsync()).ReturnValue;
-
+                const int Timeout = 1000 * 15;
+                var returnValue = await this.ExecuteCodeWithTimeoutAsync(Timeout, code, executionCode);
                 return new ExecutionResult() { Successful = true, Value = returnValue, Error = null };
             }
             catch (Exception ex)
@@ -90,6 +86,37 @@
                 return new ExecutionResult() { Successful = false, Value = null, Error = ex };
                 throw;
             }
+        }
+
+        private async Task<object> ExecuteCodeWithTimeoutAsync(int timeoutMilliseconds, string code, string executionCode)
+        {
+            object returnValue = null;
+
+            var task = new Task(
+                async () =>
+                    {
+                        ScriptOptions scriptOptions = this.GetScriptOptions();
+                        var script = CSharpScript.Create(code).ContinueWith(executionCode);
+
+                        returnValue = (await script.WithOptions(scriptOptions).RunAsync()).ReturnValue;
+                    });
+
+            task.Start();
+
+            if (await Task.WhenAny(task, Task.Delay(timeoutMilliseconds)) == task)
+            {
+                // Task completed within timeout.
+                // Consider that the task may have faulted or been canceled.
+                // We re-await the task so that any exceptions/cancellation is rethrown.
+                await task;
+            }
+            else
+            {
+                int timeoutInSeconds = timeoutMilliseconds / 1000;
+                throw new TimeoutException($"Task failed to complete before timeout of {timeoutInSeconds.ToString()} seconds.");
+            }
+
+            return returnValue;
         }
 
         /// <summary>
