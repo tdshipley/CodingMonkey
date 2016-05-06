@@ -60,8 +60,11 @@
             string sanitisedCode = codeToSanitise;
             foreach (var bannedNamespace in this.BannedNamespaces)
             {
-                sanitisedCode = sanitisedCode.Replace(bannedNamespace + ".", "");
-                sanitisedCode = sanitisedCode.Replace(bannedNamespace, "");
+                string nsPatternIncludingExtraWhitespace = this.GetNamspaceRegexPatternIgnoreSpaces(bannedNamespace);
+                string nsPatternIncludingExtraWhitespaceAndTrailingDot = nsPatternIncludingExtraWhitespace + @"\s*[.]";
+
+                sanitisedCode = Regex.Replace(sanitisedCode, nsPatternIncludingExtraWhitespaceAndTrailingDot, "");
+                sanitisedCode = Regex.Replace(sanitisedCode, nsPatternIncludingExtraWhitespace, "");
             }
 
             return sanitisedCode;
@@ -83,6 +86,20 @@
 
             return bannedNamespacesList.Distinct().ToList();
 
-        } 
+        }
+
+        private string GetNamspaceRegexPatternIgnoreSpaces(string namespaceToSearchFor)
+        {
+            string[] namespaceParts = namespaceToSearchFor.Split('.');
+
+            string regexPattern = namespaceParts[0] + @"\s*";
+
+            for (int i = 1; i < namespaceParts.Length; i++)
+            {
+                regexPattern = regexPattern + "[.]" + @"\s*" + namespaceParts[i];
+            }
+
+            return regexPattern;
+        }
     }
 }
