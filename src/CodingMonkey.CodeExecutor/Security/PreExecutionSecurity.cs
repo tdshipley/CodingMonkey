@@ -1,39 +1,23 @@
-﻿namespace CodingMonkey.CodeExecutor
+﻿namespace CodingMonkey.CodeExecutor.Security
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
 
     public class PreExecutionSecurity
     {
-        public int LinesOfCodeAdded => SafeNamespaces.Count;
-
-        /// <summary>
-        /// A list of namespaces which are allowed to be included in using statements by
-        /// user submitted code.
-        /// </summary>
-        private static readonly IList<string> SafeNamespaces = new ReadOnlyCollection<string>
-            (new List<string>()
-                 {
-                     "System",
-                     "System.Collections",
-                     "System.Collections.Generic"
-                 });
-
-
-        private IList<string> BannedNamespaces => this.GetBannedNamespaces();
-
-        private IList<string> SafeUsingStatements => SafeNamespaces.Select(x => x = "using " + x + ";").ToList();
+        public int LinesOfCodeAdded => SecurityLists.SafeNamespaces.Count;
 
         public string SanitiseCode(string codeToSanitise)
         {
-            string sanitisedCode;
+            string sanitisedCode = codeToSanitise;
 
-            sanitisedCode = SanitiseUsings(codeToSanitise);
-            sanitisedCode = SanitiseNamespaces(sanitisedCode);
+            sanitisedCode = this.SanitiseTypes(sanitisedCode);
+            sanitisedCode = this.SanitiseUsings(sanitisedCode);
+            sanitisedCode = this.SanitiseNamespaces(sanitisedCode);
 
             return sanitisedCode;
         }
@@ -48,7 +32,7 @@
         {
             string sanitisedCode = codeToSanitise;
 
-            IList<string> safeUsingStatements = this.SafeUsingStatements;
+            IList<string> safeUsingStatements = SecurityLists.SafeUsingStatements;
 
             foreach (var safeUsingStatement in safeUsingStatements)
             {
@@ -67,7 +51,7 @@
         private string SanitiseNamespaces(string codeToSanitise)
         {
             string sanitisedCode = codeToSanitise;
-            foreach (var bannedNamespace in this.BannedNamespaces)
+            foreach (var bannedNamespace in SecurityLists.BannedNamespaces)
             {
                 string nsPatternIncludingExtraWhitespace = this.GetNamspaceRegexPatternIgnoreSpaces(bannedNamespace);
                 string nsPatternIncludingExtraWhitespaceAndTrailingDot = nsPatternIncludingExtraWhitespace + @"\s*[.]";
@@ -79,22 +63,24 @@
             return sanitisedCode;
         }
 
-        private IList<string> GetBannedNamespaces()
+        private string SanitiseTypes(string codeToSanitise)
         {
-            List<string> bannedNamespacesList = new List<string>();
+            string sanitisedCode = codeToSanitise;
 
-            var mscorlib = typeof(object).GetTypeInfo().Assembly;
-            var systemCore = typeof(Enumerable).GetTypeInfo().Assembly;
+            foreach (var bannedType in SecurityLists.BannedTypes)
+            {
+                // Remove the notiation that this type takes generics args
+                string bannedTypeToSearchFor = Regex.Replace(bannedType, @"`\d", "");
 
-            var mscorlibTypes = mscorlib.GetTypes().Select(t => t.Namespace).Where(t => !SafeNamespaces.Contains(t)).Distinct().ToList();
-            var systemCoreTypes = systemCore.GetTypes().Select(t => t.Namespace).Where(t => !SafeNamespaces.Contains(t)).Distinct().ToList();
+                // Remove Type with any static / property usages
+                string bannedTypeToSearchForPatternWithDot = $"{bannedType}\\s*[.]";
+                sanitisedCode = Regex.Replace(sanitisedCode, bannedTypeToSearchForPatternWithDot, "");
 
-            bannedNamespacesList.AddRange(mscorlibTypes);
-            bannedNamespacesList.AddRange(systemCoreTypes);
-            bannedNamespacesList.RemoveAll(x => x == null);
+                // Remove Type
+                sanitisedCode = sanitisedCode.Replace(bannedTypeToSearchFor, "");
+            }
 
-            return bannedNamespacesList.Distinct().ToList();
-
+            return sanitisedCode;
         }
 
         private string GetNamspaceRegexPatternIgnoreSpaces(string namespaceToSearchFor)
