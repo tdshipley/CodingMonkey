@@ -9,13 +9,13 @@
 
     public class PreExecutionSecurity
     {
-        public int LinesOfCodeAdded => AllowedNamespaces.Count;
+        public int LinesOfCodeAdded => SafeNamespaces.Count;
 
         /// <summary>
         /// A list of namespaces which are allowed to be included in using statements by
         /// user submitted code.
         /// </summary>
-        private static readonly IList<string> AllowedNamespaces = new ReadOnlyCollection<string>
+        private static readonly IList<string> SafeNamespaces = new ReadOnlyCollection<string>
             (new List<string>()
                  {
                      "System",
@@ -26,7 +26,7 @@
 
         private IList<string> BannedNamespaces => this.GetBannedNamespaces();
 
-        private IList<string> AllowedUsingStatements => AllowedNamespaces.Select(x => x = "using " + x + ";").ToList();
+        private IList<string> SafeUsingStatements => SafeNamespaces.Select(x => x = "using " + x + ";").ToList();
 
         public string SanitiseCode(string codeToSanitise)
         {
@@ -38,19 +38,28 @@
             return sanitisedCode;
         }
 
+        /// <summary>
+        /// Adds any safe using statements which are not currently in
+        /// the code.
+        /// </summary>
+        /// <param name="codeToSanitise"></param>
+        /// <returns></returns>
         private string SanitiseUsings(string codeToSanitise)
         {
             string sanitisedCode = codeToSanitise;
 
-            const string UsingPattern = "using.+;";
-            sanitisedCode = Regex.Replace(sanitisedCode, UsingPattern, "");
-            sanitisedCode = sanitisedCode.TrimStart('\n');
+            IList<string> safeUsingStatements = this.SafeUsingStatements;
 
-            IList<string> usingStatements = this.AllowedUsingStatements;
-
-            string usingStatementsFlaterned = string.Join(Environment.NewLine, usingStatements);
-
-            sanitisedCode = usingStatementsFlaterned + Environment.NewLine + sanitisedCode;
+            foreach (var safeUsingStatement in safeUsingStatements)
+            {
+                // Add any using statements which are safe that the user hasn't added
+                // Makes things easier for new developers who might not yet understand
+                // using statements - makes things a little more script like.
+                if (!sanitisedCode.Contains(safeUsingStatement))
+                {
+                    sanitisedCode = safeUsingStatement + Environment.NewLine + sanitisedCode;
+                }
+            }
 
             return sanitisedCode;
         }
@@ -77,8 +86,8 @@
             var mscorlib = typeof(object).GetTypeInfo().Assembly;
             var systemCore = typeof(Enumerable).GetTypeInfo().Assembly;
 
-            var mscorlibTypes = mscorlib.GetTypes().Select(t => t.Namespace).Where(t => !AllowedNamespaces.Contains(t)).Distinct().ToList();
-            var systemCoreTypes = systemCore.GetTypes().Select(t => t.Namespace).Where(t => !AllowedNamespaces.Contains(t)).Distinct().ToList();
+            var mscorlibTypes = mscorlib.GetTypes().Select(t => t.Namespace).Where(t => !SafeNamespaces.Contains(t)).Distinct().ToList();
+            var systemCoreTypes = systemCore.GetTypes().Select(t => t.Namespace).Where(t => !SafeNamespaces.Contains(t)).Distinct().ToList();
 
             bannedNamespacesList.AddRange(mscorlibTypes);
             bannedNamespacesList.AddRange(systemCoreTypes);
