@@ -1,8 +1,11 @@
 ﻿namespace CodingMonkey.Models
 {
+    using System.IO;
+
     using Microsoft.Data.Entity;
     using Microsoft.Data.Entity.Metadata;
     using Microsoft.AspNet.Identity.EntityFramework;
+    using Microsoft.Extensions.PlatformAbstractions;
 
     public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>
     {
@@ -12,6 +15,22 @@
         public DbSet<Test> Tests { get; set; }
         public DbSet<TestInput> TestInputs { get; set; }
         public DbSet<TestOutput> TestOutputs { get; set; }
+
+        public CodingMonkeyContext()
+        {
+            Database.EnsureCreated();
+            // Uncomment line below if using migrations (beyond initial)
+            // Database.Migrate();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var path = PlatformServices.Default.Application.ApplicationBasePath;
+            var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
+            optionsBuilder.UseSqlite(connection);
+
+            base.OnConfiguring(optionsBuilder);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
