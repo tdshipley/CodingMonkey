@@ -9,6 +9,7 @@
     using Microsoft.CodeAnalysis.CSharp.Scripting;
     using Microsoft.CodeAnalysis.Scripting;
     using CodingMonkey.CodeExecutor.Models;
+    using CodingMonkey.CodeExecutor.Security;
 
     public struct TestInput
     {
