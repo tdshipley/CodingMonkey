@@ -3,27 +3,18 @@
     margin-top: 10%;
 }
 
-#aceEditor {
-    border: #DADDDF solid 1px;
-    font-size: 14px;
-}
-
-#editor-toolbar {
-    margin-bottom: 2px;
-}
-
-#editor-output {
-    
-}
-
 #editor-errorlist {
     width: 80%;
 }
 
-.errorHighlight{
+.errorHighlight {
   position:absolute;
   z-index:20;
   background-color:rgba(253, 20, 20, 0.20);
+}
+
+.loader {
+    color: #FFFFFF;
 }
 
 
@@ -60,4 +51,6 @@
 #aceEditor {
     width: 80%;
     min-height: 300px;
+    border: #DADDDF solid 1px;
+    font-size: 14px;
 }
