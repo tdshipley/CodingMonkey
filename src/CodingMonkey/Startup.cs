@@ -1,4 +1,4 @@
-﻿namespace skeleton_navigation_es2016_vs
+﻿namespace CodingMonkey
 {
     using System.IO;
     using System.Net;
