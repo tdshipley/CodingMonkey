@@ -3,6 +3,7 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
+import {StringHelpers} from './../utility-classes/string-helpers.js'
 
 @inject(HttpClient, Router)
 export class exercises {
@@ -32,6 +33,8 @@ export class exercises {
             },
             pageLoading: true
         };
+
+        this.stringHelper = new StringHelpers();
     }
     
     activate(params) {
@@ -42,12 +45,15 @@ export class exercises {
             .then(data => {
                 for (let exercise of data) {
                     if (exercise.CategoryIds.includes(Number(params.exerciseCategoryId))) {
+                        let exercisePageId = this.stringHelper.convertTitleToPageId(exercise.Name);
+
                         var vm = {
                             id: exercise.Id,
                             exerciseTemplateId: exercise.ExerciseTemplateId,
                             name: exercise.Name,
                             guidance: exercise.Guidance,
-                            categoryids: exercise.CategoryIds
+                            categoryids: exercise.CategoryIds,
+                            pageId: exercisePageId
                         };
 
                         this.vm.exercises.push(vm);
