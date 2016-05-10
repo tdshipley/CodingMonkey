@@ -36,7 +36,18 @@
 
         public IList<CompilerError> Compile(string code)
         {
-            code = this.Security.SanitiseCode(code);
+            try
+            {
+                code = this.Security.SanitiseCode(code);
+            }
+            catch (Exception ex)
+            {
+                CompilerError error = new CompilerError(ex);
+                return new List<CompilerError>()
+                           {
+                               error
+                           };
+            }
 
             var script = CSharpScript.Create(code);
             IList<Diagnostic> errorsFromSource = script.Compile();
@@ -55,8 +66,6 @@
 
         public async Task<ExecutionResult> ExecuteAsync(string code, string className, string mainMethodName, List<TestInput> inputs)
         {
-            code = this.Security.SanitiseCode(code);
-
             // Statements need a return in front of them to get the value see:
             // https://github.com/dotnet/roslyn/issues/5279
             string executionCode = $"return new {className}().{mainMethodName}(";
@@ -78,6 +87,7 @@
 
             try
             {
+                code = this.Security.SanitiseCode(code);
                 const int Timeout = 1000 * 15;
                 var returnValue = await this.ExecuteCodeWithTimeoutAsync(Timeout, code, executionCode);
                 return new ExecutionResult() { Successful = true, Value = returnValue, Error = null };
