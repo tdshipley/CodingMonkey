@@ -3,6 +3,7 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
+import {StringHelpers} from './../utility-classes/string-helpers.js'
 
 @inject(HttpClient, Router)
 export class categories {
@@ -27,6 +28,8 @@ export class categories {
             categories: [],
             pageLoading: true
         };
+
+        this.stringHelper = new StringHelpers();
     }
     
     activate() {
@@ -34,10 +37,14 @@ export class categories {
           .then(response => response.json())
           .then(data => {
               for (let exerciseCategory of data) {
+
+                  let categoryPageId = this.stringHelper.convertTitleToPageId(exerciseCategory.Name);
+
                   var vm = {
                       id: exerciseCategory.Id,
                       name: exerciseCategory.Name,
-                      description: exerciseCategory.Description
+                      description: exerciseCategory.Description,
+                      pageId: categoryPageId
                   };
 
                   this.vm.categories.push(vm);
@@ -46,7 +53,7 @@ export class categories {
                 this.vm.pageLoading = false;
             })
           .catch(err => {
-                this.notify.error("Failed to get exercise categories.");
+              this.notify.error("Failed to get exercise categories.");
             });
     }
     

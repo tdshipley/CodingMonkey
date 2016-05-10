@@ -9,7 +9,7 @@
             <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
         <div repeat.for="category of vm.categories" class="col-lg-4 col-lg-offset-1">
-            <div class="panel panel-default">
+            <div id="${category.pageId}" class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">${category.name}</h3>
                 </div>

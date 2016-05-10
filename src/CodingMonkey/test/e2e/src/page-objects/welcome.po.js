@@ -5,23 +5,7 @@ export class PageObjectWelcome {
   }
 
   getGreeting() {
-    return element(by.tagName('h2')).getText();
-  }
-
-  setFirstname(value) {
-    return element(by.valueBind('firstName')).clear().sendKeys(value);
-  }
-
-  setLastname(value) {
-    return element(by.valueBind('lastName')).clear().sendKeys(value);
-  }
-
-  getFullname() {
-    return element(by.css('.help-block')).getText();
-  }
-
-  pressSubmitButton() {
-    return element(by.css('button[type="submit"]')).click();
+    return element(by.tagName('h1')).getText();
   }
 
   openAlertDialog() {
