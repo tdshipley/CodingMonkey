@@ -4,6 +4,11 @@
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
+    enum PreExecutionSecurityCodes
+    {
+        FailedSanitisation = 9001
+    }
+
     public class PreExecutionSecurity
     {
         public int LinesOfCodeAdded => SecurityLists.SafeNamespaces.Count;
@@ -13,8 +18,7 @@
             string sanitisedCode = codeToSanitise;
             int noOfReplacementsMade = -1;
             int tryCount = 0;
-            const string SanitisationFailedMessage = "Code failed to complete sanitisation process.";
-
+            string SanitisationFailedMessage = $"Compilation / Execution of code failed. Code: {(int)PreExecutionSecurityCodes.FailedSanitisation}";
 
             while (noOfReplacementsMade != 0)
             {
