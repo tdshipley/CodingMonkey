@@ -16,17 +16,17 @@ var PageObjectCategories = (function () {
   _createClass(PageObjectCategories, [{
     key: 'pressSelectCategoryButton',
     value: function pressSelectCategoryButton(categoryPanelId) {
-      element(by.id(categoryPanelId)).click();
+      element(by.css('#' + categoryPanelId + ' button')).click();
     }
   }, {
     key: 'getCatgeoryTitle',
     value: function getCatgeoryTitle(categoryPanelId) {
-      return element(by.css('#' + categoryPanelId + ' > panel-title')).getText();
+      return element(by.css('#' + categoryPanelId + ' .panel-title')).getText();
     }
   }, {
     key: 'getCategoriesDisplayedCount',
     value: function getCategoriesDisplayedCount() {
-      return element.all(by.css('panel')).count();
+      return element.all(by.css('.panel')).count();
     }
   }]);
 
