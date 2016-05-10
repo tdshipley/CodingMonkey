@@ -28,6 +28,20 @@ namespace CodingMonkey.CodeExecutor.Models
             this.ErrorLength = diagnosticResult.Location.SourceSpan.Length;
         }
 
+        public CompilerError(Exception ex)
+        {
+            this.Id = String.Empty;
+            this.Message = ex.Message;
+            this.Severity = DiagnosticSeverity.Error;
+
+            this.StartLineNumber = -1;
+            this.EndLineNumber = -1;
+            this.ColStart = -1;
+            this.ColEnd = -1;
+            this.ErrorLength = -1;
+
+        }
+
         public string Id { get; set; }
         public DiagnosticSeverity Severity { get; set; }
         public string Message { get; set; }
