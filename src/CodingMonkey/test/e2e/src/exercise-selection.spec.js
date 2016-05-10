@@ -1,16 +1,19 @@
 import {PageObjectCategories} from './page-objects/categories.po.js';
 import {PageObjectExercises} from './page-objects/exercises.po.js';
+import {PageObjectEditor} from './page-objects/editor.po.js';
 import {PageObjectSkeleton} from './page-objects/skeleton.po.js';
 
 describe('Coding Monkey', function() {
   let poCategories;
   let poExercises;
   let poSkeleton;
+  let poEditor;
 
   beforeEach(() => {
     poSkeleton = new PageObjectSkeleton();
     poCategories = new PageObjectCategories();
     poExercises = new PageObjectExercises();
+    poEditor = new PageObjectEditor();
 
     browser.loadAndWaitForAureliaPage('http://localhost:5000/#/categories');
   });
@@ -23,7 +26,7 @@ describe('Coding Monkey', function() {
       expect(poCategories.getCategoriesDisplayedCount()).toBeGreaterThan(0);
   });
 
-  it('should go to the exercise selection page when category has been selected', () => {
+  it('should show the code editor when a category and exercise have been selected', () => {
       let categoryIdToTest = 'string_manipulation';
       let categoryTitle = 'String Manipulation';
 
@@ -39,6 +42,11 @@ describe('Coding Monkey', function() {
       let exerciseTitle = "Get First Letter of a String";
 
       expect(poExercises.getExerciseTitle(exerciseIdToTest)).toEqual(exerciseTitle);
+      poExercises.pressSelectExerciseButton(exerciseIdToTest);
+
+      browser.waitForRouterComplete();
+
+      expect(poSkeleton.getCurrentPageTitle()).toBe('Code Editor | Coding Monkey');
 
   });
 });
