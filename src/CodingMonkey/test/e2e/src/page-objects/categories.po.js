@@ -1,18 +1,20 @@
+import {Panel} from './../bootstrap-utility/panel.js';
+
 export class PageObjectCategories {
 
   constructor() {
-
+      this.panelHelper = new Panel();
   }
 
   pressSelectCategoryButton(categoryPanelId) {
-      element(by.css('#' + categoryPanelId + ' button')).click();
+      this.panelHelper.clickPanelButton(categoryPanelId);
   }
 
   getCatgeoryTitle(categoryPanelId) {
-      return element(by.css('#' + categoryPanelId + ' .panel-title')).getText();
+      return this.panelHelper.getTitle(categoryPanelId);
   }
 
   getCategoriesDisplayedCount() {
-      return element.all(by.css('.panel')).count();
+      return this.panelHelper.getPanelCount();
   }
 }
