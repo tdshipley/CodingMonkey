@@ -117,33 +117,39 @@
 
                 vm.TestResults.Add(testResult);
 
-                switch (test.TestOutput.ValueType)
-                {
-                    case "String":
-                        {
-                            AddResultToTestResult<string>(testResult, test.TestOutput.Value);
-                            break;
-                        }
-                    case "Integer":
-                        {
-                            AddResultToTestResult<int>(testResult, test.TestOutput.Value);
-                            break;
-                        }
-                    case "Boolean":
-                        {
-                            AddResultToTestResult<bool>(testResult, test.TestOutput.Value);
-                            break;
-                        }
-                    default:
-                        {
-                            return null;
-                        }
-                }
+                if (AddTestResult(test, testResult)) return null;
 
                 testResult.TestExecuted = true;
             }
 
             return Json(vm);
+        }
+
+        private static bool AddTestResult(Test test, TestResultViewModel testResult)
+        {
+            switch (test.TestOutput.ValueType)
+            {
+                case "String":
+                    {
+                        AddResultToTestResult<string>(testResult, test.TestOutput.Value);
+                        break;
+                    }
+                case "Integer":
+                    {
+                        AddResultToTestResult<int>(testResult, test.TestOutput.Value);
+                        break;
+                    }
+                case "Boolean":
+                    {
+                        AddResultToTestResult<bool>(testResult, test.TestOutput.Value);
+                        break;
+                    }
+                default:
+                    {
+                        return true;
+                    }
+            }
+            return false;
         }
 
         private static bool GetTestInputForCodeExecutor(TestInput testInput, TestResultViewModel testResult, List<CodeExecutor.TestInput> testInputs)
