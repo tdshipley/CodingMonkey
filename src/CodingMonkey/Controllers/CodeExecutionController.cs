@@ -1,5 +1,6 @@
 ﻿namespace CodingMonkey.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
@@ -8,7 +9,10 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.AspNet.Razor.CodeGenerators.Visitors;
     using Microsoft.Data.Entity;
+
+    using Remotion.Linq.Clauses;
 
     using TestInput = CodingMonkey.Models.TestInput;
 
@@ -61,7 +65,7 @@
                                               .Include(e => e.Tests).ThenInclude(t => t.TestOutput)
                                               .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exercise == null || exercise.Template == null)
+            if (exercise?.Template == null)
             {
                 return Json(string.Empty);
             }
@@ -75,17 +79,15 @@
                 TestResultViewModel testResult = new TestResultViewModel()
                 {
                     Description = test.Description,
-                    Inputs = new List<TestResultInputViewModel>()
+                    Inputs = new List<TestResultInputViewModel>(),
+                    TestExecuted = false,
+                    TestPassed = false
                 };
 
-                List<CodingMonkey.CodeExecutor.TestInput> testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
-                foreach (var testInput in test.TestInputs)
+                var testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
+                if (test.TestInputs.Any(testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
                 {
-
-                    if (!GetTestInputForCodeExecutor(testInput, testResult, testInputs))
-                    {
-                        return Json(string.Empty);
-                    }
+                    return this.Json(string.Empty);
                 }
 
                 // Run the code to get test result
@@ -119,27 +121,17 @@
                 {
                     case "String":
                         {
-                            testResult.ExpectedOutput = test.TestOutput.Value;
-                            testResult.TestPassed = testResult.ActualOutput.ToString() == testResult.ExpectedOutput.ToString();
+                            AddResultToTestResult<string>(testResult, test.TestOutput.Value);
                             break;
                         }
                     case "Integer":
                         {
-                            int outputValue;
-                            int.TryParse(test.TestOutput.Value, out outputValue);
-
-                            testResult.ExpectedOutput = outputValue;
-                            testResult.TestPassed = (int)testResult.ActualOutput == (int)testResult.ExpectedOutput;
-
+                            AddResultToTestResult<int>(testResult, test.TestOutput.Value);
                             break;
                         }
                     case "Boolean":
                         {
-                            bool outputValue;
-                            bool.TryParse(test.TestOutput.Value, out outputValue);
-
-                            testResult.ExpectedOutput = outputValue;
-                            testResult.TestPassed = (bool)testResult.ActualOutput == (bool)testResult.ExpectedOutput;
+                            AddResultToTestResult<bool>(testResult, test.TestOutput.Value);
                             break;
                         }
                     default:
@@ -147,6 +139,8 @@
                             return null;
                         }
                 }
+
+                testResult.TestExecuted = true;
             }
 
             return Json(vm);
@@ -158,55 +152,91 @@
             {
                 case "String":
                     {
-                        testResult.Inputs.Add(
-                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = testInput.Value });
-
-                        testInputs.Add(
-                            new CodeExecutor.TestInput()
-                                {
-                                    Value = testInput.Value,
-                                    ValueType = testInput.ValueType,
-                                    ArgumentName = testInput.ArgumentName
-                                });
-                        return true;
+                        return AddTestInputForCodeExecutorAndResult<string>(testInputs, testResult, testInput);
                     }
                 case "Integer":
                     {
-                        int inputValue;
-                        int.TryParse(testInput.Value, out inputValue);
-
-                        testResult.Inputs.Add(
-                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = inputValue });
-
-                        testInputs.Add(
-                            new CodeExecutor.TestInput()
-                                {
-                                    Value = inputValue,
-                                    ValueType = testInput.ValueType,
-                                    ArgumentName = testInput.ArgumentName
-                                });
-                        return true;
+                        return AddTestInputForCodeExecutorAndResult<int>(testInputs, testResult, testInput);
                     }
                 case "Boolean":
                     {
-                        bool inputValue;
-                        bool.TryParse(testInput.Value, out inputValue);
-
-                        testResult.Inputs.Add(
-                            new TestResultInputViewModel() { ArgumentName = testInput.ArgumentName, Value = inputValue });
-
-                        testInputs.Add(
-                            new CodeExecutor.TestInput()
-                                {
-                                    Value = inputValue,
-                                    ValueType = testInput.ValueType,
-                                    ArgumentName = testInput.ArgumentName
-                                });
-                        return true;
+                        return AddTestInputForCodeExecutorAndResult<bool>(testInputs, testResult, testInput);
                     }
                 default:
                     {
                         return false;
+                    }
+            }
+        }
+
+        private static bool AddTestInputForCodeExecutorAndResult<T>(
+            List<CodeExecutor.TestInput> testInputs,
+            TestResultViewModel testResult,
+            TestInput testInputToAdd)
+        {
+            var valueToAdd = GetValue<T>(testInputToAdd.Value);
+
+            if (valueToAdd == null)
+            {
+                return false;
+            }
+
+            testResult.Inputs.Add(new TestResultInputViewModel() { ArgumentName = testInputToAdd.ArgumentName, Value = (T)valueToAdd });
+
+            testInputs.Add(
+                new CodeExecutor.TestInput()
+                {
+                    Value = (T)valueToAdd,
+                    ValueType = testInputToAdd.ValueType,
+                    ArgumentName = testInputToAdd.ArgumentName
+                });
+
+            return true;
+        }
+
+        private static void AddResultToTestResult<T>(TestResultViewModel testResult, object expectedOutputValue)
+        {
+            var value = GetValue<T>(expectedOutputValue);
+
+            testResult.ExpectedOutput = (T)value;
+            testResult.TestPassed = testResult.ActualOutput.Equals((T)testResult.ExpectedOutput);
+        }
+
+        private static object GetValue<T>(object value)
+        {
+            switch (typeof(T).ToString())
+            {
+                case "System.String":
+                    {
+                        return value.ToString();
+                    }
+                case "System.Int32":
+                    {
+                        int inputValue;
+                        bool success = int.TryParse(value.ToString(), out inputValue);
+
+                        if (success)
+                        {
+                            return inputValue;
+                        }
+
+                        return null;
+                    }
+                case "System.Boolean":
+                    {
+                        bool inputValue;
+                        bool success = bool.TryParse(value.ToString(), out inputValue);
+
+                        if (success)
+                        {
+                            return inputValue;
+                        }
+
+                        return null;
+                    }
+                default:
+                    {
+                        return null;
                     }
             }
         }

@@ -30,6 +30,7 @@ namespace CodingMonkey.ViewModels
         public object ExpectedOutput { get; set; }
         public object ActualOutput { get; set; }
         public bool TestPassed { get; set; }
+        public bool TestExecuted { get; set; }
     }
 
     public struct TestResultInputViewModel
