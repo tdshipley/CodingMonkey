@@ -174,6 +174,7 @@ export class Editor {
 
                     this.vm.codeHasRuntimeError = data.HasRuntimeError;
                     this.vm.runtimeError = data.RuntimeError;
+                    this.vm.allTestsExecuted = data.AllTestsExecuted;
 
                     if (!data.HasRuntimeError) {
                         for (let testResult of data.TestResults) {
@@ -182,6 +183,7 @@ export class Editor {
                                 description: testResult.Description,
                                 expectedOutput: testResult.ExpectedOutput,
                                 testPassed: testResult.TestPassed,
+                                testExecuted: testResult.TestExecuted,
                                 inputs: []
                             };
 
@@ -216,6 +218,7 @@ export class Editor {
                     this.notify.error("Failed to execute code");
                     this.vm.processingCode = false;
                     this.vm.testResults = [];
+                    console.log(err);
                 });
         }
     }

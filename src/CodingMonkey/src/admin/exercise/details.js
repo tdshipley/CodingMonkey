@@ -43,7 +43,8 @@ export class details {
                 id: 0,
                 initialCode: "",
                 className: "",
-                mainMethodName: ""
+                mainMethodName: "",
+                mainMethodSignature: ""
             },
             exerciseCategories: []
         };
@@ -59,14 +60,14 @@ export class details {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.id)
-          })
+                this.getExerciseTemplate(params.id);
+            })
           .then(() => {
               this.getExerciseCategoriesForExercise(this.vm.exercise.categoryids);
           })
           .catch(err => {
-              this.notify.error("Failed to get exercise.")
-          });
+                this.notify.error("Failed to get exercise.");
+            });
     }
     
     getExerciseTemplate(exerciseId) {
@@ -79,14 +80,15 @@ export class details {
               this.vm.exerciseTemplate.initialCode = data.InitialCode;
               this.vm.exerciseTemplate.className = data.ClassName;
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
-          })
+              this.vm.exerciseTemplate.mainMethodSignature = data.MainMethodSignature;
+            })
           .catch(err => {
-              this.notify.error("Failed to get Exercise Template for Exercise.")
-          });
+                this.notify.error("Failed to get Exercise Template for Exercise.");
+            });
     }
     
     getExerciseCategoriesForExercise(categoryIds) {
-        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/'
+        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/';
         
         if(categoryIds.count !== 0) {
             this.hasCategories = true;

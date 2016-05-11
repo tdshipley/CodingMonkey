@@ -47,7 +47,8 @@ export class create {
                 id: 0,
                 initialCode: "",
                 className: "",
-                mainMethodName: ""
+                mainMethodName: "",
+                mainMethodSignature: ""
             },
             exerciseCategory: {
                 id: 0,
@@ -89,7 +90,8 @@ export class create {
                     ExerciseId: exerciseId,
                     InitialCode: this.vm.exerciseTemplate.initialCode,
                     ClassName: this.vm.exerciseTemplate.className,
-                    MainMethodName: this.vm.exerciseTemplate.mainMethodName
+                    MainMethodName: this.vm.exerciseTemplate.mainMethodName,
+                    MainMethodSignature: this.vm.exerciseTemplate.mainMethodSignature
                 })
             })
             .then(response => response.json())
@@ -106,41 +108,41 @@ export class create {
     }
     
     createCategory() {
-        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/'
-        
+        this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/';
+
         this.http.fetch('Create', {
-            method: 'post',
-            body: json({
-                name: this.vm.exerciseCategory.name,
-                description: this.vm.exerciseCategory.description,
+                method: 'post',
+                body: json({
+                    name: this.vm.exerciseCategory.name,
+                    description: this.vm.exerciseCategory.description,
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            let categoryModel = {
-                id: data.Id,
-                name: data.Name,
-                description: data.Description
-            }
-            
-            this.categoriesList.push(categoryModel);
-            this.toggleAddCategoryForm();
-            
-            this.notify.success("Create category '" + categoryModel.name + "' succeeded.");
-        })
-        .catch(err => {
-            this.notify.error("Create category '" + categoryModel.name + "' failed.")
-        })
+            .then(response => response.json())
+            .then(data => {
+                let categoryModel = {
+                    id: data.Id,
+                    name: data.Name,
+                    description: data.Description
+                }
+
+                this.categoriesList.push(categoryModel);
+                this.toggleAddCategoryForm();
+
+                this.notify.success("Create category '" + categoryModel.name + "' succeeded.");
+            })
+            .catch(err => {
+                this.notify.error("Create category '" + categoryModel.name + "' failed.");
+            });
     }
     
     getCategories() {
         this.http.baseUrl = this.baseUrl + '/api/ExerciseCategory/';
-        
+
         this.http.fetch('List')
             .then(response => response.json())
             .then(data => {
                 this.categoriesList = [];
-                              
+
                 for (let category of data) {
                     let categoryModel = {
                         id: category.Id,
@@ -152,8 +154,8 @@ export class create {
                 }
             })
             .catch(err => {
-                this.notify.error("Get Exercise Categories failed.")
-            })
+                this.notify.error("Get Exercise Categories failed.");
+            });
     }
     
     toggleAddCategoryForm() {
@@ -162,6 +164,21 @@ export class create {
     
     goToExerciseList() {
         this.appRouter.navigate("admin/exercises");
+    }
+
+    extractExpectedCodeSnippets() {
+        let classNameRegexPattern = /(class\s)(\s*\w*)/;
+        let methodNameRegexPattern = /\S*\s*(?=\()/;
+        let methodSignatureRegexPattern = /(public|private|protected|internal)\s*(int|string|bool|char|bit|byte)\s*\S*\(\S*\s*\S*\)/;
+
+        if (classNameRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
+            this.vm.exerciseTemplate.className = this.vm.exerciseTemplate.initialCode.match(classNameRegexPattern)[2];
+        }
+
+        if (methodSignatureRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
+            this.vm.exerciseTemplate.mainMethodSignature = this.vm.exerciseTemplate.initialCode.match(methodSignatureRegexPattern)[0];
+            this.vm.exerciseTemplate.mainMethodName = this.vm.exerciseTemplate.mainMethodSignature.match(methodNameRegexPattern);
+        }
     }
 
     getCurrentUserInSessionStorage() {

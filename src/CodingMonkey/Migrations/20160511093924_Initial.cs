@@ -119,7 +119,8 @@ namespace CodingMonkey.Migrations
                     ClassName = table.Column<string>(nullable: true),
                     ExerciseForeignKey = table.Column<int>(nullable: false),
                     InitialCode = table.Column<string>(nullable: true),
-                    MainMethodName = table.Column<string>(nullable: true)
+                    MainMethodName = table.Column<string>(nullable: true),
+                    MainMethodSignature = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

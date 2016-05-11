@@ -109,6 +109,8 @@ namespace CodingMonkey.Migrations
 
                     b.Property<string>("MainMethodName");
 
+                    b.Property<string>("MainMethodSignature");
+
                     b.HasKey("ExerciseTemplateId");
                 });
 

@@ -20,9 +20,15 @@
                     <label for="exerciseTemplateInitialCode">Exercise Initial Code</label>
                     <textarea value.bind="vm.exerciseTemplate.initialCode" class="form-control" rows="10" id="exerciseTemplateInitialCode" placeholder="Initial Code for the Exercise"></textarea>
                 </div>
+                <button class="btn btn-primary bottom-buffer" click.delegate="extractExpectedCodeSnippets()">Autofil Expected Information</button>
                 <div class="form-group">
                     <label for="exerciseTemplateClassName">Expected Class Name</label>
                     <input value.bind="vm.exerciseTemplate.className" type="text" class="form-control" id="exerciseTemplateClassName" placeholder="Expected Class Name">
+                </div>
+                <div class="form-group">
+                    <label for="exerciseTemplateMainMethodSignature">Expected Main Method Signature</label>
+                    <p><i>This is the full expected signature of the main method (the method executed by tests) including accessability modifier, return type, name and arguments. But excluding block brackets ({}) and implementation.</i></p>
+                    <input value.bind="vm.exerciseTemplate.mainMethodSignature" type="text" class="form-control" id="exerciseTemplateMainMethodSignature" placeholder="Expected Main Method Signature">
                 </div>
                 <div class="form-group">
                     <label for="exerciseTemplateMainMethod">Expected Main Method Name</label>
