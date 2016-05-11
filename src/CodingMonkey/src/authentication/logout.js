@@ -31,7 +31,7 @@ export class logout {
         .then(data => {
             if (data.LogoutSucceeded === true) {
                 sessionStorage.removeItem("currentUser");
-                location.reload();
+                location.href = this.baseUrl;
                 this.appRouter.navigate("/");
             } else {
                 this.notify.error(logoutErrorMessage);

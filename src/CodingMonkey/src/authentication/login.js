@@ -41,7 +41,7 @@ export class login {
         .then(data => {
             if (data.LoginSucceeded === true) {
                 this.notify.remove();
-                location.reload();
+                location.href = this.baseUrl;
                 this.appRouter.navigate("admin/exercises");
             } else {
                 this.notify.error("Your Username or Password was incorrect.");
