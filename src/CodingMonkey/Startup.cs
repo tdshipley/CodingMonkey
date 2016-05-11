@@ -1,8 +1,7 @@
-﻿namespace CodingMonkey
+﻿ namespace CodingMonkey
 {
     using System.IO;
     using System.Net;
-    using System.Runtime.InteropServices.ComTypes;
     using System.Threading.Tasks;
 
     using CodingMonkey.Models;
@@ -13,7 +12,6 @@
 
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
-    using Microsoft.AspNet.Http;
     using Microsoft.Data.Entity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +28,7 @@
 
             // Create SeriLog
             Log.Logger = new LoggerConfiguration()
-                                .MinimumLevel.Debug()
-                                .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
+                                .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt")).MinimumLevel.Debug()
                                 .CreateLogger();
 
             // Set up configuration sources.
@@ -108,6 +105,7 @@
         public async void Configure(IApplicationBuilder app, CodingMonkeyContextSeedData seeder, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddSerilog();
+            loggerFactory.MinimumLevel = LogLevel.Debug;
 
             app.UseApplicationInsightsRequestTelemetry();
 

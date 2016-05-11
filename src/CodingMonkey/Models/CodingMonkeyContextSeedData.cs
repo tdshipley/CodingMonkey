@@ -3,34 +3,41 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
-    using CodingMonkey.ViewModels;
-
     using Microsoft.AspNet.Identity;
-    using Microsoft.AspNet.Mvc.ModelBinding;
+    using Microsoft.Extensions.Logging;
 
     public class CodingMonkeyContextSeedData
     {
         private CodingMonkeyContext _context;
-
         private UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<CodingMonkeyContextSeedData> _logger; 
 
-        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager)
+        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager, ILogger<CodingMonkeyContextSeedData> logger)
         {
             this._context = context;
             this._userManager = userManager;
+            this._logger = logger;
         }
 
         public async Task EnsureSeedDataAsync()
         {
+            this._logger.LogInformation("Seeding Database: Started");
             if (await this._userManager.FindByEmailAsync("thomas.shipley@googlemail.com") == null)
             {
+                this._logger.LogDebug("Seeding Database: Adding user.");
                 // Add user
                 var user = new ApplicationUser() { UserName = "tdshipley", Email = "thomas.shipley@googlemail.com" };
 
-                await this._userManager.CreateAsync(user, "password!");
+                try
+                {
+                    await this._userManager.CreateAsync(user, "password!");
+                }
+                catch (Exception ex)
+                {
+                    this._logger.LogError("Seeding Database: Adding user {@user} failed with exception {@ex}");
+                }
             }
 
             if (this._context.Exercises.FirstOrDefault() == null)
@@ -417,6 +424,8 @@
                 }
 
             }
+
+            this._logger.LogDebug("Seeding Database: Finished");
         }
 
         private static void AssignExerciseToCategoryInMemory(Exercise exercise, ExerciseCategory exerciseCategory)
