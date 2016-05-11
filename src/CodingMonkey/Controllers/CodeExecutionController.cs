@@ -164,11 +164,12 @@
             }
 
             // Check code does not have private, protected, internal constructor
-            string constructorPattern = $"(private|internal|protected)\\s*{className}\\s*()";
+            string constructorPattern = $"(private|internal|protected|\\s*)\\s*{className}\\s*\\(";
+            string publicConstructorPattern = $"public\\s*{className}\\s*\\(";
             var doesNotConatainPublicClassConstructor = new TestResultViewModel()
                                                              {
                                                                  Description =
-                                                                     $"Code does not contain a Internal, Private or Protected Class Constructor for class '{className}'",
+                                                                     $"Code does not contain a Internal, Private or Protected Class Constructor '{className}'.",
                                                                  ExpectedOutput = true,
                                                                  ActualOutput = true,
                                                                  TestPassed = true,
@@ -177,13 +178,39 @@
                                                                      new List<TestResultInputViewModel>()
                                                              };
 
-            if (Regex.Match(code, constructorPattern).Success)
+            bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
+            if (Regex.Match(code, constructorPattern).Success && !publicConstructorFound)
             {
                 coreTestsPassed = false;
                 doesNotConatainPublicClassConstructor.TestPassed = false;
                 doesNotConatainPublicClassConstructor.ActualOutput = false;
             }
 
+            // If code has public constructor check it does not take any arguments
+            var publicClassConstructorTakesNoArguments = new TestResultViewModel()
+                                                             {
+                                                                 Description =
+                                                                     $"Public Constructor in Class '{className}' takes no arguments.",
+                                                                 ExpectedOutput = true,
+                                                                 ActualOutput = true,
+                                                                 TestPassed = true,
+                                                                 TestExecuted = true,
+                                                                 Inputs =
+                                                                     new List
+                                                                     <TestResultInputViewModel>()
+                                                             };
+
+            if (publicConstructorFound)
+            {
+                string publicConstructorWithNoArgumentsPattern = publicConstructorPattern + "\\s*\\)";
+
+                if (!Regex.Match(code, publicConstructorWithNoArgumentsPattern).Success)
+                {
+                    coreTestsPassed = false;
+                    publicClassConstructorTakesNoArguments.TestPassed = false;
+                    publicClassConstructorTakesNoArguments.ActualOutput = false;
+                }
+            }
 
             // Check code has main method
             string mainMethodSignaturePattern = mainMethodSignature.Replace(" ", "\\s*")
@@ -215,6 +242,11 @@
                                          doesNotConatainPublicClassConstructor,
                                          containsMainMethod
                                      });
+
+            if (publicConstructorFound)
+            {
+                testResults.Add(publicClassConstructorTakesNoArguments);
+            }
 
             return coreTestsPassed;
         }
