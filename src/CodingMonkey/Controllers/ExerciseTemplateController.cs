@@ -36,7 +36,8 @@ namespace CodingMonkey.Controllers
                                  ExerciseId = exerciseTemplate.Exercise.ExerciseId,
                                  InitialCode = exerciseTemplate.InitialCode,
                                  ClassName = exerciseTemplate.ClassName,
-                                 MainMethodName = exerciseTemplate.MainMethodName
+                                 MainMethodName = exerciseTemplate.MainMethodName,
+                                 MainMethodSignature = exerciseTemplate.MainMethodSignature
                              };
 
             return Json(vm);
@@ -66,7 +67,8 @@ namespace CodingMonkey.Controllers
                                                     {
                                                         InitialCode = vm.InitialCode,
                                                         ClassName = vm.ClassName,
-                                                        MainMethodName = vm.MainMethodName
+                                                        MainMethodName = vm.MainMethodName,
+                                                        MainMethodSignature = vm.MainMethodSignature
                                                     };
 
             relatedExercise.Template = exerciseTemplate;
@@ -117,6 +119,7 @@ namespace CodingMonkey.Controllers
             exerciseTemplate.ClassName = vm.ClassName;
             exerciseTemplate.MainMethodName = vm.MainMethodName;
             exerciseTemplate.InitialCode = vm.InitialCode;
+            exerciseTemplate.MainMethodSignature = vm.MainMethodSignature;
 
             try
             {

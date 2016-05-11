@@ -47,7 +47,8 @@ export class create {
                 id: 0,
                 initialCode: "",
                 className: "",
-                mainMethodName: ""
+                mainMethodName: "",
+                mainMethodSignature: ""
             },
             exerciseCategory: {
                 id: 0,
@@ -89,7 +90,8 @@ export class create {
                     ExerciseId: exerciseId,
                     InitialCode: this.vm.exerciseTemplate.initialCode,
                     ClassName: this.vm.exerciseTemplate.className,
-                    MainMethodName: this.vm.exerciseTemplate.mainMethodName
+                    MainMethodName: this.vm.exerciseTemplate.mainMethodName,
+                    MainMethodSignature: this.vm.exerciseTemplate.mainMethodSignature
                 })
             })
             .then(response => response.json())

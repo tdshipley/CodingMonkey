@@ -16,9 +16,10 @@ namespace CodingMonkey.ViewModels
 
         public bool HasCompilerErrors { get; set; }
         public bool HasRuntimeError { get; set; }
+        public bool AllTestsExecuted { get; set; }
         public IList<CompilerErrorViewModel> CompilerErrors { get; set; }
         public RuntimeErrorViewModel RuntimeError { get; set; } 
-        public IList<TestResultViewModel> TestResults { get; set; }
+        public List<TestResultViewModel> TestResults { get; set; }
 
     }
 

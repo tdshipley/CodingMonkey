@@ -1,18 +1,14 @@
 ﻿namespace CodingMonkey.Controllers
 {
-    using System;
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
     using Microsoft.AspNet.Mvc;
     using CodingMonkey.CodeExecutor;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-
-    using Microsoft.AspNet.Razor.CodeGenerators.Visitors;
     using Microsoft.Data.Entity;
-
-    using Remotion.Linq.Clauses;
 
     using TestInput = CodingMonkey.Models.TestInput;
 
@@ -70,59 +66,157 @@
                 return Json(string.Empty);
             }
 
+            vm.AllTestsExecuted = true;
             vm.TestResults = new List<TestResultViewModel>();
+
+            bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName, exercise.Template.MainMethodSignature, vm.TestResults);
 
             // Run Tests
             foreach (var test in exercise.Tests)
             {
                 // Create View Model for result
                 TestResultViewModel testResult = new TestResultViewModel()
-                {
-                    Description = test.Description,
-                    Inputs = new List<TestResultInputViewModel>(),
-                    TestExecuted = false,
-                    TestPassed = false
-                };
+                                                     {
+                                                         Description = test.Description,
+                                                         Inputs =
+                                                             new List<TestResultInputViewModel>(),
+                                                         TestExecuted = false,
+                                                         TestPassed = false
+                                                     };
 
-                var testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
-                if (test.TestInputs.Any(testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
+                if (coreTestsPassed)
                 {
-                    return this.Json(string.Empty);
+                    var testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
+                    if (test.TestInputs.Any(
+                        testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
+                    {
+                        return this.Json(string.Empty);
+                    }
+
+                    // Run the code to get test result
+                    var compiler = new RoslynCompiler();
+                    ExecutionResult executionResult =
+                        await
+                        compiler.ExecuteAsync(
+                            vm.Code,
+                            exercise.Template.ClassName,
+                            exercise.Template.MainMethodName,
+                            testInputs);
+
+                    if (!executionResult.Successful)
+                    {
+                        vm.TestResults = null;
+                        vm.CompilerErrors = null;
+                        vm.HasCompilerErrors = false;
+                        vm.HasRuntimeError = true;
+
+                        vm.RuntimeError = new RuntimeErrorViewModel()
+                                              {
+                                                  Message = executionResult.Error.Message,
+                                                  HelpLink = executionResult.Error.HelpLink
+                                              };
+
+                        return Json(vm);
+                    }
+
+                    testResult.ActualOutput = executionResult.Value;
+
+                    testResult.TestExecuted = true;
                 }
-
-                // Run the code to get test result
-                var compiler = new RoslynCompiler();
-                ExecutionResult executionResult = await compiler.ExecuteAsync(vm.Code,
-                                                exercise.Template.ClassName,
-                                                exercise.Template.MainMethodName,
-                                                testInputs);
-
-                if (!executionResult.Successful)
+                else
                 {
-                    vm.TestResults = null;
-                    vm.CompilerErrors = null;
-                    vm.HasCompilerErrors = false;
-                    vm.HasRuntimeError = true;
-
-                    vm.RuntimeError = new RuntimeErrorViewModel()
-                                          {
-                                              Message = executionResult.Error.Message,
-                                              HelpLink = executionResult.Error.HelpLink
-                                          };
-
-                    return Json(vm);
+                    vm.AllTestsExecuted = false;
+                    testResult.TestExecuted = false;
+                    testResult.TestPassed = false;
+                    testResult.ActualOutput = "Not Run";
                 }
-
-                testResult.ActualOutput = executionResult.Value;
 
                 vm.TestResults.Add(testResult);
-
                 if (AddTestResult(test, testResult)) return null;
 
-                testResult.TestExecuted = true;
             }
 
             return Json(vm);
+        }
+
+        private static bool RunCoreTests(string code, string className, string mainMethodName, string mainMethodSignature, List<TestResultViewModel> testResults)
+        {
+            bool coreTestsPassed = true;
+
+            // Check code has a public class matching expected
+            string classPattern = $"public\\s*class\\s*{className}(\\n*|\\s*){{";
+            var containsPublicClass = new TestResultViewModel()
+                                          {
+                                              Description =
+                                                  $"Code contains a Public Class named '{className}'",
+                                              ExpectedOutput = true,
+                                              ActualOutput = true,
+                                              TestPassed = true,
+                                              TestExecuted = true,
+                                              Inputs = new List<TestResultInputViewModel>()
+                                          };
+
+            if (!Regex.Match(code, classPattern).Success)
+            {
+                coreTestsPassed = false;
+                containsPublicClass.TestPassed = false;
+                containsPublicClass.ActualOutput = false;
+            }
+
+            // Check code does not have private, protected, internal constructor
+            string constructorPattern = $"(private|internal|protected)\\s*{className}\\s*()";
+            var doesNotConatainPublicClassConstructor = new TestResultViewModel()
+                                                             {
+                                                                 Description =
+                                                                     $"Code does not contain a Internal, Private or Protected Class Constructor for class '{className}'",
+                                                                 ExpectedOutput = true,
+                                                                 ActualOutput = true,
+                                                                 TestPassed = true,
+                                                                 TestExecuted = true,
+                                                                 Inputs =
+                                                                     new List<TestResultInputViewModel>()
+                                                             };
+
+            if (Regex.Match(code, constructorPattern).Success)
+            {
+                coreTestsPassed = false;
+                doesNotConatainPublicClassConstructor.TestPassed = false;
+                doesNotConatainPublicClassConstructor.ActualOutput = false;
+            }
+
+
+            // Check code has main method
+            string mainMethodSignaturePattern = mainMethodSignature.Replace(" ", "\\s*")
+                                                          .Replace("(", "\\(")
+                                                          .Replace(")", "\\)")
+                                                          .Replace(",", "\\s*,");
+
+            var containsMainMethod = new TestResultViewModel()
+                                         {
+                                             Description =
+                                                 $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
+                                             ExpectedOutput = true,
+                                             ActualOutput = true,
+                                             TestPassed = true,
+                                             TestExecuted = true,
+                                             Inputs = new List<TestResultInputViewModel>()
+                                         };
+
+            if (!Regex.Match(code, mainMethodSignaturePattern).Success)
+            {
+                coreTestsPassed = false;
+                containsMainMethod.TestPassed = false;
+                containsMainMethod.ActualOutput = false;
+            }
+
+            testResults.AddRange(new List<TestResultViewModel>()
+                                     {
+                                         containsPublicClass,
+                                         doesNotConatainPublicClassConstructor,
+                                         containsMainMethod
+                                     });
+
+            return coreTestsPassed;
         }
 
         private static bool AddTestResult(Test test, TestResultViewModel testResult)

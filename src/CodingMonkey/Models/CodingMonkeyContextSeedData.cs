@@ -116,7 +116,8 @@
                                                                           "    {\n" +
                                                                           "        // Your Code!\n" +
                                                                           "    }\n" +
-                                                                          "}"
+                                                                          "}",
+                                                            MainMethodSignature = "public int Add(int a, int b)"
                 };
 
                 AssignExerciseToExerciseTemplateInMemory(addTwoNumbersExercise, addTwoNumbersExerciseTemplate);
@@ -131,7 +132,8 @@
                                                                                "    {\n" +
                                                                                "        // Your Code!\n" +
                                                                                "    }\n" +
-                                                                               "}"
+                                                                               "}",
+                                                                 MainMethodSignature = "public int Multiply(int a, int b)"
                 };
 
                 AssignExerciseToExerciseTemplateInMemory(multiplyTwoNumbersExercise, multiplyTwoNumbersExerciseTemplate);
@@ -146,7 +148,8 @@
                                                                             "    {\n" +
                                                                             "        // Your Code!\n" +
                                                                             "    }\n" +
-                                                                            "}"
+                                                                            "}",
+                                                              MainMethodSignature = "public string GetFirstLetter(string input)"
                 };
 
                 AssignExerciseToExerciseTemplateInMemory(findFindFirstLetterExercise, findFirstLetterExerciseTemplate);

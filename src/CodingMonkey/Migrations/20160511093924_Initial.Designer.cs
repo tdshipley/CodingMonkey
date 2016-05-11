@@ -8,7 +8,7 @@ using CodingMonkey.Models;
 namespace CodingMonkey.Migrations
 {
     [DbContext(typeof(CodingMonkeyContext))]
-    [Migration("20160428153607_Initial")]
+    [Migration("20160511093924_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,6 +109,8 @@ namespace CodingMonkey.Migrations
                     b.Property<string>("InitialCode");
 
                     b.Property<string>("MainMethodName");
+
+                    b.Property<string>("MainMethodSignature");
 
                     b.HasKey("ExerciseTemplateId");
                 });
