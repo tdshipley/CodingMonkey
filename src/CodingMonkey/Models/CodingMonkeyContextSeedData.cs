@@ -3,13 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
-    using CodingMonkey.ViewModels;
+    using CodingMonkey.Configuration;
 
     using Microsoft.AspNet.Identity;
-    using Microsoft.AspNet.Mvc.ModelBinding;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.OptionsModel;
 
     public class CodingMonkeyContextSeedData
     {
@@ -17,20 +17,23 @@
 
         private UserManager<ApplicationUser> _userManager;
 
-        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager)
+        private IOptions<InitialUserConfig> _initialUserConfig;
+
+        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager, IOptions<InitialUserConfig> initialUserConfig)
         {
             this._context = context;
             this._userManager = userManager;
+            this._initialUserConfig = initialUserConfig;
         }
 
         public async Task EnsureSeedDataAsync()
         {
-            if (await this._userManager.FindByEmailAsync("thomas.shipley@googlemail.com") == null)
+            if (await this._userManager.FindByEmailAsync(this._initialUserConfig.Value.Email) == null)
             {
                 // Add user
-                var user = new ApplicationUser() { UserName = "tdshipley", Email = "thomas.shipley@googlemail.com" };
+                var user = new ApplicationUser() { UserName = this._initialUserConfig.Value.UserName, Email = this._initialUserConfig.Value.Email };
 
-                await this._userManager.CreateAsync(user, "password!");
+                await this._userManager.CreateAsync(user, this._initialUserConfig.Value.Password);
             }
 
             if (this._context.Exercises.FirstOrDefault() == null)
