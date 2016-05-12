@@ -3,6 +3,7 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
+import {Authentication} from './../../authentication/authentication.js';
 
 @inject(HttpClient, Router)
 export class create {
@@ -10,11 +11,7 @@ export class create {
         this.appRouter = router;
 
         // Check there is a logged in user or kick them to homepage
-        var currentUser = this.getCurrentUserInSessionStorage();
-
-        if (!currentUser.isLoggedIn) {
-            this.appRouter.navigate("/");
-        }
+        new Authentication(this.appRouter).verifyUserLoggedIn();
 
         var loc = window.location;
         
@@ -179,12 +176,5 @@ export class create {
             this.vm.exerciseTemplate.mainMethodSignature = this.vm.exerciseTemplate.initialCode.match(methodSignatureRegexPattern)[0];
             this.vm.exerciseTemplate.mainMethodName = this.vm.exerciseTemplate.mainMethodSignature.match(methodNameRegexPattern);
         }
-    }
-
-    getCurrentUserInSessionStorage() {
-        let currentUserRaw = sessionStorage.getItem("currentUser");
-        let currentUser = JSON.parse(currentUserRaw);
-
-        return currentUser;
     }
 }
