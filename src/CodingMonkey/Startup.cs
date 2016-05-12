@@ -5,6 +5,7 @@
     using System.Runtime.InteropServices.ComTypes;
     using System.Threading.Tasks;
 
+    using CodingMonkey.Configuration;
     using CodingMonkey.Models;
 
     using Microsoft.AspNet.Authentication.Cookies;
@@ -27,6 +28,7 @@
 
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.secrets.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
@@ -91,6 +93,14 @@
             services.AddMvc();
 
             // Add application services.
+            services.Configure<InitialUserConfig>(
+                user =>
+                    {
+                        user.Email = Configuration["InitialUser:Email"];
+                        user.UserName = Configuration["InitialUser:UserName"];
+                        user.Password = Configuration["InitialUser:Password"];
+                    });
+
             services.AddTransient<CodingMonkeyContextSeedData>();
         }
 
