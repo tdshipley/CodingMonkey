@@ -17,6 +17,17 @@
     color: #FFFFFF;
 }
 
+.exercise-guidance {
+    margin-top: 10px;
+    padding: 2%;
+    min-height: 50px;
+    border: #DADDDF solid 1px;
+    background: #f3f2f1;
+}
+
+#footer {
+    text-align: center;
+}
 
 /* ### Boostrap Additional ### */
 .top-buffer {
@@ -49,8 +60,8 @@
 
 /* ### Ace Editor ### */
 #aceEditor {
-    width: 80%;
     min-height: 300px;
     border: #DADDDF solid 1px;
     font-size: 14px;
+    margin-top: 10px;
 }
