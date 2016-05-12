@@ -5,17 +5,15 @@ import {Router} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {DialogPrompt} from '../../dialog-prompt';
 import toastr from 'toastr';
+import {Authentication} from './../../authentication/authentication.js';
 
 @inject(HttpClient, DialogService, Router)
 export class list {
     constructor(http, dialogService, router) {
         this.appRouter = router;
+        
         // Check there is a logged in user or kick them to homepage
-        var currentUser = this.getCurrentUserInSessionStorage();
-
-        if (!currentUser.isLoggedIn) {
-            this.appRouter.navigate("/");
-        }
+        new Authentication(this.appRouter).verifyUserLoggedIn();
 
         this.dialogService = dialogService;
 
@@ -117,12 +115,5 @@ export class list {
     
     goToExercise() {
         this.appRouter.navigate("admin/exercise/" + this.exerciseId);
-    }
-
-    getCurrentUserInSessionStorage() {
-        let currentUserRaw = sessionStorage.getItem("currentUser");
-        let currentUser = JSON.parse(currentUserRaw);
-
-        return currentUser;
     }
 }

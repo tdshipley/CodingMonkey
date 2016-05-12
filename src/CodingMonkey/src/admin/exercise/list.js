@@ -5,6 +5,7 @@ import {Router} from 'aurelia-router';
 import {DialogService} from 'aurelia-dialog';
 import {DialogPrompt} from '../../dialog-prompt';
 import toastr from 'toastr';
+import {Authentication} from './../../authentication/authentication.js';
 
 @inject(HttpClient, DialogService, Router)
 export class list {
@@ -14,11 +15,7 @@ export class list {
         this.appRouter = router;
 
         // Check there is a logged in user or kick them to homepage
-        var currentUser = this.getCurrentUserInSessionStorage();
-
-        if (!currentUser.isLoggedIn) {
-            this.appRouter.navigate("/");
-        }
+        new Authentication(this.appRouter).verifyUserLoggedIn();
 
         this.notify = toastr;
         this.notify.options.progressBar = true;
@@ -96,12 +93,5 @@ export class list {
     
     goToCreateExercise() {
         this.appRouter.navigate("admin/exercise/create");
-    }
-
-    getCurrentUserInSessionStorage() {
-        let currentUserRaw = sessionStorage.getItem("currentUser");
-        let currentUser = JSON.parse(currentUserRaw);
-
-        return currentUser;
     }
 }

@@ -3,17 +3,15 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
+import {Authentication} from './../../authentication/authentication.js';
 
 @inject(HttpClient, Router)
 export class create {
     constructor(http, router) {
         this.appRouter = router;
+        
         // Check there is a logged in user or kick them to homepage
-        var currentUser = this.getCurrentUserInSessionStorage();
-
-        if (!currentUser.isLoggedIn) {
-            this.appRouter.navigate("/");
-        }
+        new Authentication(this.appRouter).verifyUserLoggedIn();
 
         var loc = window.location;
         
@@ -91,18 +89,18 @@ export class create {
     
     getExercise(exerciseId) {
         this.http.baseUrl = this.baseUrl + '/api/Exercise/';
-        
+
         this.http.fetch('details/' + exerciseId)
-          .then(response => response.json())
-          .then(data => {
-              this.vm.exercise.id = data.Id
-              this.vm.exercise.name = data.Name;
-              this.vm.exercise.guidance = data.Guidance;
-              this.vm.exercise.categoryids = data.CategoryIds;
-          })
-          .catch(err => {
-              this.notify.error("Failed to get Exercise for Exercise Test.")
-          })
+            .then(response => response.json())
+            .then(data => {
+                this.vm.exercise.id = data.Id;
+                this.vm.exercise.name = data.Name;
+                this.vm.exercise.guidance = data.Guidance;
+                this.vm.exercise.categoryids = data.CategoryIds;
+            })
+            .catch(err => {
+                this.notify.error("Failed to get Exercise for Exercise Test.");
+            });
     }
     
     getExerciseTemplate(exerciseId) {
@@ -183,12 +181,5 @@ export class create {
     
     goToTestList() {
         this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
-    }
-
-    getCurrentUserInSessionStorage() {
-        let currentUserRaw = sessionStorage.getItem("currentUser");
-        let currentUser = JSON.parse(currentUserRaw);
-
-        return currentUser;
     }
 }

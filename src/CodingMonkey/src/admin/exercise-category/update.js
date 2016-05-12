@@ -3,17 +3,15 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
+import {Authentication} from './../../authentication/authentication.js';
 
 @inject(HttpClient, Router)
 export class update {
     constructor(http, router) {
         this.appRouter = router;
+        
         // Check there is a logged in user or kick them to homepage
-        var currentUser = this.getCurrentUserInSessionStorage();
-
-        if (!currentUser.isLoggedIn) {
-            this.appRouter.navigate("/");
-        }
+        new Authentication(this.appRouter).verifyUserLoggedIn();
 
         var loc = window.location;
         
@@ -53,34 +51,27 @@ export class update {
               this.heading = "Update Exercise Category: " + this.vm.exerciseCategory.name;
           })
           .catch(err => {
-              this.notify.error("Failed to get Exercise Category.")
-          });
+                this.notify.error("Failed to get Exercise Category.");
+            });
     }
     
-    updateExerciseCategory() {        
+    updateExerciseCategory() {
         this.http.fetch('update/' + this.vm.exerciseCategory.id, {
-            method: 'post',
-            body: json({
-                Name: this.vm.exerciseCategory.name,
-                Description: this.vm.exerciseCategory.description,
-                ExerciseIds: this.vm.exerciseCategory.exerciseids
+                method: 'post',
+                body: json({
+                    Name: this.vm.exerciseCategory.name,
+                    Description: this.vm.exerciseCategory.description,
+                    ExerciseIds: this.vm.exerciseCategory.exerciseids
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.notify.success("Updated Exercise Category '" + this.vm.exerciseCategory.name + "'");
-            this.appRouter.navigate("admin/exercise/categories/" + this.vm.exerciseCategory.id);
-        })
-        .catch(err => {
-            this.notify.error("Update Exercise Category failed.")
-        })
-        
-    }
+            .then(response => response.json())
+            .then(data => {
+                this.notify.success("Updated Exercise Category '" + this.vm.exerciseCategory.name + "'");
+                this.appRouter.navigate("admin/exercise/categories/" + this.vm.exerciseCategory.id);
+            })
+            .catch(err => {
+                this.notify.error("Update Exercise Category failed.");
+            });
 
-    getCurrentUserInSessionStorage() {
-        let currentUserRaw = sessionStorage.getItem("currentUser");
-        let currentUser = JSON.parse(currentUserRaw);
-
-        return currentUser;
     }
 }
