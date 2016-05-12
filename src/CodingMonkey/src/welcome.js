@@ -11,4 +11,8 @@ export class Welcome {
     navigateToCategories() {
         this.appRouter.navigate("categories");
     }
+
+    navigateToAbout() {
+        this.appRouter.navigate("about");
+    }
 }

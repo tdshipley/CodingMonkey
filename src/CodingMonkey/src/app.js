@@ -20,6 +20,16 @@ export class App {
                 settings: {
                     group: 'user'
                 },
+                route: ['about'],
+                name: 'about',
+                moduleId: 'about',
+                nav: true,
+                title: 'About'
+            },
+            {
+                settings: {
+                    group: 'user'
+                },
                 route: 'code/editor/:exerciseId',  
                 name: 'CodeEditor',
                 moduleId: './code/editor',
