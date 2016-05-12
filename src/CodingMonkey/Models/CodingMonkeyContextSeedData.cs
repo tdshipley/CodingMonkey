@@ -10,7 +10,7 @@
     using Microsoft.AspNet.Identity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.OptionsModel;
-
+    using Microsoft.AspNet.Hosting;
     public class CodingMonkeyContextSeedData
     {
         private CodingMonkeyContext _context;
@@ -19,11 +19,14 @@
 
         private IOptions<InitialUserConfig> _initialUserConfig;
 
-        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager, IOptions<InitialUserConfig> initialUserConfig)
+        private IHostingEnvironment _env;
+
+        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager, IOptions<InitialUserConfig> initialUserConfig, IHostingEnvironment env)
         {
             this._context = context;
             this._userManager = userManager;
             this._initialUserConfig = initialUserConfig;
+            this._env = env;
         }
 
         public async Task EnsureSeedDataAsync()
@@ -36,7 +39,7 @@
                 await this._userManager.CreateAsync(user, this._initialUserConfig.Value.Password);
             }
 
-            if (this._context.Exercises.FirstOrDefault() == null)
+            if (!this._env.IsProduction() && this._context.Exercises.FirstOrDefault() == null)
             {
                 // Create Exercise Categories
                 string integerManipulationCategoryDescription =
