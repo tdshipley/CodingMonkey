@@ -5,7 +5,7 @@
             <form submit.trigger="createExercise()">
                 <div class="form-group">
                     <label for="exerciseName">Name</label>
-                    <input value.bind="vm.exercise.name" type="text" class="form-control" id="exerciseName" placeholder="Exercise Name">
+                    <input value.bind="vm.exercise.name & validate" type="text" class="form-control" id="exerciseName" placeholder="Exercise Name">
                 </div>
                 <div class="form-group">
                     <label for="exerciseGuidance">Exercise Guidance</label>

@@ -1,6 +1,7 @@
 ﻿import {inject} from 'aurelia-framework';
 import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
+import {Validator, ValidationEngine, length, required} from 'aurelia-validatejs';
 import 'fetch';
 import toastr from 'toastr';
 
@@ -16,11 +17,10 @@ export class create {
             this.appRouter.navigate("/");
         }
 
-        var loc = window.location;
-        
         this.notify = toastr;
         this.notify.options.progressBar = true;
-        
+
+        var loc = window.location;
         this.heading = "Create Exercise";
         this.baseUrl = loc.protocol + "//" + loc.host;
         
@@ -56,6 +56,9 @@ export class create {
                 description: ""
             }
         };
+
+        this.reporter = ValidationEngine.getValidationReporter(this.vm);
+        this.validator = new Validator(this.vm).ensure('exercise.name').required();
     }
     
     createExercise() {
