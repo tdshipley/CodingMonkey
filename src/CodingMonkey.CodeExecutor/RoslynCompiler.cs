@@ -102,6 +102,7 @@
         private async Task<object> ExecuteCodeWithTimeoutAsync(int timeoutMilliseconds, string code, string executionCode)
         {
             object returnValue = null;
+            Exception userSubmittedCodeRuntimeException = null;
 
             var task = new Task(
                 async () =>
@@ -109,17 +110,31 @@
                         ScriptOptions scriptOptions = this.GetScriptOptions();
                         var script = CSharpScript.Create(code).ContinueWith(executionCode);
 
-                        returnValue = (await script.WithOptions(scriptOptions).RunAsync()).ReturnValue;
+                        try
+                        {
+                            returnValue = (await script.WithOptions(scriptOptions).RunAsync()).ReturnValue;
+                        }
+                        catch (Exception ex)
+                        {
+                            userSubmittedCodeRuntimeException = ex;
+                        }
                     });
 
+            Task completedTask;
             task.Start();
+            completedTask = await Task.WhenAny(task, Task.Delay(timeoutMilliseconds));
 
-            if (await Task.WhenAny(task, Task.Delay(timeoutMilliseconds)) == task)
+            if (completedTask == task)
             {
                 // Task completed within timeout.
                 // Consider that the task may have faulted or been canceled.
                 // We re-await the task so that any exceptions/cancellation is rethrown.
                 await task;
+
+                if (userSubmittedCodeRuntimeException != null)
+                {
+                    throw userSubmittedCodeRuntimeException;
+                }
             }
             else
             {
