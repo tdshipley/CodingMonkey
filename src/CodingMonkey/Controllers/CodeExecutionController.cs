@@ -8,7 +8,13 @@
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+
+    using CodingMonkey.Configuration;
+    using CodingMonkey.Structs;
+
     using Microsoft.Data.Entity;
+    using Microsoft.Extensions.OptionsModel;
+    using IdentityModel.Client;
 
     using TestInput = CodingMonkey.Models.TestInput;
 
@@ -17,6 +23,12 @@
     {
         [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
+
+        [FromServices]
+        private IOptions<AppConfig> _appConfig { get; set; }
+
+        [FromServices]
+        private IOptions<IdentityServerConfig> _identityServerConfig { get; set; }
 
         [HttpPost]
         public JsonResult Compile(int id, [FromBody] CodeEditorViewModel model)
@@ -86,7 +98,7 @@
 
                 if (coreTestsPassed)
                 {
-                    var testInputs = new List<CodingMonkey.CodeExecutor.TestInput>();
+                    var testInputs = new List<ExecutionTestInput>();
                     if (test.TestInputs.Any(
                         testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
                     {
@@ -94,34 +106,12 @@
                     }
 
                     // Run the code to get test result
-                    var compiler = new RoslynCompiler();
-                    ExecutionResult executionResult =
-                        await
-                        compiler.ExecuteAsync(
-                            vm.Code,
-                            exercise.Template.ClassName,
-                            exercise.Template.MainMethodName,
-                            testInputs);
+                    var client = new TokenClient(
+                                        this._appConfig.Value.IdentityServerApiEndpoint,
+                                        this._identityServerConfig.Value.ClientId,
+                                        this._identityServerConfig.Value.ClientSecret);
 
-                    if (!executionResult.Successful)
-                    {
-                        vm.TestResults = null;
-                        vm.CompilerErrors = null;
-                        vm.HasCompilerErrors = false;
-                        vm.HasRuntimeError = true;
-
-                        vm.RuntimeError = new RuntimeErrorViewModel()
-                                              {
-                                                  Message = executionResult.Error.Message,
-                                                  HelpLink = executionResult.Error.HelpLink
-                                              };
-
-                        return Json(vm);
-                    }
-
-                    testResult.ActualOutput = executionResult.Value;
-
-                    testResult.TestExecuted = true;
+                    var accessToken = client.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor").Result.AccessToken;
                 }
                 else
                 {
@@ -278,7 +268,7 @@
             return false;
         }
 
-        private static bool GetTestInputForCodeExecutor(TestInput testInput, TestResultViewModel testResult, List<CodeExecutor.TestInput> testInputs)
+        private static bool GetTestInputForCodeExecutor(TestInput testInput, TestResultViewModel testResult, List<ExecutionTestInput> testInputs)
         {
             switch (testInput.ValueType)
             {
@@ -302,7 +292,7 @@
         }
 
         private static bool AddTestInputForCodeExecutorAndResult<T>(
-            List<CodeExecutor.TestInput> testInputs,
+            List<ExecutionTestInput> testInputs,
             TestResultViewModel testResult,
             TestInput testInputToAdd)
         {
@@ -316,7 +306,7 @@
             testResult.Inputs.Add(new TestResultInputViewModel() { ArgumentName = testInputToAdd.ArgumentName, Value = (T)valueToAdd });
 
             testInputs.Add(
-                new CodeExecutor.TestInput()
+                new ExecutionTestInput()
                 {
                     Value = (T)valueToAdd,
                     ValueType = testInputToAdd.ValueType,

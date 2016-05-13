@@ -101,6 +101,20 @@
                         user.Password = Configuration["InitialUser:Password"];
                     });
 
+            services.Configure<IdentityServerConfig>(
+                config =>
+                    {
+                        config.ClientId = Configuration["IdentityServer:ClientId"];
+                        config.ClientSecret = Configuration["IdentityServer:ClientSecret"];
+                    });
+
+            services.Configure<AppConfig>(
+                config =>
+                    {
+                        config.CodeExecutorApiEndpoint = Configuration["CodeExecutorApiEndpoint"];
+                        config.IdentityServerApiEndpoint = Configuration["IdentityServerEndpoint"];
+                    });
+
             services.AddTransient<CodingMonkeyContextSeedData>();
         }
 

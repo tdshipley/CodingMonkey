@@ -11,20 +11,6 @@
     using CodingMonkey.CodeExecutor.Models;
     using CodingMonkey.CodeExecutor.Security;
 
-    public struct TestInput
-    {
-        public string ArgumentName;
-        public dynamic Value;
-        public string ValueType;
-    }
-
-    public struct ExecutionResult
-    {
-        public bool Successful;
-        public object Value;
-        public Exception Error;
-    }
-
     public class RoslynCompiler
     {
         public PreExecutionSecurity Security { get; set; }
