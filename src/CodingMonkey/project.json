@@ -9,7 +9,6 @@
   "frameworks": {
     "dnxcore50": {
       "dependencies": {
-        "CodingMonkey.CodeExecutor": "1.0.0-*"
       }
     }
   },

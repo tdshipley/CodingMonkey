@@ -1,20 +1,26 @@
 ﻿namespace CodingMonkey.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
     using Microsoft.AspNet.Mvc;
     using CodingMonkey.CodeExecutor;
     using System.Linq;
+    using System.Net.Http;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
+    using CodingMonkey.CodeExecutorModels;
     using CodingMonkey.Configuration;
     using CodingMonkey.Structs;
 
     using Microsoft.Data.Entity;
     using Microsoft.Extensions.OptionsModel;
     using IdentityModel.Client;
+
+    using Newtonsoft.Json;
 
     using TestInput = CodingMonkey.Models.TestInput;
 
@@ -23,43 +29,46 @@
     {
         [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
-
-        [FromServices]
+        
         private IOptions<AppConfig> _appConfig { get; set; }
-
-        [FromServices]
         private IOptions<IdentityServerConfig> _identityServerConfig { get; set; }
+
+        public CodeExecutionController(IOptions<AppConfig> appConfig, IOptions<IdentityServerConfig> identityServerConfig)
+        {
+            _appConfig = appConfig;
+            _identityServerConfig = identityServerConfig;
+        }
 
         [HttpPost]
         public JsonResult Compile(int id, [FromBody] CodeEditorViewModel model)
         {
-            var result = new RoslynCompiler().Compile(model.Code);
+            object result = null; // new RoslynCompiler().Compile(model.Code);
 
-            if (result == null || result.Count == 0)
+            if (result == null)
             {
                 model.HasCompilerErrors = false;
                 model.CompilerErrors = null;
             }
-            else
-            {
-                model.HasCompilerErrors = true;
-                model.CompilerErrors = new List<CompilerErrorViewModel>();
+            //else
+            //{
+            //    model.HasCompilerErrors = true;
+            //    model.CompilerErrors = new List<CompilerErrorViewModel>();
 
-                foreach (var resultError in result)
-                {
-                    model.CompilerErrors.Add(new CompilerErrorViewModel()
-                    {
-                        Id = resultError.Id,
-                        Severity = resultError.Severity,
-                        Message = resultError.Message,
-                        LineNumberStart = resultError.StartLineNumber,
-                        LineNumberEnd = resultError.EndLineNumber,
-                        ColStart = resultError.ColStart,
-                        ColEnd = resultError.ColEnd,
-                        ErrorLength = resultError.ErrorLength
-                    });
-                }
-            }
+            //    foreach (var resultError in result)
+            //    {
+            //        model.CompilerErrors.Add(new CompilerErrorViewModel()
+            //        {
+            //            Id = resultError.Id,
+            //            Severity = resultError.Severity,
+            //            Message = resultError.Message,
+            //            LineNumberStart = resultError.StartLineNumber,
+            //            LineNumberEnd = resultError.EndLineNumber,
+            //            ColStart = resultError.ColStart,
+            //            ColEnd = resultError.ColEnd,
+            //            ErrorLength = resultError.ErrorLength
+            //        });
+            //    }
+            //}
 
             return Json(model);
         }
@@ -83,48 +92,110 @@
 
             bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName, exercise.Template.MainMethodSignature, vm.TestResults);
 
-            // Run Tests
+            // Run the code to get test result
+            var tokenClient = new TokenClient(
+                                this._appConfig.Value.IdentityServerApiEndpoint + "/connect/token",
+                                this._identityServerConfig.Value.ClientId,
+                                this._identityServerConfig.Value.ClientSecret);
+
+            var accessTokenRequest = await tokenClient.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor");
+            var accessToken = accessTokenRequest.AccessToken;
+
+            var baseAddress = this._appConfig.Value.CodeExecutorApiEndpoint;
+
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(baseAddress)
+            };
+
+            CodeSubmission codeToExecute = new CodeSubmission()
+            {
+                Code = vm.Code,
+                CodeTemplate = new CodeTemplate()
+                                {
+                                    ClassName = exercise.Template.ClassName,
+                                    MainMethodName = exercise.Template.MainMethodName
+                                },
+                Tests = new List<CodeTest>()
+            };
+
             foreach (var test in exercise.Tests)
             {
-                // Create View Model for result
-                TestResultViewModel testResult = new TestResultViewModel()
+                CodeTest testToRun = new CodeTest()
+                                         {
+                                             Description = test.Description,
+                                             ExpectedOutput =
+                                                 new CodeTestExpectedOutput()
                                                      {
-                                                         Description = test.Description,
-                                                         Inputs =
-                                                             new List<TestResultInputViewModel>(),
-                                                         TestExecuted = false,
-                                                         TestPassed = false
-                                                     };
+                                                         Value = test.TestOutput.Value,
+                                                         ValueType =
+                                                             test.TestOutput.ValueType
+                                                     },
+                                             Inputs = new List<CodeTestInput>()
+                                         };
 
-                if (coreTestsPassed)
+                foreach (var testInput in test.TestInputs)
                 {
-                    var testInputs = new List<ExecutionTestInput>();
-                    if (test.TestInputs.Any(
-                        testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
-                    {
-                        return this.Json(string.Empty);
-                    }
-
-                    // Run the code to get test result
-                    var client = new TokenClient(
-                                        this._appConfig.Value.IdentityServerApiEndpoint,
-                                        this._identityServerConfig.Value.ClientId,
-                                        this._identityServerConfig.Value.ClientSecret);
-
-                    var accessToken = client.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor").Result.AccessToken;
-                }
-                else
-                {
-                    vm.AllTestsExecuted = false;
-                    testResult.TestExecuted = false;
-                    testResult.TestPassed = false;
-                    testResult.ActualOutput = "Not Run";
+                    testToRun.Inputs.Add(new CodeTestInput()
+                                             {
+                                                 ArgumentName = testInput.ArgumentName,
+                                                 Value = testInput.Value,
+                                                 ValueType = testInput.ValueType
+                                             });
                 }
 
-                vm.TestResults.Add(testResult);
-                if (AddTestResult(test, testResult)) return null;
-
+                codeToExecute.Tests.Add(testToRun);
             }
+
+            httpClient.SetBearerToken(accessToken);
+            var response = httpClient.PostAsync("api/Execution", new StringContent(
+                                                JsonConvert.SerializeObject(codeToExecute).ToString(), // Might need to use convert to JSON here
+                                                Encoding.UTF8,
+                                                "application/json")).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var x = 1;
+            }
+            else
+            {
+                var y = 2;
+            }
+
+            // Run Tests
+            //foreach (var test in exercise.Tests)
+            //{
+            //    // Create View Model for result
+            //    TestResultViewModel testResult = new TestResultViewModel()
+            //                                         {
+            //                                             Description = test.Description,
+            //                                             Inputs =
+            //                                                 new List<TestResultInputViewModel>(),
+            //                                             TestExecuted = false,
+            //                                             TestPassed = false
+            //                                         };
+
+            //    if (coreTestsPassed)
+            //    {
+            //        var testInputs = new List<ExecutionTestInput>();
+            //        if (test.TestInputs.Any(
+            //            testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
+            //        {
+            //            return this.Json(string.Empty);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        vm.AllTestsExecuted = false;
+            //        testResult.TestExecuted = false;
+            //        testResult.TestPassed = false;
+            //        testResult.ActualOutput = "Not Run";
+            //    }
+
+            //    vm.TestResults.Add(testResult);
+            //    if (AddTestResult(test, testResult)) return null;
+
+            //}
 
             return Json(vm);
         }
