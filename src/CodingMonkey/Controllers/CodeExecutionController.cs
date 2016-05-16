@@ -5,27 +5,21 @@
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
     using Microsoft.AspNet.Mvc;
-    using CodingMonkey.CodeExecutor;
+
     using System.Linq;
     using System.Net.Http;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using CodingMonkey.CodeExecutorModels;
     using CodingMonkey.Configuration;
-    using CodingMonkey.Structs;
 
     using Microsoft.Data.Entity;
     using Microsoft.Extensions.OptionsModel;
     using IdentityModel.Client;
 
-    using Microsoft.AspNet.Server.Kestrel.Filter;
-
     using Newtonsoft.Json;
-
-    using TestInput = CodingMonkey.Models.TestInput;
 
     [Route("api/[controller]/[action]/{id}")]
     public class CodeExecutionController : Controller
@@ -43,37 +37,48 @@
         }
 
         [HttpPost]
-        public JsonResult Compile(int id, [FromBody] CodeEditorViewModel model)
+        public async Task<JsonResult> Compile(int id, [FromBody] CodeEditorViewModel vm)
         {
-            object result = null; // new RoslynCompiler().Compile(model.Code);
+            CodeSubmission codeToSubmit = new CodeSubmission()
+                                              {
+                                                  Code = vm.Code
+                                              };
 
-            if (result == null)
+            var response = await this.PostRequestToCodeExecutorAsync("api/compile", codeToSubmit);
+
+            if (response.IsSuccessStatusCode)
             {
-                model.HasCompilerErrors = false;
-                model.CompilerErrors = null;
+                CodeSubmission codeSubmissionCompiled =
+                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+
+                vm.HasCompilerErrors = codeSubmissionCompiled.ResultSummary.HasCompilerErrors;
+
+                if (vm.HasCompilerErrors)
+                {
+                    vm.CompilerErrors = new List<CompilerErrorViewModel>();
+
+                    foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
+                    {
+                        vm.CompilerErrors.Add(new CompilerErrorViewModel()
+                                                  {
+                                                      ColEnd = compilerError.ColEnd,
+                                                      ColStart = compilerError.ColStart,
+                                                      ErrorLength = compilerError.ErrorLength,
+                                                      Id = compilerError.Id,
+                                                      LineNumberEnd = compilerError.EndLineNumber,
+                                                      LineNumberStart = compilerError.StartLineNumber,
+                                                      Message = compilerError.Message,
+                                                      Severity = compilerError.Severity
+                                                  });
+                    }
+                }
             }
-            //else
-            //{
-            //    model.HasCompilerErrors = true;
-            //    model.CompilerErrors = new List<CompilerErrorViewModel>();
+            else
+            {
+                return Json(string.Empty);
+            }
 
-            //    foreach (var resultError in result)
-            //    {
-            //        model.CompilerErrors.Add(new CompilerErrorViewModel()
-            //        {
-            //            Id = resultError.Id,
-            //            Severity = resultError.Severity,
-            //            Message = resultError.Message,
-            //            LineNumberStart = resultError.StartLineNumber,
-            //            LineNumberEnd = resultError.EndLineNumber,
-            //            ColStart = resultError.ColStart,
-            //            ColEnd = resultError.ColEnd,
-            //            ErrorLength = resultError.ErrorLength
-            //        });
-            //    }
-            //}
-
-            return Json(model);
+            return Json(vm);
         }
 
         [HttpPost]
@@ -242,7 +247,7 @@
 
             httpClient.SetBearerToken(accessToken);
             return httpClient.PostAsync(
-                    "api/Execution",
+                    path,
                     new StringContent(
                         JsonConvert.SerializeObject(dataToPost),
                         Encoding.UTF8,
