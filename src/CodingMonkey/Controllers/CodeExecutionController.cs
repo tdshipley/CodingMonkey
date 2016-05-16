@@ -8,6 +8,7 @@
     using CodingMonkey.CodeExecutor;
     using System.Linq;
     using System.Net.Http;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -94,32 +95,26 @@
 
             bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName, exercise.Template.MainMethodSignature, vm.TestResults);
 
-            // Run the code to get test result
-            var tokenClient = new TokenClient(
-                                this._appConfig.Value.IdentityServerApiEndpoint + "/connect/token",
-                                this._identityServerConfig.Value.ClientId,
-                                this._identityServerConfig.Value.ClientSecret);
-
-            var accessTokenRequest = await tokenClient.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor");
-            var accessToken = accessTokenRequest.AccessToken;
-
-            var baseAddress = this._appConfig.Value.CodeExecutorApiEndpoint;
-
-            var httpClient = new HttpClient
+            if (!coreTestsPassed)
             {
-                BaseAddress = new Uri(baseAddress)
-            };
+                return this.Json(vm);
+            }
 
-            CodeSubmission codeToExecute = new CodeSubmission()
-            {
-                Code = vm.Code,
-                CodeTemplate = new CodeTemplate()
-                                {
-                                    ClassName = exercise.Template.ClassName,
-                                    MainMethodName = exercise.Template.MainMethodName
-                                },
-                Tests = new List<CodeTest>()
-            };
+            var codeToExecute = new CodeSubmission()
+                                               {
+                                                   Code = vm.Code,
+                                                   CodeTemplate =
+                                                       new CodeTemplate()
+                                                           {
+                                                               ClassName =
+                                                                   exercise.Template
+                                                                   .ClassName,
+                                                               MainMethodName =
+                                                                   exercise.Template
+                                                                   .MainMethodName
+                                                           },
+                                                   Tests = new List<CodeTest>()
+                                               };
 
             foreach (var test in exercise.Tests)
             {
@@ -129,31 +124,30 @@
                                              ExpectedOutput =
                                                  new CodeTestExpectedOutput()
                                                      {
-                                                         Value = test.TestOutput.Value,
+                                                         Value =
+                                                             test.TestOutput.Value,
                                                          ValueType =
-                                                             test.TestOutput.ValueType
+                                                             test.TestOutput
+                                                             .ValueType
                                                      },
                                              Inputs = new List<CodeTestInput>()
                                          };
 
                 foreach (var testInput in test.TestInputs)
                 {
-                    testToRun.Inputs.Add(new CodeTestInput()
-                                             {
-                                                 ArgumentName = testInput.ArgumentName,
-                                                 Value = testInput.Value,
-                                                 ValueType = testInput.ValueType
-                                             });
+                    testToRun.Inputs.Add(
+                        new CodeTestInput()
+                            {
+                                ArgumentName = testInput.ArgumentName,
+                                Value = testInput.Value,
+                                ValueType = testInput.ValueType
+                            });
                 }
 
                 codeToExecute.Tests.Add(testToRun);
             }
 
-            httpClient.SetBearerToken(accessToken);
-            var response = httpClient.PostAsync("api/Execution", new StringContent(
-                                                JsonConvert.SerializeObject(codeToExecute).ToString(), // Might need to use convert to JSON here
-                                                Encoding.UTF8,
-                                                "application/json")).Result;
+            var response = await this.PostRequestToCodeExecutorAsync("api/Execution", codeToExecute);
 
             if (response.IsSuccessStatusCode)
             {
@@ -166,13 +160,12 @@
                     vm.HasCompilerErrors = false;
                     vm.RuntimeError = new RuntimeErrorViewModel()
                                           {
-                                              Message = codeSubmissionExecuted.ResultSummary
-                                                                              .RuntimeError
-                                                                              .Message,
-
-                                              HelpLink = codeSubmissionExecuted.ResultSummary
-                                                                               .RuntimeError
-                                                                               .HelpLink
+                                              Message =
+                                                  codeSubmissionExecuted.ResultSummary
+                                                  .RuntimeError.Message,
+                                              HelpLink =
+                                                  codeSubmissionExecuted.ResultSummary
+                                                  .RuntimeError.HelpLink
                                           };
 
                     return this.Json(vm);
@@ -187,17 +180,18 @@
 
                     foreach (var compilerError in codeSubmissionExecuted.ResultSummary.CompilerErrors)
                     {
-                        vm.CompilerErrors.Add(new CompilerErrorViewModel()
-                        {
-                            ColEnd = compilerError.ColEnd,
-                            ColStart = compilerError.ColEnd,
-                            ErrorLength = compilerError.ErrorLength,
-                            Id = compilerError.Id,
-                            LineNumberEnd = compilerError.EndLineNumber,
-                            LineNumberStart = compilerError.StartLineNumber,
-                            Message = compilerError.Message,
-                            Severity = compilerError.Severity
-                        });
+                        vm.CompilerErrors.Add(
+                            new CompilerErrorViewModel()
+                                {
+                                    ColEnd = compilerError.ColEnd,
+                                    ColStart = compilerError.ColEnd,
+                                    ErrorLength = compilerError.ErrorLength,
+                                    Id = compilerError.Id,
+                                    LineNumberEnd = compilerError.EndLineNumber,
+                                    LineNumberStart = compilerError.StartLineNumber,
+                                    Message = compilerError.Message,
+                                    Severity = compilerError.Severity
+                                });
                     }
 
                     return this.Json(vm);
@@ -232,10 +226,39 @@
             }
             else
             {
-                return Json(string.Empty);
+                return this.Json(string.Empty);
             }
 
             return Json(vm);
+        }
+
+        private async Task<HttpResponseMessage> PostRequestToCodeExecutorAsync(string path, object dataToPost)
+        {
+            var baseAddress = this._appConfig.Value.CodeExecutorApiEndpoint;
+
+            var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
+
+            var accessToken = await this.GetCodeExecutorAccessTokenAsync();
+
+            httpClient.SetBearerToken(accessToken);
+            return httpClient.PostAsync(
+                    "api/Execution",
+                    new StringContent(
+                        JsonConvert.SerializeObject(dataToPost),
+                        Encoding.UTF8,
+                        "application/json")).Result;
+        }
+
+        private async Task<string> GetCodeExecutorAccessTokenAsync()
+        {
+            var tokenClient = new TokenClient(
+                this._appConfig.Value.IdentityServerApiEndpoint + "/connect/token",
+                this._identityServerConfig.Value.ClientId,
+                this._identityServerConfig.Value.ClientSecret);
+
+            var accessTokenRequest = await tokenClient.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor");
+            var accessToken = accessTokenRequest.AccessToken;
+            return accessToken;
         }
 
         private static bool RunCoreTests(string code, string className, string mainMethodName, string mainMethodSignature, List<TestResultViewModel> testResults)
