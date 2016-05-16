@@ -20,6 +20,8 @@
     using Microsoft.Extensions.OptionsModel;
     using IdentityModel.Client;
 
+    using Microsoft.AspNet.Server.Kestrel.Filter;
+
     using Newtonsoft.Json;
 
     using TestInput = CodingMonkey.Models.TestInput;
@@ -155,47 +157,83 @@
 
             if (response.IsSuccessStatusCode)
             {
-                var x = 1;
+                CodeSubmission codeSubmissionExecuted =
+                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+
+                if (codeSubmissionExecuted.ResultSummary.HasRuntimeError)
+                {
+                    vm.HasRuntimeError = codeSubmissionExecuted.ResultSummary.HasRuntimeError;
+                    vm.HasCompilerErrors = false;
+                    vm.RuntimeError = new RuntimeErrorViewModel()
+                                          {
+                                              Message = codeSubmissionExecuted.ResultSummary
+                                                                              .RuntimeError
+                                                                              .Message,
+
+                                              HelpLink = codeSubmissionExecuted.ResultSummary
+                                                                               .RuntimeError
+                                                                               .HelpLink
+                                          };
+
+                    return this.Json(vm);
+                }
+
+                if (codeSubmissionExecuted.ResultSummary.HasCompilerErrors)
+                {
+                    vm.HasRuntimeError = false;
+                    vm.HasCompilerErrors = codeSubmissionExecuted.ResultSummary.HasCompilerErrors;
+
+                    vm.CompilerErrors = new List<CompilerErrorViewModel>();
+
+                    foreach (var compilerError in codeSubmissionExecuted.ResultSummary.CompilerErrors)
+                    {
+                        vm.CompilerErrors.Add(new CompilerErrorViewModel()
+                        {
+                            ColEnd = compilerError.ColEnd,
+                            ColStart = compilerError.ColEnd,
+                            ErrorLength = compilerError.ErrorLength,
+                            Id = compilerError.Id,
+                            LineNumberEnd = compilerError.EndLineNumber,
+                            LineNumberStart = compilerError.StartLineNumber,
+                            Message = compilerError.Message,
+                            Severity = compilerError.Severity
+                        });
+                    }
+
+                    return this.Json(vm);
+                }
+
+                vm.AllTestsExecuted = codeSubmissionExecuted.ResultSummary.AllTestsExecuted;
+
+                foreach (var test in codeSubmissionExecuted.Tests)
+                {
+                    var testResult = new TestResultViewModel()
+                                         {
+                                             ActualOutput = test.ActualOutput,
+                                             Description = test.Description,
+                                             ExpectedOutput = test.ExpectedOutput.Value,
+                                             Inputs = new List<TestResultInputViewModel>(),
+                                             TestExecuted = test.Result.TestExecuted,
+                                             TestPassed = test.Result.TestPassed
+                                         };
+
+                    vm.TestResults.Add(testResult);
+
+                    foreach (var testInput in test.Inputs)
+                    {
+                        testResult.Inputs.Add(
+                            new TestResultInputViewModel()
+                                {
+                                    ArgumentName = testInput.ArgumentName,
+                                    Value = testInput.Value
+                                });
+                    }
+                }
             }
             else
             {
-                var y = 2;
+                return Json(string.Empty);
             }
-
-            // Run Tests
-            //foreach (var test in exercise.Tests)
-            //{
-            //    // Create View Model for result
-            //    TestResultViewModel testResult = new TestResultViewModel()
-            //                                         {
-            //                                             Description = test.Description,
-            //                                             Inputs =
-            //                                                 new List<TestResultInputViewModel>(),
-            //                                             TestExecuted = false,
-            //                                             TestPassed = false
-            //                                         };
-
-            //    if (coreTestsPassed)
-            //    {
-            //        var testInputs = new List<ExecutionTestInput>();
-            //        if (test.TestInputs.Any(
-            //            testInput => !GetTestInputForCodeExecutor(testInput, testResult, testInputs)))
-            //        {
-            //            return this.Json(string.Empty);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        vm.AllTestsExecuted = false;
-            //        testResult.TestExecuted = false;
-            //        testResult.TestPassed = false;
-            //        testResult.ActualOutput = "Not Run";
-            //    }
-
-            //    vm.TestResults.Add(testResult);
-            //    if (AddTestResult(test, testResult)) return null;
-
-            //}
 
             return Json(vm);
         }

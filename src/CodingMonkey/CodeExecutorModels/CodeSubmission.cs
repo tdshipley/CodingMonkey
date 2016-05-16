@@ -12,5 +12,6 @@
         public string Code { get; set; }
         public CodeTemplate CodeTemplate { get; set; }
         public List<CodeTest> Tests { get; set; }
+        public CodeResultSummary ResultSummary { get; set; }
     }
 }
