@@ -39,7 +39,9 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final",
     "Microsoft.CodeAnalysis.CSharp.Scripting": "1.1.1",
     "Microsoft.AspNet.Identity": "3.0.0-rc1-final",
-    "IdentityServer4": "1.0.0-beta1-update1"
+    "IdentityServer4": "1.0.0-beta1-update1",
+    "Serilog.Extensions.Logging": "1.0.0-rc1-final-10092",
+    "Serilog.Sinks.RollingFile": "2.0.0-beta-700"
   },
   "exclude": [
     "wwwroot",

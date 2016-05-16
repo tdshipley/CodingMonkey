@@ -2,7 +2,6 @@
 {
     using System.IO;
     using System.Net;
-    using System.Runtime.InteropServices.ComTypes;
     using System.Threading.Tasks;
 
     using CodingMonkey.Configuration;
@@ -14,18 +13,27 @@
 
     using Microsoft.AspNet.Builder;
     using Microsoft.AspNet.Hosting;
-    using Microsoft.AspNet.Http;
     using Microsoft.Data.Entity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
+    using Serilog;
+    using Serilog.Sinks.RollingFile;
+
     public class Startup
     {
         public Startup(IHostingEnvironment env)
         {
-            // Set up configuration sources.
+            string applicationPath = PlatformServices.Default.Application.ApplicationBasePath;
 
+            // Create SeriLog
+            Log.Logger = new LoggerConfiguration()
+                                .MinimumLevel.Debug()
+                                .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
+                                .CreateLogger();
+
+            // Set up configuration sources.
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.secrets.json")
@@ -123,6 +131,7 @@
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            loggerFactory.AddSerilog();
 
             app.UseApplicationInsightsRequestTelemetry();
 
