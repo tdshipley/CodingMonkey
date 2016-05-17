@@ -11,6 +11,25 @@ The Coding Monkey website is based off the [Aurelia Skeleton Navigation Sample A
 * Font Awesome - for icons and spinners
 * Karma/Protractor/Jasmine - for testing
 
+## Required Secrets File
+
+To run the code it expects a secrets file named ```appsettings.secrets.json``` in src\codingmonkey which is not checked in and you will need to create both locally and in any deployment environment. It contains details used when communicating with identity server and the initial user to seed to the DB. For example:
+
+```
+{
+  "InitialUser": {
+    "UserName": "myusername",
+    "Email":    "myuseremail@test.com",
+    "Password": "myuserspassword"
+  },
+  "IdentityServer": {
+    "ClientId":     "client_id_of_app_for_CodingMonkey.IdentityServer",
+    "ClientSecret": "shared_secret_to_send_in_requests_to_CodingMonkey.IdentityServer"
+  }
+}
+
+```
+
 ## Running The App
 
 To run the app, follow these steps.
