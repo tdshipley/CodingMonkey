@@ -29,6 +29,11 @@
     text-align: center;
 }
 
+.exercise-complete {
+    color: #00a47f;
+    font-size: 26px;
+}
+
 /* ### Boostrap Additional ### */
 .top-buffer {
     margin-top:20px !important;

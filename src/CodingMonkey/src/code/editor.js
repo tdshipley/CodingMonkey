@@ -23,6 +23,7 @@ export class Editor {
         this.http = http;
         this.vm = this;
         this.markedLines = [];
+        this.allTestsPassed = false;
         
         this.vm = {
             exercise: {
@@ -205,11 +206,14 @@ export class Editor {
 
                         if (testsPassed) {
                             this.notify.success("All tests passed!");
+                            this.allTestsPassed = true;
                         } else {
                             this.notify.warning("Tests Failed. Review the results and try again.");
+                            this.allTestsPassed = false;
                         }
                     } else {
                         this.notify.warning("There was an error running your code. Review the error and try again.");
+                        this.allTestsPassed = false;
                     }
 
                     this.vm.processingCode = false;

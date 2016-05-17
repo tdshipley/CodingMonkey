@@ -2,6 +2,9 @@
     <div class="row top-buffer">
         <div class="col-lg-7 col-lg-offset-2">
             <h1 id="exerciseHeading">${heading}</h1>
+            <div if.bind="allTestsPassed">
+                <i class="fa fa-check-square-o exercise-complete" aria-hidden="true">Exercise Complete</i>
+            </div>
         </div>
         <div class="col-lg-7 col-lg-offset-2">
             <p class="exercise-guidance">${vm.exercise.guidance}</p>
