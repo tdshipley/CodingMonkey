@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.Entity.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CodingMonkey.Migrations
 {
@@ -30,34 +30,37 @@ namespace CodingMonkey.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUser", x => x.Id);
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
+
             migrationBuilder.CreateTable(
-                name: "Exercise",
+                name: "Exercises",
                 columns: table => new
                 {
                     ExerciseId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     Guidance = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Exercise", x => x.ExerciseId);
+                    table.PrimaryKey("PK_Exercises", x => x.ExerciseId);
                 });
+
             migrationBuilder.CreateTable(
-                name: "ExerciseCategory",
+                name: "ExerciseCategories",
                 columns: table => new
                 {
                     ExerciseCategoryId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     Description = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExerciseCategory", x => x.ExerciseCategoryId);
+                    table.PrimaryKey("PK_ExerciseCategories", x => x.ExerciseCategoryId);
                 });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -69,28 +72,44 @@ namespace CodingMonkey.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityRole", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Value = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityUserClaim<string>", x => x.Id);
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityUserClaim<string>_ApplicationUser_UserId",
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
@@ -102,20 +121,21 @@ namespace CodingMonkey.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityUserLogin<string>", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_IdentityUserLogin<string>_ApplicationUser_UserId",
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
-                name: "ExerciseTemplate",
+                name: "ExerciseTemplates",
                 columns: table => new
                 {
                     ExerciseTemplateId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     ClassName = table.Column<string>(nullable: true),
                     ExerciseForeignKey = table.Column<int>(nullable: false),
                     InitialCode = table.Column<string>(nullable: true),
@@ -124,33 +144,35 @@ namespace CodingMonkey.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExerciseTemplate", x => x.ExerciseTemplateId);
+                    table.PrimaryKey("PK_ExerciseTemplates", x => x.ExerciseTemplateId);
                     table.ForeignKey(
-                        name: "FK_ExerciseTemplate_Exercise_ExerciseForeignKey",
+                        name: "FK_ExerciseTemplates_Exercises_ExerciseForeignKey",
                         column: x => x.ExerciseForeignKey,
-                        principalTable: "Exercise",
+                        principalTable: "Exercises",
                         principalColumn: "ExerciseId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
-                name: "Test",
+                name: "Tests",
                 columns: table => new
                 {
                     TestId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     Description = table.Column<string>(nullable: true),
-                    ExerciseExerciseId = table.Column<int>(nullable: true)
+                    ExerciseId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Test", x => x.TestId);
+                    table.PrimaryKey("PK_Tests", x => x.TestId);
                     table.ForeignKey(
-                        name: "FK_Test_Exercise_ExerciseExerciseId",
-                        column: x => x.ExerciseExerciseId,
-                        principalTable: "Exercise",
+                        name: "FK_Tests_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
                         principalColumn: "ExerciseId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
                 name: "ExerciseExerciseCategory",
                 columns: table => new
@@ -162,38 +184,40 @@ namespace CodingMonkey.Migrations
                 {
                     table.PrimaryKey("PK_ExerciseExerciseCategory", x => new { x.ExerciseId, x.ExerciseCategoryId });
                     table.ForeignKey(
-                        name: "FK_ExerciseExerciseCategory_ExerciseCategory_ExerciseCategoryId",
+                        name: "FK_ExerciseExerciseCategory_ExerciseCategories_ExerciseCategoryId",
                         column: x => x.ExerciseCategoryId,
-                        principalTable: "ExerciseCategory",
+                        principalTable: "ExerciseCategories",
                         principalColumn: "ExerciseCategoryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ExerciseExerciseCategory_Exercise_ExerciseId",
+                        name: "FK_ExerciseExerciseCategory_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
-                        principalTable: "Exercise",
+                        principalTable: "Exercises",
                         principalColumn: "ExerciseId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true),
                     RoleId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityRoleClaim<string>", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityRoleClaim<string>_IdentityRole_RoleId",
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
                 columns: table => new
@@ -203,90 +227,178 @@ namespace CodingMonkey.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdentityUserRole<string>", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_IdentityUserRole<string>_IdentityRole_RoleId",
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IdentityUserRole<string>_ApplicationUser_UserId",
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
-                name: "TestInput",
+                name: "TestInputs",
                 columns: table => new
                 {
                     TestInputId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     ArgumentName = table.Column<string>(nullable: true),
-                    TestTestId = table.Column<int>(nullable: true),
+                    TestId = table.Column<int>(nullable: true),
                     Value = table.Column<string>(nullable: true),
                     ValueType = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TestInput", x => x.TestInputId);
+                    table.PrimaryKey("PK_TestInputs", x => x.TestInputId);
                     table.ForeignKey(
-                        name: "FK_TestInput_Test_TestTestId",
-                        column: x => x.TestTestId,
-                        principalTable: "Test",
+                        name: "FK_TestInputs_Tests_TestId",
+                        column: x => x.TestId,
+                        principalTable: "Tests",
                         principalColumn: "TestId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateTable(
-                name: "TestOutput",
+                name: "TestOutputs",
                 columns: table => new
                 {
                     TestOutputId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Autoincrement", true),
                     TestForeignKey = table.Column<int>(nullable: false),
                     Value = table.Column<string>(nullable: true),
                     ValueType = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TestOutput", x => x.TestOutputId);
+                    table.PrimaryKey("PK_TestOutputs", x => x.TestOutputId);
                     table.ForeignKey(
-                        name: "FK_TestOutput_Test_TestForeignKey",
+                        name: "FK_TestOutputs_Tests_TestForeignKey",
                         column: x => x.TestForeignKey,
-                        principalTable: "Test",
+                        principalTable: "Tests",
                         principalColumn: "TestId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseExerciseCategory_ExerciseCategoryId",
+                table: "ExerciseExerciseCategory",
+                column: "ExerciseCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseExerciseCategory_ExerciseId",
+                table: "ExerciseExerciseCategory",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseTemplates_ExerciseForeignKey",
+                table: "ExerciseTemplates",
+                column: "ExerciseForeignKey");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tests_ExerciseId",
+                table: "Tests",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestInputs_TestId",
+                table: "TestInputs",
+                column: "TestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestOutputs_TestForeignKey",
+                table: "TestOutputs",
+                column: "TestForeignKey");
+
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("ExerciseExerciseCategory");
-            migrationBuilder.DropTable("ExerciseTemplate");
-            migrationBuilder.DropTable("TestInput");
-            migrationBuilder.DropTable("TestOutput");
-            migrationBuilder.DropTable("AspNetRoleClaims");
-            migrationBuilder.DropTable("AspNetUserClaims");
-            migrationBuilder.DropTable("AspNetUserLogins");
-            migrationBuilder.DropTable("AspNetUserRoles");
-            migrationBuilder.DropTable("ExerciseCategory");
-            migrationBuilder.DropTable("Test");
-            migrationBuilder.DropTable("AspNetRoles");
-            migrationBuilder.DropTable("AspNetUsers");
-            migrationBuilder.DropTable("Exercise");
+            migrationBuilder.DropTable(
+                name: "ExerciseExerciseCategory");
+
+            migrationBuilder.DropTable(
+                name: "ExerciseTemplates");
+
+            migrationBuilder.DropTable(
+                name: "TestInputs");
+
+            migrationBuilder.DropTable(
+                name: "TestOutputs");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ExerciseCategories");
+
+            migrationBuilder.DropTable(
+                name: "Tests");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Exercises");
         }
     }
 }

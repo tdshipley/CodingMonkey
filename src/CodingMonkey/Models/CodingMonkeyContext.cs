@@ -2,9 +2,9 @@
 {
     using System.IO;
 
-    using Microsoft.Data.Entity;
-    using Microsoft.Data.Entity.Metadata;
-    using Microsoft.AspNet.Identity.EntityFramework;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata;
     using Microsoft.Extensions.PlatformAbstractions;
 
     public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>

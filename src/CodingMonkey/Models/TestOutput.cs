@@ -1,7 +1,4 @@
-﻿using Microsoft.Data.Entity;
-using System;
-
-namespace CodingMonkey.Models
+﻿namespace CodingMonkey.Models
 {
     public class TestOutput
     {

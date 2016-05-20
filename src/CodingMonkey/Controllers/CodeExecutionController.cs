@@ -4,9 +4,8 @@
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
-    using Microsoft.AspNet.Mvc;
+    using Microsoft.AspNetCore.Mvc;
 
-    using System.Linq;
     using System.Net.Http;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -15,25 +14,26 @@
     using CodingMonkey.CodeExecutorModels;
     using CodingMonkey.Configuration;
 
-    using Microsoft.Data.Entity;
-    using Microsoft.Extensions.OptionsModel;
     using IdentityModel.Client;
 
-    using Newtonsoft.Json;
+    using Microsoft.Extensions.Options;
 
+    using Newtonsoft.Json;
+    using Microsoft.EntityFrameworkCore;
+    using System.Linq;
     [Route("api/[controller]/[action]/{id}")]
     public class CodeExecutionController : Controller
     {
-        [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
         
         private IOptions<AppConfig> _appConfig { get; set; }
         private IOptions<IdentityServerConfig> _identityServerConfig { get; set; }
 
-        public CodeExecutionController(IOptions<AppConfig> appConfig, IOptions<IdentityServerConfig> identityServerConfig)
+        public CodeExecutionController(IOptions<AppConfig> appConfig, IOptions<IdentityServerConfig> identityServerConfig, CodingMonkeyContext codingMonkeyContext)
         {
             _appConfig = appConfig;
             _identityServerConfig = identityServerConfig;
+            CodingMonkeyContext = codingMonkeyContext;
         }
 
         [HttpPost]

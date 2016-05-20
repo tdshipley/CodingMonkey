@@ -1,20 +1,20 @@
-using System;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using CodingMonkey.Models;
 
 namespace CodingMonkey.Migrations
 {
     [DbContext(typeof(CodingMonkeyContext))]
-    [Migration("20160511093924_Initial")]
+    [Migration("20160520155015_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0-rc1-16348");
+                .HasAnnotation("ProductVersion", "1.0.0-rc2-20901");
 
             modelBuilder.Entity("CodingMonkey.Models.ApplicationUser", b =>
                 {
@@ -56,12 +56,12 @@ namespace CodingMonkey.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasAnnotation("Relational:Name", "EmailIndex");
+                        .HasName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
-                        .HasAnnotation("Relational:Name", "UserNameIndex");
+                        .HasName("UserNameIndex");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetUsers");
+                    b.ToTable("AspNetUsers");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.Exercise", b =>
@@ -74,6 +74,8 @@ namespace CodingMonkey.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("ExerciseId");
+
+                    b.ToTable("Exercises");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseCategory", b =>
@@ -86,6 +88,8 @@ namespace CodingMonkey.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("ExerciseCategoryId");
+
+                    b.ToTable("ExerciseCategories");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseExerciseCategory", b =>
@@ -95,6 +99,12 @@ namespace CodingMonkey.Migrations
                     b.Property<int>("ExerciseCategoryId");
 
                     b.HasKey("ExerciseId", "ExerciseCategoryId");
+
+                    b.HasIndex("ExerciseCategoryId");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.ToTable("ExerciseExerciseCategory");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseTemplate", b =>
@@ -113,6 +123,10 @@ namespace CodingMonkey.Migrations
                     b.Property<string>("MainMethodSignature");
 
                     b.HasKey("ExerciseTemplateId");
+
+                    b.HasIndex("ExerciseForeignKey");
+
+                    b.ToTable("ExerciseTemplates");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.Test", b =>
@@ -122,9 +136,13 @@ namespace CodingMonkey.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<int?>("ExerciseExerciseId");
+                    b.Property<int?>("ExerciseId");
 
                     b.HasKey("TestId");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.ToTable("Tests");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.TestInput", b =>
@@ -134,13 +152,17 @@ namespace CodingMonkey.Migrations
 
                     b.Property<string>("ArgumentName");
 
-                    b.Property<int?>("TestTestId");
+                    b.Property<int?>("TestId");
 
                     b.Property<string>("Value");
 
                     b.Property<string>("ValueType");
 
                     b.HasKey("TestInputId");
+
+                    b.HasIndex("TestId");
+
+                    b.ToTable("TestInputs");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.TestOutput", b =>
@@ -155,9 +177,13 @@ namespace CodingMonkey.Migrations
                     b.Property<string>("ValueType");
 
                     b.HasKey("TestOutputId");
+
+                    b.HasIndex("TestForeignKey");
+
+                    b.ToTable("TestOutputs");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
                     b.Property<string>("Id");
 
@@ -173,12 +199,12 @@ namespace CodingMonkey.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
-                        .HasAnnotation("Relational:Name", "RoleNameIndex");
+                        .HasName("RoleNameIndex");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetRoles");
+                    b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -192,10 +218,12 @@ namespace CodingMonkey.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetRoleClaims");
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -209,10 +237,12 @@ namespace CodingMonkey.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetUserClaims");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider");
 
@@ -225,10 +255,12 @@ namespace CodingMonkey.Migrations
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetUserLogins");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId");
 
@@ -236,78 +268,108 @@ namespace CodingMonkey.Migrations
 
                     b.HasKey("UserId", "RoleId");
 
-                    b.HasAnnotation("Relational:TableName", "AspNetUserRoles");
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("LoginProvider");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens");
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseExerciseCategory", b =>
                 {
                     b.HasOne("CodingMonkey.Models.ExerciseCategory")
                         .WithMany()
-                        .HasForeignKey("ExerciseCategoryId");
+                        .HasForeignKey("ExerciseCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CodingMonkey.Models.Exercise")
                         .WithMany()
-                        .HasForeignKey("ExerciseId");
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.ExerciseTemplate", b =>
                 {
                     b.HasOne("CodingMonkey.Models.Exercise")
                         .WithOne()
-                        .HasForeignKey("CodingMonkey.Models.ExerciseTemplate", "ExerciseForeignKey");
+                        .HasForeignKey("CodingMonkey.Models.ExerciseTemplate", "ExerciseForeignKey")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.Test", b =>
                 {
                     b.HasOne("CodingMonkey.Models.Exercise")
                         .WithMany()
-                        .HasForeignKey("ExerciseExerciseId");
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.TestInput", b =>
                 {
                     b.HasOne("CodingMonkey.Models.Test")
                         .WithMany()
-                        .HasForeignKey("TestTestId");
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CodingMonkey.Models.TestOutput", b =>
                 {
                     b.HasOne("CodingMonkey.Models.Test")
                         .WithOne()
-                        .HasForeignKey("CodingMonkey.Models.TestOutput", "TestForeignKey");
+                        .HasForeignKey("CodingMonkey.Models.TestOutput", "TestForeignKey")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNet.Identity.EntityFramework.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole")
                         .WithMany()
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("CodingMonkey.Models.ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
                     b.HasOne("CodingMonkey.Models.ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNet.Identity.EntityFramework.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNet.Identity.EntityFramework.IdentityRole")
+                    b.HasOne("CodingMonkey.Models.ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CodingMonkey.Models.ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }

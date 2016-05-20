@@ -1,6 +1,7 @@
 ﻿namespace CodingMonkey.Models
 {
-    using Microsoft.AspNet.Identity.EntityFramework;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
     public class ApplicationUser : IdentityUser
     {
     }

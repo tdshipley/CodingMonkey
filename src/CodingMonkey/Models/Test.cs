@@ -1,9 +1,7 @@
-using Microsoft.Data.Entity;
-using System.Collections.Generic;
-using System;
-
 namespace CodingMonkey.Models
 {
+    using System.Collections.Generic;
+
     public class Test
     {
         public Test()

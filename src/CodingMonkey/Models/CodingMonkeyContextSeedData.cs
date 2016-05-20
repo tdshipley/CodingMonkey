@@ -7,10 +7,10 @@
 
     using CodingMonkey.Configuration;
 
-    using Microsoft.AspNet.Identity;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.OptionsModel;
-    using Microsoft.AspNet.Hosting;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.Extensions.Options;
+
     public class CodingMonkeyContextSeedData
     {
         private CodingMonkeyContext _context;
