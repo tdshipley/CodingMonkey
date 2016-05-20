@@ -9,16 +9,19 @@
     using CodingMonkey.Models;
     using CodingMonkey.ViewModels;
 
-    using Microsoft.AspNet.Authorization;
-    using Microsoft.AspNet.Identity;
-    using Microsoft.AspNet.Identity.EntityFramework;
-    using Microsoft.AspNet.Mvc;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]/[action]")]
     public class AccountController : Controller
     {
-        [FromServices]
         public UserManager<ApplicationUser> _userManager { get; set; }
+
+        public AccountController(UserManager<ApplicationUser> userManager)
+        {
+            this._userManager = userManager;
+        }
 
         [HttpGet]
         [Authorize]
@@ -117,7 +120,7 @@
 
         private async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return await _userManager.GetUserAsync(HttpContext.User);
         }
     }
 }

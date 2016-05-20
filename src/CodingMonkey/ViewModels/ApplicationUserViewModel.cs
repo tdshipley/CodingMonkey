@@ -1,7 +1,8 @@
 ﻿namespace CodingMonkey.ViewModels
 {
-    using Microsoft.AspNet.Identity.EntityFramework;
     using System.Collections.Generic;
+
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
     public class ApplicationUserViewModel
     {

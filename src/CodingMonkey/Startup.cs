@@ -6,26 +6,25 @@
 
     using CodingMonkey.Configuration;
     using CodingMonkey.Models;
-
-    using Microsoft.AspNet.Authentication.Cookies;
-    using Microsoft.AspNet.Identity.EntityFramework;
     using Microsoft.Extensions.PlatformAbstractions;
 
-    using Microsoft.AspNet.Builder;
-    using Microsoft.AspNet.Hosting;
-    using Microsoft.Data.Entity;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
     using Serilog;
     using Serilog.Sinks.RollingFile;
-
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Infrastructure;
     public class Startup
     {
         public Startup(IHostingEnvironment env)
         {
-            string applicationPath = PlatformServices.Default.Application.ApplicationBasePath;
+            string applicationPath = env.ContentRootPath;
 
             // Create SeriLog
             Log.Logger = new LoggerConfiguration()
@@ -35,6 +34,7 @@
 
             // Set up configuration sources.
             var builder = new ConfigurationBuilder()
+                .SetBasePath(applicationPath)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.secrets.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
@@ -42,7 +42,8 @@
             if (env.IsDevelopment())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
+                // Not using anyway atm - disabled until https://github.com/aspnet/UserSecrets/issues/62 is fixed
+                // builder.AddUserSecrets();
 
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
@@ -64,11 +65,8 @@
             var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
 
-            services.AddEntityFramework()
-                .AddSqlite()
-                .AddDbContext<CodingMonkeyContext>(
-                    options =>
-                    { options.UseSqlite(connection); });
+
+            services.AddDbContext<CodingMonkeyContext>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 identityContext =>
@@ -127,7 +125,7 @@
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, CodingMonkeyContextSeedData seeder, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CodingMonkeyContextSeedData seeder)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -145,9 +143,7 @@
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
-            app.UseIISPlatformHandler(options => options.AuthenticationDescriptions.Clear());
-
+            
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
@@ -165,8 +161,5 @@
 
             await seeder.EnsureSeedDataAsync();
         }
-
-        // Entry point for the application.
-        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 }

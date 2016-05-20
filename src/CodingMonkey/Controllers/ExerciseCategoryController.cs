@@ -3,20 +3,22 @@ namespace CodingMonkey.Controllers
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
 
-    using Microsoft.AspNet.Mvc;
-
     using System;
     using System.Collections.Generic;
+
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using System.Linq;
-
-    using Microsoft.AspNet.Authorization;
-    using Microsoft.Data.Entity;
-
     [Route("api/[controller]/[action]")]
     public class ExerciseCategoryController : Controller
     {
-        [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
+
+        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext)
+        {
+            this.CodingMonkeyContext = codingMonkeyContext;
+        }
 
         [HttpGet]
         public JsonResult List()

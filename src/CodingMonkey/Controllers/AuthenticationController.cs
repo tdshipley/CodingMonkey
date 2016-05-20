@@ -6,15 +6,19 @@
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
 
-    using Microsoft.AspNet.Authorization;
-    using Microsoft.AspNet.Identity;
-    using Microsoft.AspNet.Mvc;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]/[action]")]
     public class AuthenticationController : Controller
     {
-        [FromServices]
         public SignInManager<ApplicationUser> _signInManager { get; set; }
+
+        public AuthenticationController(SignInManager<ApplicationUser> signInManager)
+        {
+            this._signInManager = signInManager;
+        }
 
         [HttpPost]
         public async Task<JsonResult> Login([FromBody]LoginViewModel vm)

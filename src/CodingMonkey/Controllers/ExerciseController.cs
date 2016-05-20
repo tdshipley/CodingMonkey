@@ -3,20 +3,23 @@
     using CodingMonkey.ViewModels;
     using CodingMonkey.Models;
 
-    using Microsoft.AspNet.Mvc;
-
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Microsoft.AspNet.Authorization;
-    using Microsoft.Data.Entity;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
 
     [Route("api/[controller]/[action]")]
     public class ExerciseController : Controller
     {
-        [FromServices]
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
+
+        public ExerciseController(CodingMonkeyContext codingMonkeyContext)
+        {
+            this.CodingMonkeyContext = codingMonkeyContext;
+        }
 
         [HttpGet]
         public JsonResult List()
