@@ -1,7 +1,10 @@
 {
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
+    "compile": {
+      "exclude": [ "node_modules" ]
+    }
   },
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": {
