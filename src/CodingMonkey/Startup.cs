@@ -18,10 +18,13 @@
 
     using Serilog;
     using Serilog.Sinks.RollingFile;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Infrastructure;
+
+    using AutoMapper;
+
     public class Startup
     {
+        private MapperConfiguration _mapperConfiguration { get; set; }
+
         public Startup(IHostingEnvironment env)
         {
             string applicationPath = env.ContentRootPath;
@@ -31,6 +34,12 @@
                                 .MinimumLevel.Debug()
                                 .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
                                 .CreateLogger();
+
+            // Setup automapper
+            _mapperConfiguration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperConfiguration());
+            });
 
             // Set up configuration sources.
             var builder = new ConfigurationBuilder()
@@ -64,7 +73,6 @@
             // Add Db
             var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
-
 
             services.AddDbContext<CodingMonkeyContext>();
 
@@ -122,6 +130,8 @@
                     });
 
             services.AddTransient<CodingMonkeyContextSeedData>();
+
+            services.AddSingleton<IMapper>(x => _mapperConfiguration.CreateMapper());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

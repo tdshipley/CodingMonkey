@@ -91,7 +91,8 @@
     "Serilog.Extensions.Logging": "1.0.0-rc2-10104",
     "Serilog.Sinks.RollingFile": "2.0.0-rc-703",
     "Microsoft.AspNetCore.Diagnostics": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final"
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
+    "AutoMapper": "4.2.1"
   },
   "publishOptions": {
     "include": [

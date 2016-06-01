@@ -6,7 +6,7 @@
     {
         public ExerciseViewModel()
         {
-            CategoryIds = new List<int>();
+            this.CategoryIds = new List<int>();
         }
         
         public int Id { get; set; }
