@@ -13,14 +13,17 @@
         {
             // Database Models to Database View Models
             CreateMap<Exercise, ExerciseViewModel>()
-                .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseId));
+                .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseId))
+                .ReverseMap();
 
             CreateMap<ExerciseCategory, ExerciseCategoryViewModel>()
-                .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseCategoryId));
+                .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseCategoryId))
+                .ReverseMap();
 
             CreateMap<ExerciseTemplate, ExerciseTemplateViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseTemplateId))
-                .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.ExerciseForeignKey));
+                .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.ExerciseForeignKey))
+                .ReverseMap();
 
             CreateMap<Test, TestViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.TestId))
@@ -36,7 +39,7 @@
                                                                                                                         Id = testInput.TestInputId,
                                                                                                                         Value = testInput.Value,
                                                                                                                         ValueType = testInput.ValueType
-                                                                                                                    }).ToList()));
+                                                                                                                    }).ToList())).ReverseMap();
         }
     }
 }

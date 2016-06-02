@@ -7,6 +7,8 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using AutoMapper;
+
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -15,9 +17,12 @@
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public TestController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public TestController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
@@ -28,41 +33,9 @@
                 CodingMonkeyContext.Tests.Include(x => x.TestInputs)
                     .Include(x => x.TestOutput)
                     .Include(x => x.Exercise)
-                    .Where(x => x.Exercise.ExerciseId == exerciseId);
+                    .Where(x => x.Exercise.ExerciseId == exerciseId).ToList();
 
-            List<TestViewModel> vm = new List<TestViewModel>();
-
-            foreach (var test in tests)
-            {
-                List<TestInputViewModel> testInputsViewModel = new List<TestInputViewModel>();
-
-                foreach (var testInput in test.TestInputs)
-                {
-                    testInputsViewModel.Add(
-                        new TestInputViewModel()
-                            {
-                                Id = testInput.TestInputId,
-                                ArgumentName = testInput.ArgumentName,
-                                ValueType = testInput.ValueType,
-                                Value = testInput.Value
-                            });
-                }
-
-                vm.Add(
-                    new TestViewModel()
-                        {
-                            Id = test.TestId,
-                            Description = test.Description,
-                            TestInputs = testInputsViewModel,
-                            TestOutput =
-                                new TestOutputViewModel()
-                                    {
-                                        Id = test.TestOutput.TestOutputId,
-                                        ValueType = test.TestOutput.ValueType,
-                                        Value = test.TestOutput.Value
-                                    }
-                        });
-            }
+            List<TestViewModel> vm = this.Mapper.Map<List<TestViewModel>>(tests);
 
             return Json(vm);
         }
@@ -83,33 +56,7 @@
                 return Json(string.Empty);
             }
 
-            List<TestInputViewModel> testInputsViewModel = new List<TestInputViewModel>();
-
-            foreach (var testInput in test.TestInputs)
-            {
-                testInputsViewModel.Add(
-                    new TestInputViewModel()
-                        {
-                            Id = testInput.TestInputId,
-                            ArgumentName = testInput.ArgumentName,
-                            ValueType = testInput.ValueType,
-                            Value = testInput.Value
-                        });
-            }
-
-            var vm = new TestViewModel()
-                         {
-                             Id = test.TestId,
-                             Description = test.Description,
-                             TestInputs = testInputsViewModel,
-                             TestOutput =
-                                 new TestOutputViewModel()
-                                     {
-                                         Id = test.TestOutput.TestOutputId,
-                                         ValueType = test.TestOutput.ValueType,
-                                         Value = test.TestOutput.Value
-                                     }
-                         };
+            var vm = this.Mapper.Map<TestViewModel>(test);
 
             return Json(vm);
         }
@@ -131,13 +78,14 @@
             Exercise exerciseTestBelongsTo =
                 CodingMonkeyContext.Exercises.SingleOrDefault(x => x.ExerciseId == exerciseId);
 
+
             Test testToCreate = new Test()
-                                    {
-                                        Description = vm.Description,
-                                        TestInputs = testInputsForModel,
-                                        TestOutput = testOutputForModel,
-                                        Exercise = exerciseTestBelongsTo
-                                    };
+            {
+                Description = vm.Description,
+                TestInputs = testInputsForModel,
+                TestOutput = testOutputForModel,
+                Exercise = exerciseTestBelongsTo
+            };
 
             try
             {
