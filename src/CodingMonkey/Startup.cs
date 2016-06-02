@@ -38,7 +38,7 @@
             // Setup automapper
             _mapperConfiguration = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new AutoMapperConfiguration());
+                cfg.AddProfile(new CodingMonkeyAutoMapperProfile());
             });
 
             // Set up configuration sources.
