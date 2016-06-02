@@ -10,47 +10,31 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
 
     [Route("api/[controller]/[action]")]
     public class ExerciseController : Controller
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public ExerciseController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public ExerciseController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
         public JsonResult List()
         {
-            var exercises = CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories);
+            var exercises = CodingMonkeyContext.Exercises
+                                               .Include(e => e.ExerciseExerciseCategories)
+                                               .Include(e => e.Template)
+                                               .ToList();
 
 
-            List<ExerciseViewModel> vm = new List<ExerciseViewModel>();
-            
-            foreach (var exercise in exercises)
-            {
-                var exerciseTemplate =
-                    CodingMonkeyContext.ExerciseTemplates.Include(et => et.Exercise)
-                        .SingleOrDefault(et => et.Exercise.ExerciseId == exercise.ExerciseId);
-
-                int exerciseTemplateId = 0;
-
-                if (exerciseTemplate != null)
-                {
-                    exerciseTemplateId = exerciseTemplate.ExerciseTemplateId;
-                }
-
-                vm.Add(new ExerciseViewModel()
-                        {
-                            Id = exercise.ExerciseId,
-                            ExerciseTemplateId = exerciseTemplateId,
-                            Guidance = exercise.Guidance,
-                            Name = exercise.Name,
-                            CategoryIds = GetExerciseCategoryIdsForExercise(exercise.ExerciseId, exercise)
-                        });
-            }
+            var vm = this.Mapper.Map<List<ExerciseViewModel>>(exercises);
 
             return Json(vm);
         }
@@ -59,24 +43,17 @@
         [Route("{id}")]
         public JsonResult Details(int id)
         {
-            var exercise =
-                CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories)
-                    .SingleOrDefault(e => e.ExerciseId == id);
+            var exercise = CodingMonkeyContext.Exercises
+                                              .Include(e => e.ExerciseExerciseCategories)
+                                              .Include(e => e.Template)
+                                              .SingleOrDefault(e => e.ExerciseId == id);
 
             if (exercise == null)
             {
                 return Json(string.Empty);
             }
 
-            List<int> exerciseCategoryIds = GetExerciseCategoryIdsForExercise(id, exercise);
-
-            var vm = new ExerciseViewModel()
-                             {
-                                 Id = exercise.ExerciseId,
-                                 Name = exercise.Name,
-                                 Guidance = exercise.Guidance,
-                                 CategoryIds = exerciseCategoryIds
-                             };
+            var vm = this.Mapper.Map<ExerciseViewModel>(exercise);
 
             return Json(vm);
         }

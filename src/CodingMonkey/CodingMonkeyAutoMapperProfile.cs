@@ -14,10 +14,17 @@
             // Database Models to Database View Models
             CreateMap<Exercise, ExerciseViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseId))
+                .ForMember(dest => dest.ExerciseTemplateId, cfg => cfg.MapFrom(src => src.Template.ExerciseTemplateId))
+                .ForMember(dest => dest.CategoryIds, cfg => cfg.MapFrom(src => src.ExerciseExerciseCategories
+                                                                                  .Where(x => x.ExerciseId == src.ExerciseId)
+                                                                                  .Select(x => x.ExerciseCategoryId)))
                 .ReverseMap();
 
             CreateMap<ExerciseCategory, ExerciseCategoryViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseCategoryId))
+                .ForMember(dest => dest.ExerciseIds, cfg => cfg.MapFrom(src => src.ExerciseExerciseCategories
+                                                                                  .Where(x => x.ExerciseCategoryId == src.ExerciseCategoryId)
+                                                                                  .Select(x => x.ExerciseId)))
                 .ReverseMap();
 
             CreateMap<ExerciseTemplate, ExerciseTemplateViewModel>()
@@ -39,7 +46,7 @@
                                                                                                                         Id = testInput.TestInputId,
                                                                                                                         Value = testInput.Value,
                                                                                                                         ValueType = testInput.ValueType
-                                                                                                                    }).ToList())).ReverseMap();
+                                                                                                                    }))).ReverseMap();
         }
     }
 }

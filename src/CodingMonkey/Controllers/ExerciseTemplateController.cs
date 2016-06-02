@@ -9,14 +9,19 @@ namespace CodingMonkey.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
+    using AutoMapper;
+
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
     public class ExerciseTemplateController : Controller
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
@@ -31,15 +36,7 @@ namespace CodingMonkey.Controllers
                 return Json(string.Empty);
             }
 
-            var vm = new ExerciseTemplateViewModel()
-                             {
-                                 Id = exerciseTemplate.ExerciseTemplateId,
-                                 ExerciseId = exerciseTemplate.Exercise.ExerciseId,
-                                 InitialCode = exerciseTemplate.InitialCode,
-                                 ClassName = exerciseTemplate.ClassName,
-                                 MainMethodName = exerciseTemplate.MainMethodName,
-                                 MainMethodSignature = exerciseTemplate.MainMethodSignature
-                             };
+            var vm = this.Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate);
 
             return Json(vm);
         }

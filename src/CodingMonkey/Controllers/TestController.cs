@@ -35,7 +35,7 @@
                     .Include(x => x.Exercise)
                     .Where(x => x.Exercise.ExerciseId == exerciseId).ToList();
 
-            List<TestViewModel> vm = this.Mapper.Map<List<TestViewModel>>(tests);
+            var vm = this.Mapper.Map<List<TestViewModel>>(tests);
 
             return Json(vm);
         }
@@ -77,7 +77,6 @@
 
             Exercise exerciseTestBelongsTo =
                 CodingMonkeyContext.Exercises.SingleOrDefault(x => x.ExerciseId == exerciseId);
-
 
             Test testToCreate = new Test()
             {
@@ -253,10 +252,9 @@
         public JsonResult Delete(int id)
         {
             var result = new Dictionary<string, dynamic>();
-            var testToDelete =
-                CodingMonkeyContext.Tests.Include(t => t.TestInputs)
-                    .Include(t => t.TestOutput)
-                    .SingleOrDefault(t => t.TestId == id);
+            var testToDelete = CodingMonkeyContext.Tests.Include(t => t.TestInputs)
+                                                        .Include(t => t.TestOutput)
+                                                        .SingleOrDefault(t => t.TestId == id);
 
             if (testToDelete == null)
             {

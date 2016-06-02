@@ -10,36 +10,28 @@ namespace CodingMonkey.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
+    using AutoMapper;
+
     [Route("api/[controller]/[action]")]
     public class ExerciseCategoryController : Controller
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
         public JsonResult List()
         {
-            var exerciseCategories = CodingMonkeyContext.ExerciseCategories.Include(e => e.ExerciseExerciseCategories);
+            var exerciseCategories = CodingMonkeyContext.ExerciseCategories
+                                                        .Include(e => e.ExerciseExerciseCategories);
 
-            List<ExerciseCategoryViewModel> vm = new List<ExerciseCategoryViewModel>();
-
-            foreach (var exerciseCategory in exerciseCategories)
-            {
-                List<int> exerciseIdsInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
-
-                vm.Add(
-                    new ExerciseCategoryViewModel()
-                        {
-                            Id = exerciseCategory.ExerciseCategoryId,
-                            Name = exerciseCategory.Name,
-                            Description = exerciseCategory.Description,
-                            ExerciseIds = exerciseIdsInCategory
-                        });
-            }
+            var vm = this.Mapper.Map<List<ExerciseCategoryViewModel>>(exerciseCategories);
 
             return Json(vm);
         }
@@ -48,23 +40,16 @@ namespace CodingMonkey.Controllers
         [Route("{id}")]
         public JsonResult Details(int id)
         {
-            var exerciseCategory =
-                CodingMonkeyContext.ExerciseCategories.SingleOrDefault(e => e.ExerciseCategoryId == id);
+            var exerciseCategory = CodingMonkeyContext.ExerciseCategories
+                                                      .Include(e => e.ExerciseExerciseCategories)
+                                                      .SingleOrDefault(e => e.ExerciseCategoryId == id);
 
             if (exerciseCategory == null)
             {
                 return Json(string.Empty);
             }
 
-            List<int> exercisesInCategory = GetExercisesInCategory(exerciseCategory.ExerciseCategoryId);
-
-            var vm = new ExerciseCategoryViewModel()
-                             {
-                                 Id = exerciseCategory.ExerciseCategoryId,
-                                 Name = exerciseCategory.Name,
-                                 Description = exerciseCategory.Description,
-                                 ExerciseIds = exercisesInCategory
-                             };
+            var vm = this.Mapper.Map<ExerciseCategoryViewModel>(exerciseCategory);
 
             return Json(vm);
         }
