@@ -48,11 +48,9 @@
                                               .Include(e => e.Template)
                                               .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exercise == null) return Json(string.Empty);
+            JsonResult result = exercise == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseViewModel>(exercise));
 
-            var vm = Mapper.Map<ExerciseViewModel>(exercise);
-
-            return Json(vm);
+            return Json(result);
         }
 
         [HttpPost]

@@ -31,11 +31,9 @@ namespace CodingMonkey.Controllers
                                                       .Include(e => e.Exercise)
                                                       .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
-            if (exerciseTemplate == null) return Json(string.Empty);
+            JsonResult result = exerciseTemplate == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate));
 
-            var vm = this.Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate);
-
-            return Json(vm);
+            return Json(result);
         }
 
         [HttpPost]

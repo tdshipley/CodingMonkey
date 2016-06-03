@@ -52,11 +52,9 @@
                                           .Include(x => x.Exercise)
                                           .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
-            if (test == null) return Json(string.Empty);
+            JsonResult result = test == null ? Json(string.Empty) : Json(Mapper.Map<TestViewModel>(test));
 
-            var vm = this.Mapper.Map<TestViewModel>(test);
-
-            return Json(vm);
+            return result;
         }
 
         [HttpPost]
