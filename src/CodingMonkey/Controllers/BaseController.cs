@@ -8,21 +8,29 @@ namespace CodingMonkey.Controllers
 {
     public class BaseController : Controller
     {
-        protected JsonResult ResultNotFoundMessage(ControllerDataActions dataAction)
+        protected JsonResult DataActionFailedMessage(DataAction dataAction,
+            DataActionFailReason reason = DataActionFailReason.ExceptionThrown)
         {
             Dictionary<string, dynamic> result = new Dictionary<string, dynamic>
                                                      {
                                                         { dataAction.ToString().ToLower(), false },
-                                                        { "reason", "exception thrown"}
+                                                        { "reason", reason.ToString() }
                                                      };
 
             return Json(result);
         }
 
-        protected enum ControllerDataActions
+        protected enum DataAction
         {
             Deleted = 100,
-            Updated = 200
+            Updated = 200,
+            Created = 300
+        }
+
+        protected enum DataActionFailReason
+        {
+            ExceptionThrown = 100,
+            RecordNotFound = 200
         }
     }
 }

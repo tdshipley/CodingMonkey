@@ -21,6 +21,7 @@
     using Newtonsoft.Json;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
+
     [Route("api/[controller]/[action]/{id}")]
     public class CodeExecutionController : Controller
     {
@@ -31,9 +32,9 @@
 
         public CodeExecutionController(IOptions<AppConfig> appConfig, IOptions<IdentityServerConfig> identityServerConfig, CodingMonkeyContext codingMonkeyContext)
         {
-            _appConfig = appConfig;
-            _identityServerConfig = identityServerConfig;
-            CodingMonkeyContext = codingMonkeyContext;
+            this._appConfig = appConfig;
+            this._identityServerConfig = identityServerConfig;
+            this.CodingMonkeyContext = codingMonkeyContext;
         }
 
         [HttpPost]
@@ -44,33 +45,34 @@
                                                   Code = vm.Code
                                               };
 
-            var response = await this.PostRequestToCodeExecutorAsync("api/compile", codeToSubmit);
+            var response = await PostRequestToCodeExecutorAsync("api/compile", codeToSubmit);
 
             if (response.IsSuccessStatusCode)
             {
-                CodeSubmission codeSubmissionCompiled =
-                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+                CodeSubmission codeSubmissionCompiled = JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
                 vm.HasCompilerErrors = codeSubmissionCompiled.ResultSummary.HasCompilerErrors;
 
-                if (vm.HasCompilerErrors)
+                if (!vm.HasCompilerErrors)
                 {
-                    vm.CompilerErrors = new List<CompilerErrorViewModel>();
+                    return Json(vm);
+                }
 
-                    foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
-                    {
-                        vm.CompilerErrors.Add(new CompilerErrorViewModel()
-                                                  {
-                                                      ColEnd = compilerError.ColEnd,
-                                                      ColStart = compilerError.ColStart,
-                                                      ErrorLength = compilerError.ErrorLength,
-                                                      Id = compilerError.Id,
-                                                      LineNumberEnd = compilerError.EndLineNumber,
-                                                      LineNumberStart = compilerError.StartLineNumber,
-                                                      Message = compilerError.Message,
-                                                      Severity = compilerError.Severity
-                                                  });
-                    }
+                vm.CompilerErrors = new List<CompilerErrorViewModel>();
+
+                foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
+                {
+                    vm.CompilerErrors.Add(new CompilerErrorViewModel()
+                                              {
+                                                  ColEnd = compilerError.ColEnd,
+                                                  ColStart = compilerError.ColStart,
+                                                  ErrorLength = compilerError.ErrorLength,
+                                                  Id = compilerError.Id,
+                                                  LineNumberEnd = compilerError.EndLineNumber,
+                                                  LineNumberStart = compilerError.StartLineNumber,
+                                                  Message = compilerError.Message,
+                                                  Severity = compilerError.Severity
+                                              });
                 }
             }
             else
@@ -102,22 +104,17 @@
 
             if (!coreTestsPassed)
             {
-                return this.Json(vm);
+                return Json(vm);
             }
 
             var codeToExecute = new CodeSubmission()
                                                {
                                                    Code = vm.Code,
-                                                   CodeTemplate =
-                                                       new CodeTemplate()
-                                                           {
-                                                               ClassName =
-                                                                   exercise.Template
-                                                                   .ClassName,
-                                                               MainMethodName =
-                                                                   exercise.Template
-                                                                   .MainMethodName
-                                                           },
+                                                   CodeTemplate = new CodeTemplate()
+                                                                      {
+                                                                          ClassName = exercise.Template.ClassName,
+                                                                          MainMethodName = exercise.Template.MainMethodName
+                                                                      },
                                                    Tests = new List<CodeTest>()
                                                };
 
@@ -126,15 +123,11 @@
                 CodeTest testToRun = new CodeTest()
                                          {
                                              Description = test.Description,
-                                             ExpectedOutput =
-                                                 new CodeTestExpectedOutput()
-                                                     {
-                                                         Value =
-                                                             test.TestOutput.Value,
-                                                         ValueType =
-                                                             test.TestOutput
-                                                             .ValueType
-                                                     },
+                                             ExpectedOutput = new CodeTestExpectedOutput()
+                                                                  {
+                                                                      Value = test.TestOutput.Value,
+                                                                      ValueType = test.TestOutput.ValueType
+                                                                  },
                                              Inputs = new List<CodeTestInput>()
                                          };
 
@@ -152,12 +145,11 @@
                 codeToExecute.Tests.Add(testToRun);
             }
 
-            var response = await this.PostRequestToCodeExecutorAsync("api/Execution", codeToExecute);
+            var response = await PostRequestToCodeExecutorAsync("api/Execution", codeToExecute);
 
             if (response.IsSuccessStatusCode)
             {
-                CodeSubmission codeSubmissionExecuted =
-                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+                CodeSubmission codeSubmissionExecuted = JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
                 if (codeSubmissionExecuted.ResultSummary.HasRuntimeError)
                 {
@@ -165,15 +157,11 @@
                     vm.HasCompilerErrors = false;
                     vm.RuntimeError = new RuntimeErrorViewModel()
                                           {
-                                              Message =
-                                                  codeSubmissionExecuted.ResultSummary
-                                                  .RuntimeError.Message,
-                                              HelpLink =
-                                                  codeSubmissionExecuted.ResultSummary
-                                                  .RuntimeError.HelpLink
+                                              Message = codeSubmissionExecuted.ResultSummary.RuntimeError.Message,
+                                              HelpLink = codeSubmissionExecuted.ResultSummary.RuntimeError.HelpLink
                                           };
 
-                    return this.Json(vm);
+                    return Json(vm);
                 }
 
                 if (codeSubmissionExecuted.ResultSummary.HasCompilerErrors)
@@ -199,7 +187,7 @@
                                 });
                     }
 
-                    return this.Json(vm);
+                    return Json(vm);
                 }
 
                 vm.AllTestsExecuted = codeSubmissionExecuted.ResultSummary.AllTestsExecuted;
@@ -231,7 +219,7 @@
             }
             else
             {
-                return this.Json(string.Empty);
+                return Json(string.Empty);
             }
 
             return Json(vm);
@@ -301,8 +289,7 @@
                                                                  ActualOutput = true,
                                                                  TestPassed = true,
                                                                  TestExecuted = true,
-                                                                 Inputs =
-                                                                     new List<TestResultInputViewModel>()
+                                                                 Inputs = new List<TestResultInputViewModel>()
                                                              };
 
             bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
@@ -322,9 +309,7 @@
                                                                  ActualOutput = true,
                                                                  TestPassed = true,
                                                                  TestExecuted = true,
-                                                                 Inputs =
-                                                                     new List
-                                                                     <TestResultInputViewModel>()
+                                                                 Inputs = new List<TestResultInputViewModel>()
                                                              };
 
             if (publicConstructorFound)
@@ -341,14 +326,13 @@
 
             // Check code has main method
             string mainMethodSignaturePattern = mainMethodSignature.Replace(" ", "\\s*")
-                                                          .Replace("(", "\\(")
-                                                          .Replace(")", "\\)")
-                                                          .Replace(",", "\\s*,");
+                                                                   .Replace("(", "\\(")
+                                                                   .Replace(")", "\\)")
+                                                                   .Replace(",", "\\s*,");
 
             var containsMainMethod = new TestResultViewModel()
                                          {
-                                             Description =
-                                                 $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
+                                             Description = $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
                                              ExpectedOutput = true,
                                              ActualOutput = true,
                                              TestPassed = true,

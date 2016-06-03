@@ -31,7 +31,7 @@ namespace CodingMonkey.Controllers
             var exerciseCategories = CodingMonkeyContext.ExerciseCategories
                                                         .Include(e => e.ExerciseExerciseCategories);
 
-            var vm = this.Mapper.Map<List<ExerciseCategoryViewModel>>(exerciseCategories);
+            var vm = Mapper.Map<List<ExerciseCategoryViewModel>>(exerciseCategories);
 
             return Json(vm);
         }
@@ -46,7 +46,7 @@ namespace CodingMonkey.Controllers
 
             JsonResult result = exerciseCategory == null
                                     ? Json(string.Empty)
-                                    : Json(this.Mapper.Map<ExerciseCategoryViewModel>(exerciseCategory));
+                                    : Json(Mapper.Map<ExerciseCategoryViewModel>(exerciseCategory));
 
             return result;
         }
@@ -55,10 +55,7 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Create([FromBody] ExerciseCategoryViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null)  return Json(string.Empty);
 
             ExerciseCategory exerciseCategoryToCreate = new ExerciseCategory()
                                                             {
@@ -70,22 +67,14 @@ namespace CodingMonkey.Controllers
             {
                 CodingMonkeyContext.ExerciseCategories.Add(exerciseCategoryToCreate);
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                var exceptionResult = new Dictionary<string, dynamic>();
-
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return Json(this.DataActionFailedMessage(DataAction.Created));
             }
 
-            vm = this.Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToCreate);
+            vm = Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToCreate);
 
             return Json(vm);
         }
@@ -95,40 +84,27 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Update(int id, [FromBody] ExerciseCategoryViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null) return Json(string.Empty);
 
-            var exceptionResult = new Dictionary<string, dynamic>();
             var exerciseCategoryToUpdate = CodingMonkeyContext.ExerciseCategories
                                                               .Include(x => x.ExerciseExerciseCategories)
                                                               .SingleOrDefault(e => e.ExerciseCategoryId == id);
 
-            if (exerciseCategoryToUpdate == null)
-            {
-                return this.ResultNotFoundMessage(ControllerDataActions.Updated);
-            }
+            if (exerciseCategoryToUpdate == null)  return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
 
             try
             {
                 exerciseCategoryToUpdate.Name = vm.Name;
                 exerciseCategoryToUpdate.Description = vm.Description;
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Updated);
             }
 
-            vm = this.Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToUpdate);
+            vm = Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToUpdate);
 
             return Json(vm);
         }
@@ -138,29 +114,23 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Delete(int id)
         {
-            var result = new Dictionary<string, dynamic>();
-            var exerciseCategoryToDelete =
-                CodingMonkeyContext.ExerciseCategories.Include(ec => ec.ExerciseExerciseCategories)
-                    .SingleOrDefault(e => e.ExerciseCategoryId == id);
+            var exerciseCategoryToDelete = CodingMonkeyContext.ExerciseCategories
+                                                              .Include(ec => ec.ExerciseExerciseCategories)
+                                                              .SingleOrDefault(e => e.ExerciseCategoryId == id);
 
-            if (exerciseCategoryToDelete == null)
-            {
-                return this.ResultNotFoundMessage(ControllerDataActions.Deleted);
-            }
+            if (exerciseCategoryToDelete == null) return DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
 
             try
             {
-                this.CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategoryToDelete);
-                this.CodingMonkeyContext.SaveChanges();
-                result["deleted"] = true;
+                CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategoryToDelete);
+                CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                result["deleted"] = false;
-                result["reason"] = "exception thrown";
+                return DataActionFailedMessage(DataAction.Deleted);
             }
 
-            return Json(result);
+            return Json(new { deleted = true });
         }
     }
 }

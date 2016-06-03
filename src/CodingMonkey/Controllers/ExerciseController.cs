@@ -13,7 +13,7 @@
     using AutoMapper;
 
     [Route("api/[controller]/[action]")]
-    public class ExerciseController : Controller
+    public class ExerciseController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
@@ -34,7 +34,7 @@
                                                .ToList();
 
 
-            var vm = this.Mapper.Map<List<ExerciseViewModel>>(exercises);
+            var vm = Mapper.Map<List<ExerciseViewModel>>(exercises);
 
             return Json(vm);
         }
@@ -48,12 +48,9 @@
                                               .Include(e => e.Template)
                                               .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exercise == null)
-            {
-                return Json(string.Empty);
-            }
+            if (exercise == null) return Json(string.Empty);
 
-            var vm = this.Mapper.Map<ExerciseViewModel>(exercise);
+            var vm = Mapper.Map<ExerciseViewModel>(exercise);
 
             return Json(vm);
         }
@@ -62,19 +59,13 @@
         [Authorize]
         public JsonResult Create([FromBody] ExerciseViewModel vm)
         {
-            var exceptionResult = new Dictionary<string, dynamic>();
-
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null) return Json(string.Empty);
 
             Exercise exerciseToCreate = new Exercise()
                                             {
                                                 Name = vm.Name,
                                                 Guidance = vm.Guidance,
-                                                ExerciseExerciseCategories =
-                                                    new List<ExerciseExerciseCategory>()
+                                                ExerciseExerciseCategories = new List<ExerciseExerciseCategory>()
                                             };
 
             try
@@ -95,13 +86,10 @@
             }
             catch (Exception)
             {
-                exceptionResult["created"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Created);
             }
 
-            vm.Id = exerciseToCreate.ExerciseId;
+            vm = Mapper.Map<ExerciseViewModel>(exerciseToCreate);
 
             return Json(vm);
         }
@@ -111,33 +99,20 @@
         [Authorize]
         public JsonResult Update(int id, [FromBody] ExerciseViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null) return Json(string.Empty);
 
-            var exceptionResult = new Dictionary<string, dynamic>();
             var exerciseToUpdate =
                 CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories)
                     .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exerciseToUpdate == null)
-            {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "record not found";
-
-                return Json(exceptionResult);
-            }
+            if (exerciseToUpdate == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
 
             try
             {
                 exerciseToUpdate.Name = vm.Name;
                 exerciseToUpdate.Guidance = vm.Guidance;
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
                 // Update categories
                 //Remove categories not in new list
@@ -171,10 +146,7 @@
             }
             catch (Exception)
             {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Updated);
             }
 
             vm.CategoryIds =
@@ -182,9 +154,7 @@
                     .Select(x => x.ExerciseCategoryId)
                     .ToList();
 
-            vm.Id = exerciseToUpdate.ExerciseId;
-            vm.Guidance = exerciseToUpdate.Guidance;
-            vm.Name = exerciseToUpdate.Name;
+            vm = Mapper.Map<ExerciseViewModel>(exerciseToUpdate);
 
             return Json(vm);
         }
@@ -194,32 +164,23 @@
         [Route("{id}")]
         public JsonResult Delete(int id)
         {
-            var result = new Dictionary<string, dynamic>();
-            var exerciseToDelete =
-                CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories)
-                    .SingleOrDefault(e => e.ExerciseId == id);
+            var exerciseToDelete = CodingMonkeyContext.Exercises
+                                                      .Include(e => e.ExerciseExerciseCategories)
+                                                      .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exerciseToDelete == null)
+            if (exerciseToDelete == null) return DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
+
+            try
             {
-                result["deleted"] = false;
-                result["reason"] = "record not found";
+                CodingMonkeyContext.Exercises.Remove(exerciseToDelete);
+                CodingMonkeyContext.SaveChanges();
             }
-            else
+            catch (Exception)
             {
-                try
-                {
-                    CodingMonkeyContext.Exercises.Remove(exerciseToDelete);
-                    CodingMonkeyContext.SaveChanges();
-                    result["deleted"] = true;
-                }
-                catch (Exception)
-                {
-                    result["deleted"] = false;
-                    result["reason"] = "exception thrown";
-                }
+                return DataActionFailedMessage(DataAction.Deleted);
             }
 
-            return Json(result);
+            return Json(new { deleted = true });
         }
 
         private void AddCategoryIds(Exercise exercise, List<int> categoryIds)
@@ -237,14 +198,6 @@
                             Exercise = exercise
                         });
             }
-        }
-
-        private List<int> GetExerciseCategoryIdsForExercise(int exerciseId, Exercise exercise)
-        {
-            return
-                exercise.ExerciseExerciseCategories.Where(ec => ec.ExerciseId == exerciseId)
-                    .Select(ecid => ecid.ExerciseCategoryId)
-                    .ToList();
         }
     }
 }
