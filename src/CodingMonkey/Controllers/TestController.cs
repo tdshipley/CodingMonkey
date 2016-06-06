@@ -74,24 +74,16 @@
                 CodingMonkeyContext.Tests.Add(testToCreate);
 
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception)
-            {
-                return DataActionFailedMessage(DataAction.Created);
-            }
 
-            // Relate created test inputs
-            foreach (var testInput in testToCreate.TestInputs)
-            {
-                testInput.Test = testToCreate;
-            }
+                // Relate Test Inputs & Outputs to newly created test
+                foreach (var testInput in testToCreate.TestInputs)
+                {
+                    testInput.Test = testToCreate;
+                }
 
-            // Relate created test output
-            testToCreate.TestOutput.TestForeignKey = testToCreate.TestId;
-            testToCreate.TestOutput.Test = testToCreate;
+                testToCreate.TestOutput.TestForeignKey = testToCreate.TestId;
+                testToCreate.TestOutput.Test = testToCreate;
 
-            try
-            {
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
