@@ -69,7 +69,8 @@
             if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
             Test testToCreate = Mapper.Map<Test>(vm);
-            testToCreate.Exercise = relatedExercise;
+
+            testToCreate.RelateExerciseToTestInMemory(relatedExercise);
 
             try
             {

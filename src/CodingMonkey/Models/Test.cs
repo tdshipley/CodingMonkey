@@ -16,6 +16,11 @@ namespace CodingMonkey.Models
 
         public Exercise Exercise { get; set; }
 
+        public void RelateExerciseToTestInMemory(Exercise exercise)
+        {
+            this.Exercise = exercise;
+        }
+
         public void RelateTestToTestIoInMemory()
         {
             this.RelateTestToTestInputsInMemory();
