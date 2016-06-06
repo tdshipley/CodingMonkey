@@ -78,13 +78,7 @@
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
                 // Relate Test Inputs & Outputs to newly created test
-                foreach (var testInput in testToCreate.TestInputs)
-                {
-                    testInput.Test = testToCreate;
-                }
-
-                testToCreate.TestOutput.TestForeignKey = testToCreate.TestId;
-                testToCreate.TestOutput.Test = testToCreate;
+                testToCreate.RelateTestToTestIoInMemory();
 
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }

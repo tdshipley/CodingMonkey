@@ -54,13 +54,13 @@
                 .ForMember(dest => dest.TestOutput, cfg => cfg.MapFrom(src => new TestOutput()
                                                                                   {
                                                                                       TestOutputId = src.TestOutput.Id,
-                                                                                      TestForeignKey = src.Id,
+                                                                                      TestForeignKey = src.Id.GetValueOrDefault(),
                                                                                       Value = src.TestOutput.Value,
                                                                                       ValueType = src.TestOutput.ValueType
                                                                                   }))
                 .ForMember(dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs.Select(testInput => new TestInput()
                                                                                                                      {
-                                                                                                                         TestInputId = testInput.Id,
+                                                                                                                         TestInputId = testInput.Id.GetValueOrDefault(),
                                                                                                                          ArgumentName = testInput.ArgumentName,
                                                                                                                          Value = testInput.Value,
                                                                                                                          ValueType = testInput.ValueType
