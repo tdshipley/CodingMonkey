@@ -47,6 +47,24 @@
                                                                                                                         Value = testInput.Value,
                                                                                                                         ValueType = testInput.ValueType
                                                                                                                     }))).ReverseMap();
+
+            // Database View Models to Database Models
+            CreateMap<TestViewModel, Test>()
+                .ForMember(dest => dest.TestId, cfg => cfg.MapFrom(src => src.Id))
+                .ForMember(dest => dest.TestOutput, cfg => cfg.MapFrom(src => new TestOutput()
+                                                                                  {
+                                                                                      TestOutputId = src.TestOutput.Id,
+                                                                                      TestForeignKey = src.Id,
+                                                                                      Value = src.TestOutput.Value,
+                                                                                      ValueType = src.TestOutput.ValueType
+                                                                                  }))
+                .ForMember(dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs.Select(testInput => new TestInput()
+                                                                                                                     {
+                                                                                                                         TestInputId = testInput.Id,
+                                                                                                                         ArgumentName = testInput.ArgumentName,
+                                                                                                                         Value = testInput.Value,
+                                                                                                                         ValueType = testInput.ValueType
+                                                                                                                     })));
         }
     }
 }
