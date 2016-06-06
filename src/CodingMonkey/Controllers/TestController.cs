@@ -63,19 +63,11 @@
         {
             if (vm == null) return Json(string.Empty);
 
-            List<TestInput> testInputsForModel = ConvertTestInputsViewModelToTestInputsModel(vm.TestInputs);
-            TestOutput testOutputForModel = ConvertTestOutputViewModelToTestOutputModel(vm.TestOutput);
-
             Exercise exerciseTestBelongsTo = CodingMonkeyContext.Exercises
                                                                 .SingleOrDefault(x => x.ExerciseId == exerciseId);
 
-            Test testToCreate = new Test()
-            {
-                Description = vm.Description,
-                TestInputs = testInputsForModel,
-                TestOutput = testOutputForModel,
-                Exercise = exerciseTestBelongsTo
-            };
+            Test testToCreate = Mapper.Map<Test>(vm);
+            testToCreate.Exercise = exerciseTestBelongsTo;
 
             try
             {
@@ -88,33 +80,15 @@
                 return DataActionFailedMessage(DataAction.Created);
             }
 
-            // Create view model with data from db
-            vm.Id = testToCreate.TestId;
-
-            vm.TestInputs.Clear();
             // Relate created test inputs
-            foreach (var testInput in testInputsForModel)
+            foreach (var testInput in testToCreate.TestInputs)
             {
                 testInput.Test = testToCreate;
-                vm.TestInputs.Add(
-                    new TestInputViewModel()
-                        {
-                            Id = testInput.TestInputId,
-                            ArgumentName = testInput.ArgumentName,
-                            ValueType = testInput.ValueType,
-                            Value = testInput.Value
-                        });
             }
 
             // Relate created test output
-            testOutputForModel.TestForeignKey = testToCreate.TestId;
-            testOutputForModel.Test = testToCreate;
-            vm.TestOutput = new TestOutputViewModel()
-                                {
-                                    Id = testOutputForModel.TestOutputId,
-                                    Value = testOutputForModel.Value,
-                                    ValueType = testOutputForModel.ValueType
-                                };
+            testToCreate.TestOutput.TestForeignKey = testToCreate.TestId;
+            testToCreate.TestOutput.Test = testToCreate;
 
             try
             {
@@ -124,6 +98,8 @@
             {
                 return DataActionFailedMessage(DataAction.Created);
             }
+
+            vm = Mapper.Map<TestViewModel>(testToCreate);
 
             return Json(vm);
         }
@@ -229,29 +205,6 @@
             }
 
             return Json(new { deleted = true });
-        }
-
-        private List<TestInput> ConvertTestInputsViewModelToTestInputsModel(List<TestInputViewModel> testInputViewModel)
-        {
-            List<TestInput> testInputs = new List<TestInput>();
-
-            foreach (var testInput in testInputViewModel)
-            {
-                testInputs.Add(
-                    new TestInput()
-                        {
-                            Value = testInput.Value,
-                            ValueType = testInput.ValueType,
-                            ArgumentName = testInput.ArgumentName
-                        });
-            }
-
-            return testInputs;
-        }
-
-        private TestOutput ConvertTestOutputViewModelToTestOutputModel(TestOutputViewModel testOutputViewModel)
-        {
-            return new TestOutput() { Value = testOutputViewModel.Value, ValueType = testOutputViewModel.ValueType };
         }
     }
 }
