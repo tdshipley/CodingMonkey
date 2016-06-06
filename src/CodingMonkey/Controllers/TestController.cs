@@ -63,11 +63,13 @@
         {
             if (vm == null) return Json(string.Empty);
 
-            Exercise exerciseTestBelongsTo = CodingMonkeyContext.Exercises
-                                                                .SingleOrDefault(x => x.ExerciseId == exerciseId);
+            Exercise relatedExercise = CodingMonkeyContext.Exercises
+                                                          .SingleOrDefault(x => x.ExerciseId == exerciseId);
+
+            if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
             Test testToCreate = Mapper.Map<Test>(vm);
-            testToCreate.Exercise = exerciseTestBelongsTo;
+            testToCreate.Exercise = relatedExercise;
 
             try
             {
