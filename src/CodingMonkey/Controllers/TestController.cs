@@ -100,71 +100,32 @@
         {
             if (vm == null) return Json(string.Empty);
             
-            var testToUpdate = CodingMonkeyContext.Tests
+            var existingTest = CodingMonkeyContext.Tests
                                                   .Include(x => x.TestInputs)
                                                   .Include(x => x.TestOutput)
                                                   .Include(x => x.Exercise)
                                                   .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
-            if (testToUpdate == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
+            if (existingTest == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
 
             try
             {
-                testToUpdate.Description = vm.Description;
+                //TODO: When EF7 Introduces AddOrUpdate - use that instead of code below
+                // http://stackoverflow.com/questions/36208580/what-happened-to-addorupdate-in-ef-7
+                var updatedTest = Mapper.Map<Test>(vm);
 
-                // Remove deleted test inputs
-                var testInputsInDb = CodingMonkeyContext.TestInputs
-                                                        .Include(x => x.Test)
-                                                        .Where(x => x.Test.TestId == id).ToList();
-
-                foreach (var testInput in testInputsInDb)
-                {
-                    if (!vm.TestInputs.Any(x => x.Id == testInput.TestInputId))
-                    {
-                        CodingMonkeyContext.TestInputs.Remove(testInput);
-                        testToUpdate.TestInputs.Remove(testInput);
-                    }
-                }
-
-                // Update existing test inputs
-                foreach (var testInputModel in testToUpdate.TestInputs)
-                {
-                    // Update test input
-                    var updatedTestInput = vm.TestInputs.FirstOrDefault(x => x.Id == testInputModel.TestInputId);
-
-                    // Create new test input
-                    if (updatedTestInput != null)
-                    {
-                        testInputModel.ArgumentName = updatedTestInput.ArgumentName;
-                        testInputModel.Value = updatedTestInput.Value;
-                        testInputModel.ValueType = updatedTestInput.ValueType;
-                    }
-                }
-
-                // Update test outputs
-                testToUpdate.TestOutput.Value = vm.TestOutput.Value;
-                testToUpdate.TestOutput.ValueType = vm.TestOutput.ValueType;
+                CodingMonkeyContext.TestOutputs.Remove(existingTest.TestOutput);
+                CodingMonkeyContext.TestInputs.RemoveRange(existingTest.TestInputs);
 
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
-                // Create new test inputs
-                foreach (var newTestInput in vm.TestInputs.Where(x => x.Id == null))
-                {
-                    TestInput testInputToAdd = new TestInput()
-                                                   {
-                                                       ArgumentName = newTestInput.ArgumentName,
-                                                       Value = newTestInput.Value,
-                                                       ValueType = newTestInput.ValueType
-                                                   };
+                existingTest.Description = updatedTest.Description;
+                existingTest.TestOutput = updatedTest.TestOutput;
+                existingTest.TestInputs = updatedTest.TestInputs;
 
-                    testToUpdate.TestInputs.Add(testInputToAdd);
-
-                    if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-
-                    newTestInput.Id = testInputToAdd.TestInputId;
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return DataActionFailedMessage(DataAction.Updated);
             }
@@ -186,7 +147,7 @@
             try
             {
                 CodingMonkeyContext.Tests.Remove(testToDelete);
-                CodingMonkeyContext.SaveChanges();
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
