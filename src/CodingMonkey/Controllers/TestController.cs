@@ -123,6 +123,9 @@
                 existingTest.TestOutput = updatedTest.TestOutput;
                 existingTest.TestInputs = updatedTest.TestInputs;
 
+                // Ensure any test input / outputs are related in case new ones added
+                existingTest.RelateTestToTestIoInMemory();
+
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
