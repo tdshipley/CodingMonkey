@@ -15,5 +15,18 @@ namespace CodingMonkey.Models
         public ExerciseTemplate Template { get; set; }
         public List<ExerciseExerciseCategory> ExerciseExerciseCategories { get; set; }
         public List<Test> Tests { get; set; }
+
+        public void RelateExerciseCategoriesToExerciseInMemory(List<int> categoryIds)
+        {
+            foreach (int categoryId in categoryIds)
+            {
+                this.ExerciseExerciseCategories.Add(
+                    new ExerciseExerciseCategory()
+                    {
+                        ExerciseId = this.ExerciseId,
+                        ExerciseCategoryId = categoryId
+                    });
+            }
+        }
     }
 }

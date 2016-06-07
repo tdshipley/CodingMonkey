@@ -106,13 +106,15 @@
                                                   .Include(x => x.Exercise)
                                                   .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
+            var updatedTest = Mapper.Map<Test>(vm);
+
             if (existingTest == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
+            if (updatedTest == null) return DataActionFailedMessage(DataAction.Updated);
 
             try
             {
                 //TODO: When EF7 Introduces AddOrUpdate - use that instead of code below
                 // http://stackoverflow.com/questions/36208580/what-happened-to-addorupdate-in-ef-7
-                var updatedTest = Mapper.Map<Test>(vm);
 
                 CodingMonkeyContext.TestOutputs.Remove(existingTest.TestOutput);
                 CodingMonkeyContext.TestInputs.RemoveRange(existingTest.TestInputs);

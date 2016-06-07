@@ -49,6 +49,14 @@
                                                                                                                     }))).ReverseMap();
 
             // Database View Models to Database Models
+            CreateMap<ExerciseViewModel, Exercise>()
+                .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.CategoryIds.Select(categoryId => new ExerciseExerciseCategory()
+                                                                                                                                                        {
+                                                                                                                                                            ExerciseCategoryId = categoryId,
+                                                                                                                                                            ExerciseId = src.Id
+                                                                                                                                                        })));
+
             CreateMap<TestViewModel, Test>()
                 .ForMember(dest => dest.TestId, cfg => cfg.MapFrom(src => src.Id))
                 .ForMember(dest => dest.TestOutput, cfg => cfg.MapFrom(src => new TestOutput()

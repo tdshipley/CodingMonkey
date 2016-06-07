@@ -93,6 +93,7 @@ export class update {
         this.http.fetch('update/' + this.vm.exercise.id, {
                 method: 'post',
                 body: json({
+                    Id: this.vm.exercise.id,
                     Name: this.vm.exercise.name,
                     Guidance: this.vm.exercise.guidance,
                     CategoryIds: this.vm.exercise.categoryids

@@ -59,28 +59,17 @@
         {
             if (vm == null) return Json(string.Empty);
 
-            Exercise exerciseToCreate = new Exercise()
-                                            {
-                                                Name = vm.Name,
-                                                Guidance = vm.Guidance,
-                                                ExerciseExerciseCategories = new List<ExerciseExerciseCategory>()
-                                            };
+            Exercise exerciseToCreate = Mapper.Map<Exercise>(vm);
 
             try
             {
                 CodingMonkeyContext.Exercises.Add(exerciseToCreate);
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
-                AddCategoryIds(exerciseToCreate, vm.CategoryIds);
+                exerciseToCreate.RelateExerciseCategoriesToExerciseInMemory(vm.CategoryIds);
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
@@ -99,60 +88,34 @@
         {
             if (vm == null) return Json(string.Empty);
 
-            var exerciseToUpdate =
-                CodingMonkeyContext.Exercises.Include(e => e.ExerciseExerciseCategories)
-                    .SingleOrDefault(e => e.ExerciseId == id);
+            var existingExercise = CodingMonkeyContext.Exercises
+                                                      .Include(e => e.ExerciseExerciseCategories)
+                                                      .SingleOrDefault(e => e.ExerciseId == id);
 
-            if (exerciseToUpdate == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
+            var updatedExercise = Mapper.Map<Exercise>(vm);
+
+            if (existingExercise == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
+            if (updatedExercise == null) return DataActionFailedMessage(DataAction.Updated);
 
             try
             {
-                exerciseToUpdate.Name = vm.Name;
-                exerciseToUpdate.Guidance = vm.Guidance;
+
+                CodingMonkeyContext.ExerciseExerciseCategories.RemoveRange(existingExercise.ExerciseExerciseCategories);
 
                 if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
-                // Update categories
-                //Remove categories not in new list
-                foreach (var row in exerciseToUpdate.ExerciseExerciseCategories.ToList())
-                {
-                    if (!vm.CategoryIds.Contains(row.ExerciseCategoryId))
-                    {
-                        exerciseToUpdate.ExerciseExerciseCategories.Remove(row);
-                    }
-                }
+                existingExercise.Name = updatedExercise.Name;
+                existingExercise.Guidance = updatedExercise.Guidance;
+                existingExercise.ExerciseExerciseCategories = updatedExercise.ExerciseExerciseCategories;
 
-                //Add categories not currently in db
-                foreach (var categoryId in vm.CategoryIds)
-                {
-                    if (!exerciseToUpdate.ExerciseExerciseCategories.Any(ec => ec.ExerciseCategoryId == categoryId))
-                    {
-                        exerciseToUpdate.ExerciseExerciseCategories.Add(
-                            new ExerciseExerciseCategory()
-                                {
-                                    ExerciseId = exerciseToUpdate.ExerciseId,
-                                    ExerciseCategoryId = categoryId,
-                                    ExerciseCategory =
-                                        CodingMonkeyContext.ExerciseCategories.SingleOrDefault(
-                                            ec => ec.ExerciseCategoryId == categoryId),
-                                    Exercise = exerciseToUpdate
-                                });
-                    }
-                }
-
-                CodingMonkeyContext.SaveChanges();
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return DataActionFailedMessage(DataAction.Updated);
             }
 
-            vm.CategoryIds =
-                exerciseToUpdate.ExerciseExerciseCategories.Where(x => x.ExerciseId == exerciseToUpdate.ExerciseId)
-                    .Select(x => x.ExerciseCategoryId)
-                    .ToList();
-
-            vm = Mapper.Map<ExerciseViewModel>(exerciseToUpdate);
+            vm = Mapper.Map<ExerciseViewModel>(updatedExercise);
 
             return Json(vm);
         }
@@ -179,23 +142,6 @@
             }
 
             return Json(new { deleted = true });
-        }
-
-        private void AddCategoryIds(Exercise exercise, List<int> categoryIds)
-        {
-            foreach (int categoryId in categoryIds)
-            {
-                exercise.ExerciseExerciseCategories.Add(
-                    new ExerciseExerciseCategory()
-                        {
-                            ExerciseId = exercise.ExerciseId,
-                            ExerciseCategoryId = categoryId,
-                            ExerciseCategory =
-                                CodingMonkeyContext.ExerciseCategories.SingleOrDefault(
-                                    ec => ec.ExerciseCategoryId == categoryId),
-                            Exercise = exercise
-                        });
-            }
         }
     }
 }
