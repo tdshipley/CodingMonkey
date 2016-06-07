@@ -33,7 +33,7 @@ namespace CodingMonkey.Controllers
 
             JsonResult result = exerciseTemplate == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate));
 
-            return Json(result);
+            return result;
         }
 
         [HttpPost]

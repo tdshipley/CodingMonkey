@@ -50,7 +50,7 @@
 
             JsonResult result = exercise == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseViewModel>(exercise));
 
-            return Json(result);
+            return result;
         }
 
         [HttpPost]
