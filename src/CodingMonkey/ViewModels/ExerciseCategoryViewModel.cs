@@ -10,7 +10,7 @@
         }
         
         public int Id { get; set; }
-        public ICollection<int> ExerciseIds { get; set; }
+        public List<int> ExerciseIds { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

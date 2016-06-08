@@ -7,62 +7,36 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using AutoMapper;
+
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
-    public class TestController : Controller
+    public class TestController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public TestController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public TestController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
         [Authorize]
         public JsonResult List(int exerciseId)
         {
-            var tests =
-                CodingMonkeyContext.Tests.Include(x => x.TestInputs)
-                    .Include(x => x.TestOutput)
-                    .Include(x => x.Exercise)
-                    .Where(x => x.Exercise.ExerciseId == exerciseId);
+            var tests = CodingMonkeyContext.Tests
+                                           .Include(x => x.TestInputs)
+                                           .Include(x => x.TestOutput)
+                                           .Include(x => x.Exercise)
+                                           .Where(x => x.Exercise.ExerciseId == exerciseId).ToList();
 
-            List<TestViewModel> vm = new List<TestViewModel>();
-
-            foreach (var test in tests)
-            {
-                List<TestInputViewModel> testInputsViewModel = new List<TestInputViewModel>();
-
-                foreach (var testInput in test.TestInputs)
-                {
-                    testInputsViewModel.Add(
-                        new TestInputViewModel()
-                            {
-                                Id = testInput.TestInputId,
-                                ArgumentName = testInput.ArgumentName,
-                                ValueType = testInput.ValueType,
-                                Value = testInput.Value
-                            });
-                }
-
-                vm.Add(
-                    new TestViewModel()
-                        {
-                            Id = test.TestId,
-                            Description = test.Description,
-                            TestInputs = testInputsViewModel,
-                            TestOutput =
-                                new TestOutputViewModel()
-                                    {
-                                        Id = test.TestOutput.TestOutputId,
-                                        ValueType = test.TestOutput.ValueType,
-                                        Value = test.TestOutput.Value
-                                    }
-                        });
-            }
+            var vm = this.Mapper.Map<List<TestViewModel>>(tests);
 
             return Json(vm);
         }
@@ -72,132 +46,49 @@
         [Route("{id}")]
         public JsonResult Details(int exerciseId, int id)
         {
-            var test =
-                CodingMonkeyContext.Tests.Include(x => x.TestInputs)
-                    .Include(x => x.TestOutput)
-                    .Include(x => x.Exercise)
-                    .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
+            var test = CodingMonkeyContext.Tests
+                                          .Include(x => x.TestInputs)
+                                          .Include(x => x.TestOutput)
+                                          .Include(x => x.Exercise)
+                                          .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
-            if (test == null)
-            {
-                return Json(string.Empty);
-            }
+            JsonResult result = test == null ? Json(string.Empty) : Json(Mapper.Map<TestViewModel>(test));
 
-            List<TestInputViewModel> testInputsViewModel = new List<TestInputViewModel>();
-
-            foreach (var testInput in test.TestInputs)
-            {
-                testInputsViewModel.Add(
-                    new TestInputViewModel()
-                        {
-                            Id = testInput.TestInputId,
-                            ArgumentName = testInput.ArgumentName,
-                            ValueType = testInput.ValueType,
-                            Value = testInput.Value
-                        });
-            }
-
-            var vm = new TestViewModel()
-                         {
-                             Id = test.TestId,
-                             Description = test.Description,
-                             TestInputs = testInputsViewModel,
-                             TestOutput =
-                                 new TestOutputViewModel()
-                                     {
-                                         Id = test.TestOutput.TestOutputId,
-                                         ValueType = test.TestOutput.ValueType,
-                                         Value = test.TestOutput.Value
-                                     }
-                         };
-
-            return Json(vm);
+            return result;
         }
 
         [HttpPost]
         [Authorize]
         public JsonResult Create(int exerciseId, [FromBody] TestViewModel vm)
         {
-            var exceptionResult = new Dictionary<string, dynamic>();
+            if (vm == null) return Json(string.Empty);
 
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            Exercise relatedExercise = CodingMonkeyContext.Exercises
+                                                          .SingleOrDefault(x => x.ExerciseId == exerciseId);
 
-            List<TestInput> testInputsForModel = ConvertTestInputsViewModelToTestInputsModel(vm.TestInputs);
-            TestOutput testOutputForModel = ConvertTestOutputViewModelToTestOutputModel(vm.TestOutput);
+            if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
-            Exercise exerciseTestBelongsTo =
-                CodingMonkeyContext.Exercises.SingleOrDefault(x => x.ExerciseId == exerciseId);
+            Test testToCreate = Mapper.Map<Test>(vm);
 
-            Test testToCreate = new Test()
-                                    {
-                                        Description = vm.Description,
-                                        TestInputs = testInputsForModel,
-                                        TestOutput = testOutputForModel,
-                                        Exercise = exerciseTestBelongsTo
-                                    };
+            testToCreate.RelateExerciseToTestInMemory(relatedExercise);
 
             try
             {
                 CodingMonkeyContext.Tests.Add(testToCreate);
 
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
+
+                // Relate Test Inputs & Outputs to newly created test
+                testToCreate.RelateTestToTestIoInMemory();
+
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                exceptionResult["created"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Created);
             }
 
-            // Create view model with data from db
-            vm.Id = testToCreate.TestId;
-
-            vm.TestInputs.Clear();
-            // Relate created test inputs
-            foreach (var testInput in testInputsForModel)
-            {
-                testInput.Test = testToCreate;
-                vm.TestInputs.Add(
-                    new TestInputViewModel()
-                        {
-                            Id = testInput.TestInputId,
-                            ArgumentName = testInput.ArgumentName,
-                            ValueType = testInput.ValueType,
-                            Value = testInput.Value
-                        });
-            }
-
-            // Relate created test output
-            testOutputForModel.TestForeignKey = testToCreate.TestId;
-            testOutputForModel.Test = testToCreate;
-            vm.TestOutput = new TestOutputViewModel()
-                                {
-                                    Id = testOutputForModel.TestOutputId,
-                                    Value = testOutputForModel.Value,
-                                    ValueType = testOutputForModel.ValueType
-                                };
-
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
-            }
-            catch (Exception)
-            {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
-            }
+            vm = Mapper.Map<TestViewModel>(testToCreate);
 
             return Json(vm);
         }
@@ -207,93 +98,41 @@
         [Route("{id}")]
         public JsonResult Update(int exerciseId, int id, [FromBody] TestViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null) return Json(string.Empty);
+            
+            var existingTest = CodingMonkeyContext.Tests
+                                                  .Include(x => x.TestInputs)
+                                                  .Include(x => x.TestOutput)
+                                                  .Include(x => x.Exercise)
+                                                  .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
-            var exceptionResult = new Dictionary<string, dynamic>();
-            var testToUpdate =
-                CodingMonkeyContext.Tests.Include(x => x.TestInputs)
-                    .Include(x => x.TestOutput)
-                    .Include(x => x.Exercise)
-                    .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
+            var updatedTest = Mapper.Map<Test>(vm);
 
-            if (testToUpdate == null)
-            {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "record not found";
-
-                return Json(exceptionResult);
-            }
+            if (existingTest == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
+            if (updatedTest == null) return DataActionFailedMessage(DataAction.Updated);
 
             try
             {
-                testToUpdate.Description = vm.Description;
+                //TODO: When EF7 Introduces AddOrUpdate - use that instead of code below
+                // http://stackoverflow.com/questions/36208580/what-happened-to-addorupdate-in-ef-7
 
-                // Remove deleted test inputs
-                var testInputsInDb =
-                    CodingMonkeyContext.TestInputs.Include(x => x.Test).Where(x => x.Test.TestId == id).ToList();
+                CodingMonkeyContext.TestOutputs.Remove(existingTest.TestOutput);
+                CodingMonkeyContext.TestInputs.RemoveRange(existingTest.TestInputs);
 
-                foreach (var testInput in testInputsInDb)
-                {
-                    if (!vm.TestInputs.Any(x => x.Id == testInput.TestInputId))
-                    {
-                        CodingMonkeyContext.TestInputs.Remove(testInput);
-                        testToUpdate.TestInputs.Remove(testInput);
-                    }
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
 
-                // Update existing test inputs
-                foreach (var testInputModel in testToUpdate.TestInputs)
-                {
-                    // Update test input
-                    var updatedTestInput = vm.TestInputs.FirstOrDefault(x => x.Id == testInputModel.TestInputId);
+                existingTest.Description = updatedTest.Description;
+                existingTest.TestOutput = updatedTest.TestOutput;
+                existingTest.TestInputs = updatedTest.TestInputs;
 
-                    // Create new test input
-                    if (updatedTestInput != null)
-                    {
-                        testInputModel.ArgumentName = updatedTestInput.ArgumentName;
-                        testInputModel.Value = updatedTestInput.Value;
-                        testInputModel.ValueType = updatedTestInput.ValueType;
-                    }
-                }
+                // Ensure any test input / outputs are related in case new ones added
+                existingTest.RelateTestToTestIoInMemory();
 
-                // Update test outputs
-                testToUpdate.TestOutput.Value = vm.TestOutput.Value;
-                testToUpdate.TestOutput.ValueType = vm.TestOutput.ValueType;
-
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
-
-                // Create new test inputs
-                foreach (var newTestInput in vm.TestInputs.Where(x => x.Id == null))
-                {
-                    TestInput testInputToAdd = new TestInput()
-                                                   {
-                                                       ArgumentName = newTestInput.ArgumentName,
-                                                       Value = newTestInput.Value,
-                                                       ValueType = newTestInput.ValueType
-                                                   };
-
-                    testToUpdate.TestInputs.Add(testInputToAdd);
-
-                    if (ModelState.IsValid)
-                    {
-                        CodingMonkeyContext.SaveChanges();
-                    }
-
-                    newTestInput.Id = testInputToAdd.TestInputId;
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Updated);
             }
 
             return Json(vm);
@@ -304,56 +143,23 @@
         [Route("{id}")]
         public JsonResult Delete(int id)
         {
-            var result = new Dictionary<string, dynamic>();
-            var testToDelete =
-                CodingMonkeyContext.Tests.Include(t => t.TestInputs)
-                    .Include(t => t.TestOutput)
-                    .SingleOrDefault(t => t.TestId == id);
+            var testToDelete = CodingMonkeyContext.Tests.Include(t => t.TestInputs)
+                                                        .Include(t => t.TestOutput)
+                                                        .SingleOrDefault(t => t.TestId == id);
 
-            if (testToDelete == null)
+            if (testToDelete == null) DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
+            
+            try
             {
-                result["deleted"] = false;
-                result["reason"] = "record not found";
+                CodingMonkeyContext.Tests.Remove(testToDelete);
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
-            else
+            catch (Exception)
             {
-                try
-                {
-                    CodingMonkeyContext.Tests.Remove(testToDelete);
-                    CodingMonkeyContext.SaveChanges();
-                    result["deleted"] = true;
-                }
-                catch (Exception)
-                {
-                    result["deleted"] = false;
-                    result["reason"] = "exception thrown";
-                }
+                DataActionFailedMessage(DataAction.Deleted);
             }
 
-            return Json(result);
-        }
-
-        private List<TestInput> ConvertTestInputsViewModelToTestInputsModel(List<TestInputViewModel> testInputViewModel)
-        {
-            List<TestInput> testInputs = new List<TestInput>();
-
-            foreach (var testInput in testInputViewModel)
-            {
-                testInputs.Add(
-                    new TestInput()
-                        {
-                            Value = testInput.Value,
-                            ValueType = testInput.ValueType,
-                            ArgumentName = testInput.ArgumentName
-                        });
-            }
-
-            return testInputs;
-        }
-
-        private TestOutput ConvertTestOutputViewModelToTestOutputModel(TestOutputViewModel testOutputViewModel)
-        {
-            return new TestOutput() { Value = testOutputViewModel.Value, ValueType = testOutputViewModel.ValueType };
+            return Json(new { deleted = true });
         }
     }
 }

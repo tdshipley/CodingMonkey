@@ -9,88 +9,57 @@ namespace CodingMonkey.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
+    using AutoMapper;
+
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
-    public class ExerciseTemplateController : Controller
+    public class ExerciseTemplateController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext)
+        public IMapper Mapper { get; set; }
+
+        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
         public JsonResult Details(int exerciseId)
         {
-            var exerciseTemplate =
-                CodingMonkeyContext.ExerciseTemplates.Include(e => e.Exercise)
-                    .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
+            var exerciseTemplate = CodingMonkeyContext.ExerciseTemplates
+                                                      .Include(e => e.Exercise)
+                                                      .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
-            if (exerciseTemplate == null)
-            {
-                return Json(string.Empty);
-            }
+            JsonResult result = exerciseTemplate == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate));
 
-            var vm = new ExerciseTemplateViewModel()
-                             {
-                                 Id = exerciseTemplate.ExerciseTemplateId,
-                                 ExerciseId = exerciseTemplate.Exercise.ExerciseId,
-                                 InitialCode = exerciseTemplate.InitialCode,
-                                 ClassName = exerciseTemplate.ClassName,
-                                 MainMethodName = exerciseTemplate.MainMethodName,
-                                 MainMethodSignature = exerciseTemplate.MainMethodSignature
-                             };
-
-            return Json(vm);
+            return result;
         }
 
         [HttpPost]
         [Authorize]
         public JsonResult Create(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
-
-            var exceptionResult = new Dictionary<string, dynamic>();
+            if (vm == null) return Json(string.Empty);
+            
             var relatedExercise = CodingMonkeyContext.Exercises.SingleOrDefault(e => e.ExerciseId == exerciseId);
 
-            if (relatedExercise == null)
-            {
-                exceptionResult["created"] = false;
-                exceptionResult["reason"] = "exercise not found";
+            if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
-                return Json(exceptionResult);
-            }
+            var exerciseTemplateToCreate = Mapper.Map<ExerciseTemplate>(vm);
 
-            ExerciseTemplate exerciseTemplate = new ExerciseTemplate()
-                                                    {
-                                                        InitialCode = vm.InitialCode,
-                                                        ClassName = vm.ClassName,
-                                                        MainMethodName = vm.MainMethodName,
-                                                        MainMethodSignature = vm.MainMethodSignature
-                                                    };
-
-            relatedExercise.Template = exerciseTemplate;
+            relatedExercise.Template = exerciseTemplateToCreate;
 
             try
             {
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                exceptionResult["created"] = false;
-                exceptionResult["reason"] = "exception saving to db";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Created);
             }
 
-            vm.Id = relatedExercise.Template.ExerciseTemplateId;
-            vm.ExerciseId = relatedExercise.ExerciseId;
+            vm = Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplateToCreate);
 
             return Json(vm);
         }
@@ -99,46 +68,29 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Update(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
-            if (vm == null)
-            {
-                return Json(string.Empty);
-            }
+            if (vm == null) return Json(string.Empty);
+            
+            var exerciseTemplateToUpdate = CodingMonkeyContext.ExerciseTemplates
+                                                              .Include(et => et.Exercise)
+                                                              .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
-            var exceptionResult = new Dictionary<string, dynamic>();
-            var exerciseTemplate =
-                CodingMonkeyContext.ExerciseTemplates.Include(et => et.Exercise)
-                    .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
+            if (exerciseTemplateToUpdate == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
 
-            if (exerciseTemplate == null)
-            {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "record not found";
-
-                return Json(exceptionResult);
-            }
-
-            exerciseTemplate.ClassName = vm.ClassName;
-            exerciseTemplate.MainMethodName = vm.MainMethodName;
-            exerciseTemplate.InitialCode = vm.InitialCode;
-            exerciseTemplate.MainMethodSignature = vm.MainMethodSignature;
+            exerciseTemplateToUpdate.ClassName = vm.ClassName;
+            exerciseTemplateToUpdate.MainMethodName = vm.MainMethodName;
+            exerciseTemplateToUpdate.InitialCode = vm.InitialCode;
+            exerciseTemplateToUpdate.MainMethodSignature = vm.MainMethodSignature;
 
             try
             {
-                if (ModelState.IsValid)
-                {
-                    CodingMonkeyContext.SaveChanges();
-                }
+                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
             }
             catch (Exception)
             {
-                exceptionResult["updated"] = false;
-                exceptionResult["reason"] = "exception thrown";
-
-                return Json(exceptionResult);
+                return DataActionFailedMessage(DataAction.Updated);
             }
 
-            vm.Id = exerciseTemplate.ExerciseTemplateId;
-            vm.ExerciseId = exerciseTemplate.Exercise.ExerciseId;
+            vm = Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplateToUpdate);
 
             return Json(vm);
         }
@@ -147,31 +99,22 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Delete(int exerciseId)
         {
-            var result = new Dictionary<string, dynamic>();
             var exerciseTemplate = CodingMonkeyContext.ExerciseTemplates.SingleOrDefault(
                 e => e.Exercise.ExerciseId == exerciseId);
 
-            if (exerciseTemplate == null)
+            if (exerciseTemplate == null) DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
+
+            try
             {
-                result["deleted"] = false;
-                result["reason"] = "record not found";
+                CodingMonkeyContext.ExerciseTemplates.Remove(exerciseTemplate);
+                CodingMonkeyContext.SaveChanges();
             }
-            else
+            catch (Exception)
             {
-                try
-                {
-                    CodingMonkeyContext.ExerciseTemplates.Remove(exerciseTemplate);
-                    CodingMonkeyContext.SaveChanges();
-                    result["deleted"] = true;
-                }
-                catch (Exception)
-                {
-                    result["deleted"] = false;
-                    result["reason"] = "exception thrown";
-                }
+                return DataActionFailedMessage(DataAction.Deleted);
             }
 
-            return Json(result);
+            return Json(new { deleted = true });
         }
     }
 }

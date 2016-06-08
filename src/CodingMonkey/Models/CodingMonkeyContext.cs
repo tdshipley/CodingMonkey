@@ -16,6 +16,8 @@
         public DbSet<TestInput> TestInputs { get; set; }
         public DbSet<TestOutput> TestOutputs { get; set; }
 
+        public DbSet<ExerciseExerciseCategory> ExerciseExerciseCategories { get; set; } 
+
         public CodingMonkeyContext()
         {
             Database.EnsureCreated();
