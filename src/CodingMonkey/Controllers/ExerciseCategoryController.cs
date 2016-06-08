@@ -11,25 +11,28 @@ namespace CodingMonkey.Controllers
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using AutoMapper;
+    using Models.Repositories;
 
     [Route("api/[controller]/[action]")]
     public class ExerciseCategoryController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
+        public CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
+
         public IMapper Mapper { get; set; }
 
-        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
+        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this.Mapper = mapper;
         }
 
         [HttpGet]
         public JsonResult List()
         {
-            var exerciseCategories = CodingMonkeyContext.ExerciseCategories
-                                                        .Include(e => e.ExerciseExerciseCategories);
+            var exerciseCategories = CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.All();
 
             var vm = Mapper.Map<List<ExerciseCategoryViewModel>>(exerciseCategories);
 
@@ -40,9 +43,7 @@ namespace CodingMonkey.Controllers
         [Route("{id}")]
         public JsonResult Details(int id)
         {
-            var exerciseCategory = CodingMonkeyContext.ExerciseCategories
-                                                      .Include(e => e.ExerciseExerciseCategories)
-                                                      .SingleOrDefault(e => e.ExerciseCategoryId == id);
+            var exerciseCategory = CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.GetById(id);
 
             JsonResult result = exerciseCategory == null
                                     ? Json(string.Empty)
@@ -61,9 +62,7 @@ namespace CodingMonkey.Controllers
 
             try
             {
-                CodingMonkeyContext.ExerciseCategories.Add(exerciseCategoryToCreate);
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
+                if (ModelState.IsValid) CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Create(exerciseCategoryToCreate);
             }
             catch (Exception)
             {
@@ -82,25 +81,17 @@ namespace CodingMonkey.Controllers
         {
             if (vm == null) return Json(string.Empty);
 
-            var exerciseCategoryToUpdate = CodingMonkeyContext.ExerciseCategories
-                                                              .Include(x => x.ExerciseExerciseCategories)
-                                                              .SingleOrDefault(e => e.ExerciseCategoryId == id);
-
-            if (exerciseCategoryToUpdate == null)  return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
-
             try
             {
-                exerciseCategoryToUpdate.Name = vm.Name;
-                exerciseCategoryToUpdate.Description = vm.Description;
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
+                ExerciseCategory newExerciseCategory = Mapper.Map<ExerciseCategory>(vm);
+                if (ModelState.IsValid) CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Update(id, newExerciseCategory);
             }
             catch (Exception)
             {
                 return DataActionFailedMessage(DataAction.Updated);
             }
 
-            vm = Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToUpdate);
+            vm = Mapper.Map<ExerciseCategoryViewModel>(CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.GetById(id));
 
             return Json(vm);
         }
@@ -110,16 +101,10 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Delete(int id)
         {
-            var exerciseCategoryToDelete = CodingMonkeyContext.ExerciseCategories
-                                                              .Include(ec => ec.ExerciseExerciseCategories)
-                                                              .SingleOrDefault(e => e.ExerciseCategoryId == id);
-
-            if (exerciseCategoryToDelete == null) return DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
 
             try
             {
-                CodingMonkeyContext.ExerciseCategories.Remove(exerciseCategoryToDelete);
-                CodingMonkeyContext.SaveChanges();
+                CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Delete(id);
             }
             catch (Exception)
             {
