@@ -17,20 +17,17 @@
                 .ForMember(dest => dest.ExerciseTemplateId, cfg => cfg.MapFrom(src => src.Template.ExerciseTemplateId))
                 .ForMember(dest => dest.CategoryIds, cfg => cfg.MapFrom(src => src.ExerciseExerciseCategories
                                                                                   .Where(x => x.ExerciseId == src.ExerciseId)
-                                                                                  .Select(x => x.ExerciseCategoryId)))
-                .ReverseMap();
+                                                                                  .Select(x => x.ExerciseCategoryId)));
 
             CreateMap<ExerciseCategory, ExerciseCategoryViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseCategoryId))
                 .ForMember(dest => dest.ExerciseIds, cfg => cfg.MapFrom(src => src.ExerciseExerciseCategories
                                                                                   .Where(x => x.ExerciseCategoryId == src.ExerciseCategoryId)
-                                                                                  .Select(x => x.ExerciseId)))
-                .ReverseMap();
+                                                                                  .Select(x => x.ExerciseId)));
 
             CreateMap<ExerciseTemplate, ExerciseTemplateViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.ExerciseTemplateId))
-                .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.ExerciseForeignKey))
-                .ReverseMap();
+                .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.ExerciseForeignKey));
 
             CreateMap<Test, TestViewModel>()
                 .ForMember(dest => dest.Id, cfg => cfg.MapFrom(src => src.TestId))
@@ -46,7 +43,7 @@
                                                                                                                         Id = testInput.TestInputId,
                                                                                                                         Value = testInput.Value,
                                                                                                                         ValueType = testInput.ValueType
-                                                                                                                    }))).ReverseMap();
+                                                                                                                    })));
 
             // Database View Models to Database Models
             CreateMap<ExerciseViewModel, Exercise>()
@@ -56,6 +53,17 @@
                                                                                                                                                             ExerciseCategoryId = categoryId,
                                                                                                                                                             ExerciseId = src.Id
                                                                                                                                                         })));
+
+            CreateMap<ExerciseCategoryViewModel, ExerciseCategory>()
+                .ForMember(dest => dest.ExerciseCategoryId, cfg => cfg.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.ExerciseIds.Select(exerciseId => new ExerciseExerciseCategory()
+                                                                                                                                                            {
+                                                                                                                                                                ExerciseId = exerciseId,
+                                                                                                                                                                ExerciseCategoryId = src.Id
+                                                                                                                                                            })));
+            CreateMap<ExerciseTemplateViewModel, ExerciseTemplate>()
+                .ForMember(dest => dest.ExerciseTemplateId, cfg => cfg.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ExerciseForeignKey, cfg => cfg.MapFrom(src => src.ExerciseId));
 
             CreateMap<TestViewModel, Test>()
                 .ForMember(dest => dest.TestId, cfg => cfg.MapFrom(src => src.Id))

@@ -46,13 +46,7 @@ namespace CodingMonkey.Controllers
 
             if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
-            ExerciseTemplate exerciseTemplateToCreate = new ExerciseTemplate()
-                                                    {
-                                                        InitialCode = vm.InitialCode,
-                                                        ClassName = vm.ClassName,
-                                                        MainMethodName = vm.MainMethodName,
-                                                        MainMethodSignature = vm.MainMethodSignature
-                                                    };
+            var exerciseTemplateToCreate = Mapper.Map<ExerciseTemplate>(vm);
 
             relatedExercise.Template = exerciseTemplateToCreate;
 

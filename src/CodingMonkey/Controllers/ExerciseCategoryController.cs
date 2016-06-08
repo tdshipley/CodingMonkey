@@ -57,11 +57,7 @@ namespace CodingMonkey.Controllers
         {
             if (vm == null)  return Json(string.Empty);
 
-            ExerciseCategory exerciseCategoryToCreate = new ExerciseCategory()
-                                                            {
-                                                                Name = vm.Name,
-                                                                Description = vm.Description
-                                                            };
+            var exerciseCategoryToCreate = Mapper.Map<ExerciseCategory>(vm);
 
             try
             {
