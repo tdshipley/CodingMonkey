@@ -36,30 +36,33 @@
                                                                                 ValueType = src.TestOutput.ValueType,
                                                                                 Id = src.TestOutput.TestOutputId
                                                                             }))
-                .ForMember( dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs.Select(testInput => new TestInputViewModel()
-                                                                                                                    {
-                                                                                                                        ArgumentName = testInput.ArgumentName,
-                                                                                                                        Id = testInput.TestInputId,
-                                                                                                                        Value = testInput.Value,
-                                                                                                                        ValueType = testInput.ValueType
-                                                                                                                    })));
+                .ForMember( dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs
+                                                                                  .Select(testInput => new TestInputViewModel()
+                                                                                                            {
+                                                                                                                ArgumentName = testInput.ArgumentName,
+                                                                                                                Id = testInput.TestInputId,
+                                                                                                                Value = testInput.Value,
+                                                                                                                ValueType = testInput.ValueType
+                                                                                                            })));
 
             // Database View Models to Database Models
             CreateMap<ExerciseViewModel, Exercise>()
                 .ForMember(dest => dest.ExerciseId, cfg => cfg.MapFrom(src => src.Id))
-                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.CategoryIds.Select(categoryId => new ExerciseExerciseCategory()
-                                                                                                                                                        {
-                                                                                                                                                            ExerciseCategoryId = categoryId,
-                                                                                                                                                            ExerciseId = src.Id
-                                                                                                                                                        })));
+                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.CategoryIds
+                                                                                                                      .Select(categoryId => new ExerciseExerciseCategory()
+                                                                                                                                                {
+                                                                                                                                                    ExerciseCategoryId = categoryId,
+                                                                                                                                                    ExerciseId = src.Id
+                                                                                                                                                })));
 
             CreateMap<ExerciseCategoryViewModel, ExerciseCategory>()
                 .ForMember(dest => dest.ExerciseCategoryId, cfg => cfg.MapFrom(src => src.Id))
-                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.ExerciseIds.Select(exerciseId => new ExerciseExerciseCategory()
-                                                                                                                                                            {
-                                                                                                                                                                ExerciseId = exerciseId,
-                                                                                                                                                                ExerciseCategoryId = src.Id
-                                                                                                                                                            })));
+                .ForMember(dest => dest.ExerciseExerciseCategories, cfg => cfg.MapFrom(src => src.Id == 0 ? null : src.ExerciseIds
+                                                                                                                      .Select(exerciseId => new ExerciseExerciseCategory()
+                                                                                                                                                {
+                                                                                                                                                    ExerciseId = exerciseId,
+                                                                                                                                                    ExerciseCategoryId = src.Id
+                                                                                                                                                })));
             CreateMap<ExerciseTemplateViewModel, ExerciseTemplate>()
                 .ForMember(dest => dest.ExerciseTemplateId, cfg => cfg.MapFrom(src => src.Id))
                 .ForMember(dest => dest.ExerciseForeignKey, cfg => cfg.MapFrom(src => src.ExerciseId));
@@ -73,13 +76,14 @@
                                                                                       Value = src.TestOutput.Value,
                                                                                       ValueType = src.TestOutput.ValueType
                                                                                   }))
-                .ForMember(dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs.Select(testInput => new TestInput()
-                                                                                                                     {
-                                                                                                                         TestInputId = testInput.Id.GetValueOrDefault(),
-                                                                                                                         ArgumentName = testInput.ArgumentName,
-                                                                                                                         Value = testInput.Value,
-                                                                                                                         ValueType = testInput.ValueType
-                                                                                                                     })));
+                .ForMember(dest => dest.TestInputs, cfg => cfg.MapFrom(src => src.TestInputs
+                                                                                 .Select(testInput => new TestInput()
+                                                                                                          {
+                                                                                                              TestInputId = testInput.Id.GetValueOrDefault(),
+                                                                                                              ArgumentName = testInput.ArgumentName,
+                                                                                                              Value = testInput.Value,
+                                                                                                              ValueType = testInput.ValueType
+                                                                                                          })));
         }
     }
 }
