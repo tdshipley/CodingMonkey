@@ -101,7 +101,6 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Delete(int id)
         {
-
             try
             {
                 CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Delete(id);
