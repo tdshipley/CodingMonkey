@@ -16,15 +16,12 @@ namespace CodingMonkey.Controllers
     [Route("api/[controller]/[action]")]
     public class ExerciseCategoryController : BaseController
     {
-        public CodingMonkeyContext CodingMonkeyContext { get; set; }
-
         public CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
 
         public IMapper Mapper { get; set; }
 
-        public ExerciseCategoryController(CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
+        public ExerciseCategoryController(CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
         {
-            this.CodingMonkeyContext = codingMonkeyContext;
             this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this.Mapper = mapper;
         }

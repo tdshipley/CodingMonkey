@@ -92,8 +92,6 @@
 
             if (existingExerciseCategory == null) throw new ArgumentException("Exercise category to update not found.");
 
-            MemoryCache.Remove(this.GetEntityCacheKey(id));
-
             existingExerciseCategory.Name = newExerciseCategory.Name;
             existingExerciseCategory.Description = newExerciseCategory.Description;
 
@@ -106,6 +104,7 @@
                 throw new Exception("Failed to update exercise category", ex);
             }
 
+            MemoryCache.Remove(this.GetEntityCacheKey(id));
             MemoryCache.Set(this.GetEntityCacheKey(id), existingExerciseCategory);
             MemoryCache.Remove(this.AllCacheKey);
         }

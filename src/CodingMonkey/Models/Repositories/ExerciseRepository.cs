@@ -85,7 +85,7 @@ namespace CodingMonkey.Models.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to create exercise category", ex);
+                throw new Exception("Failed to create exercise", ex);
             }
 
             string exerciseCacheKey = this.GetEntityCacheKey(entity.ExerciseId);
@@ -96,12 +96,52 @@ namespace CodingMonkey.Models.Repositories
 
         public void Update(int id, Exercise entity)
         {
-            throw new NotImplementedException();
+            Exercise existingExercise = this.GetById(id);
+
+            if (existingExercise == null) throw new ArgumentException("Exercise to update not found.");
+
+            try
+            {
+                CodingMonkeyContext.ExerciseExerciseCategories.RemoveRange(existingExercise.ExerciseExerciseCategories);
+
+                CodingMonkeyContext.SaveChanges();
+
+                existingExercise.Name = entity.Name;
+                existingExercise.Guidance = entity.Guidance;
+                existingExercise.ExerciseExerciseCategories = entity.ExerciseExerciseCategories;
+
+                CodingMonkeyContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to update exercise", ex);
+            }
+
+            MemoryCache.Remove(this.GetEntityCacheKey(id));
+            MemoryCache.Set(this.GetEntityCacheKey(id), existingExercise);
+            MemoryCache.Remove(this.AllCacheKey);
         }
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            Exercise exerciseToDelete = CodingMonkeyContext.Exercises
+                                                           .Include(e => e.ExerciseExerciseCategories)
+                                                           .SingleOrDefault(e => e.ExerciseId == id);
+
+            if (exerciseToDelete == null) throw new ArgumentException("Exercise to delete not found");
+
+            try
+            {
+                CodingMonkeyContext.Exercises.Remove(exerciseToDelete);
+                CodingMonkeyContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to delete exercise category", ex);
+            }
+
+            MemoryCache.Remove(this.GetEntityCacheKey(id));
+            MemoryCache.Remove(this.AllCacheKey);
         }
     }
 }
