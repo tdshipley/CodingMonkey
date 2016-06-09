@@ -135,6 +135,8 @@
 
             services.AddTransient<ExerciseCategoryRepository>();
             services.AddTransient<ExerciseRepository>();
+            services.AddTransient<ExerciseTemplateRepository>();
+            services.AddTransient<TestRepository>();
 
             services.AddTransient<IMapper>(x => _mapperConfiguration.CreateMapper());
         }
