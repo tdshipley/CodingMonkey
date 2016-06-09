@@ -1,10 +1,17 @@
 ﻿namespace CodingMonkey.Models.Repositories
 {
-    using Microsoft.Extensions.Caching.Memory;
+    using System.Collections.Generic;
 
-    public interface IRepository
+    public interface IRepository<T>
     {
-        IMemoryCache MemoryCache { get; set; }
-        CodingMonkeyContext CodingMonkeyContext { get; set; }
+        List<T> All();
+
+        T GetById(int id);
+
+        void Create(T entity);
+
+        void Update(int id, T entity);
+
+        void Delete(int id);
     }
 }

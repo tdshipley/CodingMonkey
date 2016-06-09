@@ -5,24 +5,33 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    public class ExerciseCategoryRepository : IRepository
+
+    public class ExerciseCategoryRepository : RepositoryBase, IRepository<ExerciseCategory>
     {
-        public IMemoryCache MemoryCache { get; set; }
-        public CodingMonkeyContext CodingMonkeyContext { get; set; }
+        protected override IMemoryCache MemoryCache { get; set; }
 
-        private TimeSpan CacheEntryTimeoutValue => TimeSpan.FromHours(2);
+        protected override CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        private string CacheKeyPrefix => typeof(ExerciseCategory).Name.ToLower();
-        private string AllCacheKey => $"{CacheKeyPrefix}_all";
-        private MemoryCacheEntryOptions DefaultCacheEntryOptions => new MemoryCacheEntryOptions()
-                                                                        {
-                                                                            AbsoluteExpirationRelativeToNow = this.CacheEntryTimeoutValue
-                                                                        };
+        protected override TimeSpan CacheEntryTimeoutValue { get; set; }
+
+        protected override string CacheKeyPrefix { get; set; }
+
+        protected override string AllCacheKey { get; set; }
+
+        protected override MemoryCacheEntryOptions DefaultCacheEntryOptions { get; set; }
 
         public ExerciseCategoryRepository(IMemoryCache memoryCache, CodingMonkeyContext codingMonkeyContext)
         {
             this.MemoryCache = memoryCache;
             this.CodingMonkeyContext = codingMonkeyContext;
+
+            this.CacheEntryTimeoutValue = TimeSpan.FromHours(2);
+            this.CacheKeyPrefix = typeof(ExerciseCategory).Name.ToLower();
+            this.AllCacheKey = $"{CacheKeyPrefix}_all";
+            this.DefaultCacheEntryOptions = new MemoryCacheEntryOptions()
+                                                {
+                                                    AbsoluteExpirationRelativeToNow = this.CacheEntryTimeoutValue
+                                                };
         }
 
         public List<ExerciseCategory> All()
@@ -45,7 +54,7 @@
         {
             ExerciseCategory category = null;
 
-            string exerciseCategoryCacheKey = GetExerciseCategoryCacheKey(id);
+            string exerciseCategoryCacheKey = this.GetEntityCacheKey(id);
 
             if (!MemoryCache.TryGetValue(exerciseCategoryCacheKey, out category))
             {
@@ -71,7 +80,7 @@
                 throw new Exception("Failed to create exercise category", ex);
             }
 
-            string exerciseCategoryCacheKey = GetExerciseCategoryCacheKey(exerciseCategory.ExerciseCategoryId);
+            string exerciseCategoryCacheKey = this.GetEntityCacheKey(exerciseCategory.ExerciseCategoryId);
             MemoryCache.Set(exerciseCategoryCacheKey, exerciseCategory, this.DefaultCacheEntryOptions);
 
             MemoryCache.Remove(this.AllCacheKey);
@@ -83,7 +92,7 @@
 
             if (existingExerciseCategory == null) throw new ArgumentException("Exercise category to update not found.");
 
-            MemoryCache.Remove(GetExerciseCategoryCacheKey(id));
+            MemoryCache.Remove(this.GetEntityCacheKey(id));
 
             existingExerciseCategory.Name = newExerciseCategory.Name;
             existingExerciseCategory.Description = newExerciseCategory.Description;
@@ -97,8 +106,7 @@
                 throw new Exception("Failed to update exercise category", ex);
             }
 
-            MemoryCache.Set(GetExerciseCategoryCacheKey(id), existingExerciseCategory);
-
+            MemoryCache.Set(this.GetEntityCacheKey(id), existingExerciseCategory);
             MemoryCache.Remove(this.AllCacheKey);
         }
 
@@ -120,13 +128,8 @@
                 throw new Exception("Failed to delete exercise category", ex);
             }
 
-            MemoryCache.Remove(this.GetExerciseCategoryCacheKey(id));
+            MemoryCache.Remove(this.GetEntityCacheKey(id));
             MemoryCache.Remove(this.AllCacheKey);
-        }
-
-        private string GetExerciseCategoryCacheKey(int id)
-        {
-            return $"{this.CacheKeyPrefix}_{id}";
         }
     }
 }

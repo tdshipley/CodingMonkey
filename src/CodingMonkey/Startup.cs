@@ -134,6 +134,7 @@
             services.AddTransient<CodingMonkeyRepositoryContext>();
 
             services.AddTransient<ExerciseCategoryRepository>();
+            services.AddTransient<ExerciseRepository>();
 
             services.AddTransient<IMapper>(x => _mapperConfiguration.CreateMapper());
         }

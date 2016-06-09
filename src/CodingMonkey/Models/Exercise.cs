@@ -1,6 +1,7 @@
 namespace CodingMonkey.Models
 {
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Exercise
     {
@@ -15,6 +16,8 @@ namespace CodingMonkey.Models
         public ExerciseTemplate Template { get; set; }
         public List<ExerciseExerciseCategory> ExerciseExerciseCategories { get; set; }
         public List<Test> Tests { get; set; }
+        [NotMapped]
+        public List<int> CategoryIds { get; set; } 
 
         public void RelateExerciseCategoriesToExerciseInMemory(List<int> categoryIds)
         {
