@@ -11,25 +11,28 @@ namespace CodingMonkey.Controllers
     using System.Linq;
     using AutoMapper;
 
+    using CodingMonkey.Models.Repositories;
+
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
     public class ExerciseTemplateController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
+        public CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
+
         public IMapper Mapper { get; set; }
 
-        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
+        public ExerciseTemplateController(CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this.Mapper = mapper;
         }
 
         [HttpGet]
         public JsonResult Details(int exerciseId)
         {
-            var exerciseTemplate = CodingMonkeyContext.ExerciseTemplates
-                                                      .Include(e => e.Exercise)
-                                                      .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
+            var exerciseTemplate = this.CodingMonkeyRepositoryContext.ExerciseTemplateRepository.GetById(exerciseId);
 
             JsonResult result = exerciseTemplate == null ? Json(string.Empty) : Json(Mapper.Map<ExerciseTemplateViewModel>(exerciseTemplate));
 
@@ -41,18 +44,16 @@ namespace CodingMonkey.Controllers
         public JsonResult Create(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
             if (vm == null) return Json(string.Empty);
-            
-            var relatedExercise = CodingMonkeyContext.Exercises.SingleOrDefault(e => e.ExerciseId == exerciseId);
-
-            if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
 
             var exerciseTemplateToCreate = Mapper.Map<ExerciseTemplate>(vm);
 
-            relatedExercise.Template = exerciseTemplateToCreate;
-
             try
             {
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    exerciseTemplateToCreate = this.CodingMonkeyRepositoryContext.ExerciseTemplateRepository
+                                                                                 .Create(exerciseTemplateToCreate);
+                }
             }
             catch (Exception)
             {
@@ -69,21 +70,16 @@ namespace CodingMonkey.Controllers
         public JsonResult Update(int exerciseId, [FromBody] ExerciseTemplateViewModel vm)
         {
             if (vm == null) return Json(string.Empty);
-            
-            var exerciseTemplateToUpdate = CodingMonkeyContext.ExerciseTemplates
-                                                              .Include(et => et.Exercise)
-                                                              .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
-            if (exerciseTemplateToUpdate == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
-
-            exerciseTemplateToUpdate.ClassName = vm.ClassName;
-            exerciseTemplateToUpdate.MainMethodName = vm.MainMethodName;
-            exerciseTemplateToUpdate.InitialCode = vm.InitialCode;
-            exerciseTemplateToUpdate.MainMethodSignature = vm.MainMethodSignature;
+            ExerciseTemplate exerciseTemplateToUpdate = Mapper.Map<ExerciseTemplate>(vm);
 
             try
             {
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    exerciseTemplateToUpdate = CodingMonkeyRepositoryContext.ExerciseTemplateRepository
+                                                                            .Update(exerciseId, exerciseTemplateToUpdate);
+                }
             }
             catch (Exception)
             {
@@ -99,15 +95,9 @@ namespace CodingMonkey.Controllers
         [Authorize]
         public JsonResult Delete(int exerciseId)
         {
-            var exerciseTemplate = CodingMonkeyContext.ExerciseTemplates.SingleOrDefault(
-                e => e.Exercise.ExerciseId == exerciseId);
-
-            if (exerciseTemplate == null) DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
-
             try
             {
-                CodingMonkeyContext.ExerciseTemplates.Remove(exerciseTemplate);
-                CodingMonkeyContext.SaveChanges();
+                CodingMonkeyRepositoryContext.ExerciseRepository.Delete(exerciseId);
             }
             catch (Exception)
             {

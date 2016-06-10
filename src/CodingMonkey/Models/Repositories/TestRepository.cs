@@ -43,12 +43,12 @@
             throw new NotImplementedException();
         }
 
-        public void Create(Test entity)
+        public Test Create(Test entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(int id, Test entity)
+        public Test Update(int id, Test entity)
         {
             throw new NotImplementedException();
         }

@@ -68,7 +68,7 @@
             return category;
         }
 
-        public void Create(ExerciseCategory exerciseCategory)
+        public ExerciseCategory Create(ExerciseCategory exerciseCategory)
         {
             try
             {
@@ -84,9 +84,11 @@
             MemoryCache.Set(exerciseCategoryCacheKey, exerciseCategory, this.DefaultCacheEntryOptions);
 
             MemoryCache.Remove(this.AllCacheKey);
+
+            return exerciseCategory;
         }
 
-        public void Update(int id, ExerciseCategory newExerciseCategory)
+        public ExerciseCategory Update(int id, ExerciseCategory newExerciseCategory)
         {
             ExerciseCategory existingExerciseCategory = this.GetById(id);
 
@@ -107,6 +109,8 @@
             MemoryCache.Remove(this.GetEntityCacheKey(id));
             MemoryCache.Set(this.GetEntityCacheKey(id), existingExerciseCategory);
             MemoryCache.Remove(this.AllCacheKey);
+
+            return existingExerciseCategory;
         }
 
         public void Delete(int id)

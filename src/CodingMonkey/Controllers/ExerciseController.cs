@@ -58,7 +58,11 @@
 
             try
             {
-                if (ModelState.IsValid) this.CodingMonkeyRepositoryContext.ExerciseRepository.Create(exerciseToCreate);
+                if (ModelState.IsValid)
+                {
+                    exerciseToCreate = this.CodingMonkeyRepositoryContext.ExerciseRepository
+                                                                         .Create(exerciseToCreate);
+                }
             }
             catch (Exception)
             {
@@ -81,7 +85,11 @@
 
             try
             {
-                if (ModelState.IsValid) this.CodingMonkeyRepositoryContext.ExerciseRepository.Update(id, updatedExercise);
+                if (ModelState.IsValid)
+                {
+                    updatedExercise = this.CodingMonkeyRepositoryContext.ExerciseRepository
+                                                                        .Update(id, updatedExercise);
+                }
             }
             catch (Exception ex)
             {

@@ -59,7 +59,11 @@ namespace CodingMonkey.Controllers
 
             try
             {
-                if (ModelState.IsValid) CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Create(exerciseCategoryToCreate);
+                if (ModelState.IsValid)
+                {
+                    exerciseCategoryToCreate = CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository
+                                                                            .Create(exerciseCategoryToCreate);
+                }
             }
             catch (Exception)
             {
@@ -78,17 +82,22 @@ namespace CodingMonkey.Controllers
         {
             if (vm == null) return Json(string.Empty);
 
+            ExerciseCategory newExerciseCategory = Mapper.Map<ExerciseCategory>(vm);
+
             try
             {
-                ExerciseCategory newExerciseCategory = Mapper.Map<ExerciseCategory>(vm);
-                if (ModelState.IsValid) CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.Update(id, newExerciseCategory);
+                if (ModelState.IsValid)
+                {
+                    newExerciseCategory = CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository
+                                                                       .Update(id, newExerciseCategory);
+                }
             }
             catch (Exception)
             {
                 return DataActionFailedMessage(DataAction.Updated);
             }
 
-            vm = Mapper.Map<ExerciseCategoryViewModel>(CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository.GetById(id));
+            vm = Mapper.Map<ExerciseCategoryViewModel>(newExerciseCategory);
 
             return Json(vm);
         }

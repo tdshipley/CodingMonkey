@@ -71,7 +71,7 @@ namespace CodingMonkey.Models.Repositories
             return exercise;
         }
 
-        public void Create(Exercise entity)
+        public Exercise Create(Exercise entity)
         {
             try
             {
@@ -92,9 +92,11 @@ namespace CodingMonkey.Models.Repositories
             MemoryCache.Set(exerciseCacheKey, entity, this.DefaultCacheEntryOptions);
 
             MemoryCache.Remove(this.AllCacheKey);
+
+            return entity;
         }
 
-        public void Update(int id, Exercise entity)
+        public Exercise Update(int id, Exercise entity)
         {
             Exercise existingExercise = this.GetById(id);
 
@@ -120,6 +122,8 @@ namespace CodingMonkey.Models.Repositories
             MemoryCache.Remove(this.GetEntityCacheKey(id));
             MemoryCache.Set(this.GetEntityCacheKey(id), existingExercise);
             MemoryCache.Remove(this.AllCacheKey);
+
+            return existingExercise;
         }
 
         public void Delete(int id)
