@@ -52,7 +52,7 @@ namespace CodingMonkey.Controllers
                 if (ModelState.IsValid)
                 {
                     exerciseTemplateToCreate = this.CodingMonkeyRepositoryContext.ExerciseTemplateRepository
-                                                                                 .Create(exerciseTemplateToCreate);
+                                                                                 .Create(exerciseId, exerciseTemplateToCreate);
                 }
             }
             catch (Exception)
@@ -78,7 +78,7 @@ namespace CodingMonkey.Controllers
                 if (ModelState.IsValid)
                 {
                     exerciseTemplateToUpdate = CodingMonkeyRepositoryContext.ExerciseTemplateRepository
-                                                                            .Update(exerciseId, exerciseTemplateToUpdate);
+                                                                            .Update(exerciseId, exerciseTemplateToUpdate.ExerciseTemplateId, exerciseTemplateToUpdate);
                 }
             }
             catch (Exception)

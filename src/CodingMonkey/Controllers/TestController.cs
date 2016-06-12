@@ -12,17 +12,21 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Models.Repositories;
 
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
     public class TestController : BaseController
     {
         public CodingMonkeyContext CodingMonkeyContext { get; set; }
 
+        public CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
+
         public IMapper Mapper { get; set; }
 
-        public TestController(CodingMonkeyContext codingMonkeyContext, IMapper mapper)
+        public TestController(CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
         {
             this.CodingMonkeyContext = codingMonkeyContext;
+            this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this.Mapper = mapper;
         }
 
@@ -30,11 +34,7 @@
         [Authorize]
         public JsonResult List(int exerciseId)
         {
-            var tests = CodingMonkeyContext.Tests
-                                           .Include(x => x.TestInputs)
-                                           .Include(x => x.TestOutput)
-                                           .Include(x => x.Exercise)
-                                           .Where(x => x.Exercise.ExerciseId == exerciseId).ToList();
+            var tests = CodingMonkeyRepositoryContext.TestRepository.All(exerciseId);
 
             var vm = this.Mapper.Map<List<TestViewModel>>(tests);
 
@@ -46,11 +46,7 @@
         [Route("{id}")]
         public JsonResult Details(int exerciseId, int id)
         {
-            var test = CodingMonkeyContext.Tests
-                                          .Include(x => x.TestInputs)
-                                          .Include(x => x.TestOutput)
-                                          .Include(x => x.Exercise)
-                                          .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
+            var test = CodingMonkeyRepositoryContext.TestRepository.GetById(id);
 
             JsonResult result = test == null ? Json(string.Empty) : Json(Mapper.Map<TestViewModel>(test));
 
@@ -63,32 +59,11 @@
         {
             if (vm == null) return Json(string.Empty);
 
-            Exercise relatedExercise = CodingMonkeyContext.Exercises
-                                                          .SingleOrDefault(x => x.ExerciseId == exerciseId);
-
-            if (relatedExercise == null) return DataActionFailedMessage(DataAction.Created, DataActionFailReason.RecordNotFound);
-
             Test testToCreate = Mapper.Map<Test>(vm);
 
-            testToCreate.RelateExerciseToTestInMemory(relatedExercise);
+            Test createdTest = CodingMonkeyRepositoryContext.TestRepository.Create(exerciseId, testToCreate);
 
-            try
-            {
-                CodingMonkeyContext.Tests.Add(testToCreate);
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-
-                // Relate Test Inputs & Outputs to newly created test
-                testToCreate.RelateTestToTestIoInMemory();
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception)
-            {
-                return DataActionFailedMessage(DataAction.Created);
-            }
-
-            vm = Mapper.Map<TestViewModel>(testToCreate);
+            vm = Mapper.Map<TestViewModel>(createdTest);
 
             return Json(vm);
         }
@@ -108,32 +83,7 @@
 
             var updatedTest = Mapper.Map<Test>(vm);
 
-            if (existingTest == null) return DataActionFailedMessage(DataAction.Updated, DataActionFailReason.RecordNotFound);
-            if (updatedTest == null) return DataActionFailedMessage(DataAction.Updated);
-
-            try
-            {
-                //TODO: When EF7 Introduces AddOrUpdate - use that instead of code below
-                // http://stackoverflow.com/questions/36208580/what-happened-to-addorupdate-in-ef-7
-
-                CodingMonkeyContext.TestOutputs.Remove(existingTest.TestOutput);
-                CodingMonkeyContext.TestInputs.RemoveRange(existingTest.TestInputs);
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-
-                existingTest.Description = updatedTest.Description;
-                existingTest.TestOutput = updatedTest.TestOutput;
-                existingTest.TestInputs = updatedTest.TestInputs;
-
-                // Ensure any test input / outputs are related in case new ones added
-                existingTest.RelateTestToTestIoInMemory();
-
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return DataActionFailedMessage(DataAction.Updated);
-            }
+            updatedTest = CodingMonkeyRepositoryContext.TestRepository.Update(exerciseId, id, updatedTest);
 
             return Json(vm);
         }
@@ -143,21 +93,7 @@
         [Route("{id}")]
         public JsonResult Delete(int id)
         {
-            var testToDelete = CodingMonkeyContext.Tests.Include(t => t.TestInputs)
-                                                        .Include(t => t.TestOutput)
-                                                        .SingleOrDefault(t => t.TestId == id);
-
-            if (testToDelete == null) DataActionFailedMessage(DataAction.Deleted, DataActionFailReason.RecordNotFound);
-            
-            try
-            {
-                CodingMonkeyContext.Tests.Remove(testToDelete);
-                if (ModelState.IsValid) CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception)
-            {
-                DataActionFailedMessage(DataAction.Deleted);
-            }
+            CodingMonkeyRepositoryContext.TestRepository.Delete(id);
 
             return Json(new { deleted = true });
         }
