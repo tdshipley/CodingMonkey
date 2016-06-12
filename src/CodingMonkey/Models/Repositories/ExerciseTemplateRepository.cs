@@ -18,8 +18,6 @@
 
         protected override CodingMonkeyContext CodingMonkeyContext { get; set; }
 
-        private CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
-
         protected override TimeSpan CacheEntryTimeoutValue { get; set; }
 
         protected override string CacheKeyPrefix { get; set; }
@@ -28,11 +26,10 @@
 
         protected override MemoryCacheEntryOptions DefaultCacheEntryOptions { get; set; }
 
-        public ExerciseTemplateRepository(IMemoryCache memoryCache, CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext)
+        public ExerciseTemplateRepository(IMemoryCache memoryCache, CodingMonkeyContext codingMonkeyContext)
         {
             this.MemoryCache = memoryCache;
             this.CodingMonkeyContext = codingMonkeyContext;
-            this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
 
             this.CacheEntryTimeoutValue = TimeSpan.FromHours(2);
             this.CacheKeyPrefix = typeof(ExerciseCategory).Name.ToLower();
@@ -88,16 +85,16 @@
 
             try
             {
-                relatedExercise = CodingMonkeyRepositoryContext.ExerciseRepository
-                                                               .GetById(entity.ExerciseForeignKey);
+                relatedExercise = CodingMonkeyContext.Exercises
+                                              .Include(e => e.ExerciseExerciseCategories)
+                                              .Include(e => e.Template)
+                                              .SingleOrDefault(e => e.ExerciseId == entity.ExerciseForeignKey);
 
                 if(relatedExercise == null) throw new ArgumentException("Could not find related exercise to exercise template");
 
                 relatedExercise.Template = entity;
 
-                relatedExercise = CodingMonkeyRepositoryContext.ExerciseRepository
-                                                               .Update(relatedExercise.ExerciseId, relatedExercise);
-                entity = relatedExercise.Template;
+                CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -105,7 +102,7 @@
             }
 
             string exerciseTemplateCacheKey = this.GetEntityCacheKey(relatedExercise.ExerciseId);
-            MemoryCache.Set(exerciseTemplateCacheKey, entity, this.DefaultCacheEntryOptions);
+            MemoryCache.Set(exerciseTemplateCacheKey, relatedExercise.Template, this.DefaultCacheEntryOptions);
 
             MemoryCache.Remove(this.AllCacheKey);
 
@@ -118,15 +115,19 @@
 
             try
             {
-                relatedExercise = this.CodingMonkeyRepositoryContext.ExerciseRepository
-                                                                    .GetById(id);
+                relatedExercise = CodingMonkeyContext.Exercises
+                                              .Include(e => e.ExerciseExerciseCategories)
+                                              .Include(e => e.Template)
+                                              .SingleOrDefault(e => e.ExerciseId == entity.ExerciseForeignKey);
 
                 if (relatedExercise == null) throw new ArgumentException("Exercise Template to update not found.");
 
-                relatedExercise.Template = entity;
+                relatedExercise.Template.ClassName = entity.ClassName;
+                relatedExercise.Template.InitialCode = entity.InitialCode;
+                relatedExercise.Template.MainMethodName = entity.MainMethodName;
+                relatedExercise.Template.MainMethodSignature = entity.MainMethodSignature;
 
-                relatedExercise = this.CodingMonkeyRepositoryContext.ExerciseRepository
-                                                                    .Update(relatedExercise.ExerciseId, relatedExercise);
+                CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -149,11 +150,9 @@
             {
                 if (relatedExercise == null) throw new ArgumentException("Related Exercise to Exercise Template to delete not found");
                 CodingMonkeyContext.ExerciseTemplates.Remove(relatedExercise.Template);
-                CodingMonkeyContext.SaveChanges();
-
                 relatedExercise.Template = null;
 
-                CodingMonkeyRepositoryContext.ExerciseRepository.Delete(relatedExercise.ExerciseId);
+                CodingMonkeyContext.SaveChanges();
             }
             catch (Exception ex)
             {
