@@ -94,7 +94,7 @@
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to create exercise category", ex);
+                throw new Exception("Failed to create exercise template", ex);
             }
 
             string exerciseTemplateCacheKey = this.GetEntityCacheKey(relatedExercise.ExerciseId);
@@ -127,7 +127,7 @@
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to update exercise category", ex);
+                throw new Exception("Failed to update exercise template", ex);
             }
 
             MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));

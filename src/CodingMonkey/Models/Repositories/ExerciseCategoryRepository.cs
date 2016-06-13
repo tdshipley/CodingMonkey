@@ -50,17 +50,17 @@
             return categories;
         }
 
-        public ExerciseCategory GetById(int id)
+        public ExerciseCategory GetById(int exerciseCategoryId)
         {
             ExerciseCategory category = null;
 
-            string exerciseCategoryCacheKey = this.GetEntityCacheKey(id);
+            string exerciseCategoryCacheKey = this.GetEntityCacheKey(exerciseCategoryId);
 
             if (!MemoryCache.TryGetValue(exerciseCategoryCacheKey, out category))
             {
                 category = CodingMonkeyContext.ExerciseCategories
                                               .Include(e => e.ExerciseExerciseCategories)
-                                              .SingleOrDefault(e => e.ExerciseCategoryId == id);
+                                              .SingleOrDefault(e => e.ExerciseCategoryId == exerciseCategoryId);
 
                 MemoryCache.Set(exerciseCategoryCacheKey, category, this.DefaultCacheEntryOptions);
             }
@@ -88,9 +88,9 @@
             return exerciseCategory;
         }
 
-        public ExerciseCategory Update(int id, ExerciseCategory newExerciseCategory)
+        public ExerciseCategory Update(int exerciseCategoryId, ExerciseCategory newExerciseCategory)
         {
-            ExerciseCategory existingExerciseCategory = this.GetById(id);
+            ExerciseCategory existingExerciseCategory = this.GetById(exerciseCategoryId);
 
             if (existingExerciseCategory == null) throw new ArgumentException("Exercise category to update not found.");
 
@@ -106,18 +106,18 @@
                 throw new Exception("Failed to update exercise category", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(id));
-            MemoryCache.Set(this.GetEntityCacheKey(id), existingExerciseCategory);
+            MemoryCache.Remove(this.GetEntityCacheKey(exerciseCategoryId));
+            MemoryCache.Set(this.GetEntityCacheKey(exerciseCategoryId), existingExerciseCategory);
             MemoryCache.Remove(this.AllCacheKey);
 
             return existingExerciseCategory;
         }
 
-        public void Delete(int id)
+        public void Delete(int exerciseCategoryId)
         {
             ExerciseCategory exerciseCategoryToDelete = CodingMonkeyContext.ExerciseCategories
                                                                            .Include(ec => ec.ExerciseExerciseCategories)
-                                                                           .SingleOrDefault(e => e.ExerciseCategoryId == id);
+                                                                           .SingleOrDefault(e => e.ExerciseCategoryId == exerciseCategoryId);
 
             if (exerciseCategoryToDelete == null) throw new ArgumentException("Exercise category to delete not found");
 
@@ -131,7 +131,7 @@
                 throw new Exception("Failed to delete exercise category", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(id));
+            MemoryCache.Remove(this.GetEntityCacheKey(exerciseCategoryId));
             MemoryCache.Remove(this.AllCacheKey);
         }
     }

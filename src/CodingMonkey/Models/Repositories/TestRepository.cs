@@ -92,7 +92,7 @@
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to create exercise", ex);
+                throw new Exception("Failed to create test", ex);
             }
 
             string testCacheKey = this.GetEntityCacheKey(entity.TestId);
@@ -136,7 +136,7 @@
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to update exercise category", ex);
+                throw new Exception("Failed to update test", ex);
             }
 
             MemoryCache.Remove(this.GetEntityCacheKey(testId));

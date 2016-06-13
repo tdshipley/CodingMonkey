@@ -52,18 +52,18 @@ namespace CodingMonkey.Models.Repositories
             return exercises;
         }
 
-        public Exercise GetById(int id)
+        public Exercise GetById(int exerciseId)
         {
             Exercise exercise = null;
 
-            string exerciseCacheKey = this.GetEntityCacheKey(id);
+            string exerciseCacheKey = this.GetEntityCacheKey(exerciseId);
 
             if (!MemoryCache.TryGetValue(exerciseCacheKey, out exercise))
             {
                 exercise = CodingMonkeyContext.Exercises
                                               .Include(e => e.ExerciseExerciseCategories)
                                               .Include(e => e.Template)
-                                              .SingleOrDefault(e => e.ExerciseId == id);
+                                              .SingleOrDefault(e => e.ExerciseId == exerciseId);
 
                 MemoryCache.Set(exerciseCacheKey, exercise, this.DefaultCacheEntryOptions);
             }
@@ -96,9 +96,9 @@ namespace CodingMonkey.Models.Repositories
             return entity;
         }
 
-        public Exercise Update(int id, Exercise entity)
+        public Exercise Update(int exerciseId, Exercise entity)
         {
-            Exercise existingExercise = this.GetById(id);
+            Exercise existingExercise = this.GetById(exerciseId);
 
             if (existingExercise == null) throw new ArgumentException("Exercise to update not found.");
 
@@ -119,18 +119,18 @@ namespace CodingMonkey.Models.Repositories
                 throw new Exception("Failed to update exercise", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(id));
-            MemoryCache.Set(this.GetEntityCacheKey(id), existingExercise);
+            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
+            MemoryCache.Set(this.GetEntityCacheKey(exerciseId), existingExercise);
             MemoryCache.Remove(this.AllCacheKey);
 
             return existingExercise;
         }
 
-        public void Delete(int id)
+        public void Delete(int exerciseId)
         {
             Exercise exerciseToDelete = CodingMonkeyContext.Exercises
                                                            .Include(e => e.ExerciseExerciseCategories)
-                                                           .SingleOrDefault(e => e.ExerciseId == id);
+                                                           .SingleOrDefault(e => e.ExerciseId == exerciseId);
 
             if (exerciseToDelete == null) throw new ArgumentException("Exercise to delete not found");
 
@@ -141,10 +141,10 @@ namespace CodingMonkey.Models.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to delete exercise category", ex);
+                throw new Exception("Failed to delete exercise", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(id));
+            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
             MemoryCache.Remove(this.AllCacheKey);
         }
     }
