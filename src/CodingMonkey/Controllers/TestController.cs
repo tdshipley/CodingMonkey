@@ -17,15 +17,12 @@
     [Route("api/exercise/{exerciseId}/[controller]/[action]")]
     public class TestController : BaseController
     {
-        public CodingMonkeyContext CodingMonkeyContext { get; set; }
-
         public CodingMonkeyRepositoryContext CodingMonkeyRepositoryContext { get; set; }
 
         public IMapper Mapper { get; set; }
 
-        public TestController(CodingMonkeyContext codingMonkeyContext, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
+        public TestController(CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, IMapper mapper)
         {
-            this.CodingMonkeyContext = codingMonkeyContext;
             this.CodingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this.Mapper = mapper;
         }
@@ -74,12 +71,6 @@
         public JsonResult Update(int exerciseId, int id, [FromBody] TestViewModel vm)
         {
             if (vm == null) return Json(string.Empty);
-            
-            var existingTest = CodingMonkeyContext.Tests
-                                                  .Include(x => x.TestInputs)
-                                                  .Include(x => x.TestOutput)
-                                                  .Include(x => x.Exercise)
-                                                  .SingleOrDefault(e => e.TestId == id && e.Exercise.ExerciseId == exerciseId);
 
             var updatedTest = Mapper.Map<Test>(vm);
 
