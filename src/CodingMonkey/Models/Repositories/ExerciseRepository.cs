@@ -26,7 +26,7 @@ namespace CodingMonkey.Models.Repositories
         {
             this.MemoryCache = memoryCache;
             this.CodingMonkeyContext = codingMonkeyContext;
-            this.CacheEntryTimeoutValue = TimeSpan.FromHours(2);
+            this.CacheEntryTimeoutValue = TimeSpan.FromHours(24);
             this.CacheKeyPrefix = typeof(Exercise).Name.ToLower();
             this.AllCacheKey = $"{CacheKeyPrefix}_all";
             this.DefaultCacheEntryOptions = new MemoryCacheEntryOptions()
