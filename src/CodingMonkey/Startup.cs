@@ -20,7 +20,7 @@
     using Serilog.Sinks.RollingFile;
 
     using AutoMapper;
-
+    using Models.Repositories;
     public class Startup
     {
         private MapperConfiguration _mapperConfiguration { get; set; }
@@ -74,6 +74,7 @@
             var path = PlatformServices.Default.Application.ApplicationBasePath;
             var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
 
+            services.AddMemoryCache();
             services.AddDbContext<CodingMonkeyContext>();
 
             services.AddIdentity<ApplicationUser, IdentityRole>(
@@ -130,8 +131,14 @@
                     });
 
             services.AddTransient<CodingMonkeyContextSeedData>();
+            services.AddTransient<CodingMonkeyRepositoryContext>();
 
-            services.AddSingleton<IMapper>(x => _mapperConfiguration.CreateMapper());
+            services.AddTransient<ExerciseCategoryRepository>();
+            services.AddTransient<ExerciseRepository>();
+            services.AddTransient<ExerciseTemplateRepository>();
+            services.AddTransient<TestRepository>();
+
+            services.AddTransient<IMapper>(x => _mapperConfiguration.CreateMapper());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

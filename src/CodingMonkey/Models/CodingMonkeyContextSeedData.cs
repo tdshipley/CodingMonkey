@@ -6,14 +6,18 @@
     using System.Threading.Tasks;
 
     using CodingMonkey.Configuration;
+    using CodingMonkey.Models.Repositories;
 
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.Extensions.Options;
 
     public class CodingMonkeyContextSeedData
     {
         private CodingMonkeyContext _context;
+
+        private CodingMonkeyRepositoryContext _codingMonkeyRepositoryContext { get; set; }
 
         private UserManager<ApplicationUser> _userManager;
 
@@ -21,9 +25,10 @@
 
         private IHostingEnvironment _env;
 
-        public CodingMonkeyContextSeedData(CodingMonkeyContext context, UserManager<ApplicationUser> userManager, IOptions<InitialUserConfig> initialUserConfig, IHostingEnvironment env)
+        public CodingMonkeyContextSeedData(CodingMonkeyContext context, CodingMonkeyRepositoryContext codingMonkeyRepositoryContext, UserManager<ApplicationUser> userManager, IOptions<InitialUserConfig> initialUserConfig, IHostingEnvironment env)
         {
             this._context = context;
+            this._codingMonkeyRepositoryContext = codingMonkeyRepositoryContext;
             this._userManager = userManager;
             this._initialUserConfig = initialUserConfig;
             this._env = env;
@@ -421,8 +426,19 @@
                 {
                     throw ex;
                 }
-
             }
+
+            this.InitialiseExerciseAndExerciseCategoryAllCaches();
+        }
+
+        /// <summary>
+        /// Intialises the lists in the cache - 
+        /// lists of exercises and exercise categories
+        /// </summary>
+        private void InitialiseExerciseAndExerciseCategoryAllCaches()
+        {
+            this._codingMonkeyRepositoryContext.ExerciseCatgeoryRepository.All();
+            this._codingMonkeyRepositoryContext.ExerciseRepository.All();
         }
 
         private static void AssignExerciseToCategoryInMemory(Exercise exercise, ExerciseCategory exerciseCategory)
