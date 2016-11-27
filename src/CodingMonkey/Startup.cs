@@ -21,6 +21,8 @@
 
     using AutoMapper;
     using Models.Repositories;
+    using Newtonsoft.Json.Serialization;
+
     public class Startup
     {
         private MapperConfiguration _mapperConfiguration { get; set; }
@@ -105,7 +107,19 @@
                 .AddEntityFrameworkStores<CodingMonkeyContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc();
+            // Change JSON serialisation to use property names!
+            // See: https://weblog.west-wind.com/posts/2016/Jun/27/Upgrading-to-ASPNET-Core-RTM-from-RC2
+            services.AddMvc()
+                    .AddJsonOptions(opt =>
+                    {
+                        var resolver = opt.SerializerSettings.ContractResolver;
+
+                        if(resolver != null)
+                        {
+                            var res = resolver as DefaultContractResolver;
+                            res.NamingStrategy = null; // This removes camel casing
+                        }
+                    });
 
             // Add application services.
             services.Configure<InitialUserConfig>(
