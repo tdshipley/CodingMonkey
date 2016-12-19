@@ -2,6 +2,7 @@
 {
     using PageObjects;
     using PageObjects.PageObjects;
+    using System;
     using Xunit;
 
     public class HomepageTests
@@ -15,10 +16,14 @@
         {
             var basePageObject = new BasePageObject();
 
-            bool jumbotronIsDisplayed =  basePageObject.Get<HomePageObject>()
-                                                       .IsHomepageJumbotronDisplayed();
+            bool jumbotronIsDisplayed = basePageObject.Get<HomePageObject>()
+                                                      .IsHomepageJumbotronDisplayed();
 
             Assert.True(jumbotronIsDisplayed);
+
+            // TODO: Setup per test class clean up to clean up driver per
+            // test class instead of this. 
+            basePageObject.QuitDriver();
         }
     }
 }

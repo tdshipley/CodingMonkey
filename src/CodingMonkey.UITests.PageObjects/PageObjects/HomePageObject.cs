@@ -15,7 +15,7 @@
 
             try
             {
-                this.FindVisibleElement(By.Id("jumbotron"));
+                this.FindVisibleElement(By.ClassName("jumbotron"));
                 displayed = true;
             }
             catch { }

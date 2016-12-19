@@ -4,12 +4,15 @@
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "Selenium.Support": "3.0.1",
-    "Selenium.WebDriver": "3.0.1",
-    "Selenium.WebDriver.ChromeDriver": "2.26.0"
+    "Selenium.WebDriver": "3.0.1"
   },
 
   "frameworks": {
     "net452": {
     }
+  },
+
+  "buildOptions": {
+    "copyToOutput": [ "Drivers\\" ]
   }
 }
