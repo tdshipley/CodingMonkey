@@ -73,5 +73,19 @@
             return soultionPath;
         }
 
+        public bool IsElementDisplayed(By by)
+        {
+            bool displayed = false;
+
+            try
+            {
+                this.FindVisibleElement(by);
+                displayed = true;
+            }
+            catch { }
+
+            return displayed;
+        }
+
     }
 }

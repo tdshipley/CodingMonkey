@@ -1,5 +1,6 @@
 ﻿namespace CodingMonkey.UITests.PageObjects.PageObjects
 {
+    using System;
     using Interfaces;
     using OpenQA.Selenium;
 
@@ -11,16 +12,18 @@
 
         public bool IsHomepageJumbotronDisplayed()
         {
-            bool displayed = false;
+            return this.IsElementDisplayed(By.ClassName("jumbotron"));
+        }
 
-            try
-            {
-                this.FindVisibleElement(By.ClassName("jumbotron"));
-                displayed = true;
-            }
-            catch { }
-            
-            return displayed;
+        public bool IsNavigationBarDisplayed()
+        {
+            return this.IsElementDisplayed(By.ClassName("navbar"));
+        }
+
+        public bool IsGetStartedButtonDisplayedInJumbotron()
+        {
+            string cssSelector = ".jumbotron .btn";
+            return this.IsElementDisplayed(By.CssSelector(cssSelector));
         }
     }
 }
