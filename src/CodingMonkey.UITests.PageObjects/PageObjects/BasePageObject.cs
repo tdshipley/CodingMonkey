@@ -20,7 +20,7 @@
 
         public string BaseUrl { get; set; }
 
-        public BasePageObject(string baseUrl = "http://localhost:5000", IWebDriver driver = null)
+        public BasePageObject(string baseUrl = "http://localhost:49850", IWebDriver driver = null)
         {
             this.BaseUrl = baseUrl;
 
