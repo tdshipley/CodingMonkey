@@ -4,16 +4,16 @@
     using PageObjects.PageObjects;
     using Xunit;
 
-    public class ExerciseCategoryPageTests
+    public class ExerciseCategoryListPageTests
     {
         [Fact]
-        public void ExerciseCategoryPageHasCategoryListDisplayed()
+        public void ExerciseCategoryListPageHasCategoryListDisplayed()
         {
             var basePageObject = new BasePageObject();
 
             bool categoryListDisplayed = basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
-                .Get<ExerciseCategoryObject>()
+                .Get<ExerciseCategoryListObject>()
                 .IsCategoryListDisplayed();
 
             Assert.True(categoryListDisplayed, "Category list is not displayed");
@@ -24,16 +24,16 @@
         }
 
         [Fact]
-        public void ExerciseCategoryPageHasCategoriesDisplayedInCategoryList()
+        public void ExerciseCategoryListPageHasCategoriesDisplayedInCategoryList()
         {
             var basePageObject = new BasePageObject();
 
             int numberOfCategoriesDisplayed = basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
-                .Get<ExerciseCategoryObject>()
+                .Get<ExerciseCategoryListObject>()
                 .GetCountOfCategoriesDisplayed();
 
-            int numberOfSelectCategoryButtonsDisplayed = basePageObject.Get<ExerciseCategoryObject>()
+            int numberOfSelectCategoryButtonsDisplayed = basePageObject.Get<ExerciseCategoryListObject>()
                 .GetCountOfSelectCategoryButtons();
 
             Assert.NotEqual(numberOfCategoriesDisplayed, 0);

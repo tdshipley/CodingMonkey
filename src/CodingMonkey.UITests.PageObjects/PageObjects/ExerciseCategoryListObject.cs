@@ -4,9 +4,9 @@
     using Interfaces;
     using OpenQA.Selenium;
 
-    public class ExerciseCategoryObject : BasePageObject, IPageObject
+    public class ExerciseCategoryListObject : BasePageObject, IPageObject
     {
-        public ExerciseCategoryObject(string baseUrl, IWebDriver driver) : base (baseUrl, driver)
+        public ExerciseCategoryListObject(string baseUrl, IWebDriver driver) : base (baseUrl, driver)
         {
         }
 
@@ -23,6 +23,12 @@
         public int GetCountOfSelectCategoryButtons()
         {
             return this.FindVisibleElements(By.ClassName("select-category-btn")).Count;
+        }
+
+        public ExerciseCategoryListObject ClickSelectCategoryButtonForFirstFoundCategory()
+        {
+            this.FindVisibleElement(By.ClassName("select-category-btn")).Click();
+            return this;
         }
     }
 }
