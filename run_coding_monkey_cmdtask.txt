@@ -1,0 +1,9 @@
+*cmd /k ""%ConEmuDir%\..\init.bat""  -new_console:d:"C:\home_code\CodingMonkey"
+
+*cmd /k ""%ConEmuDir%\..\init.bat" && gulp watch" -new_console:d:"C:\home_code\CodingMonkey\CodingMonkey\src\CodingMonkey"
+
+*cmd /k ""%ConEmuDir%\..\init.bat" && SET ASPNETCORE_URLS=https://*:49850&& SET ASPNETCORE_ENVIRONMENT=development&& dotnet run" -new_console:d:"C:\home_code\CodingMonkey\CodingMonkey\src\CodingMonkey"
+
+*cmd /k ""%ConEmuDir%\..\init.bat" && SET ASPNETCORE_URLS=https://*:60149&& SET ASPNETCORE_ENVIRONMENT=development&& dotnet run"  -new_console:d:"C:\home_code\CodingMonkey\CodingMonkey.CodeExecutor\src\CodingMonkey.CodeExecutor"
+
+*cmd /k ""%ConEmuDir%\..\init.bat" && SET ASPNETCORE_URLS=https://*:55497&& SET ASPNETCORE_ENVIRONMENT=development&& dotnet run"  -new_console:d:"C:\home_code\CodingMonkey\CodingMonkey.IdentityServer\src\CodingMonkey.IdentityServer"
