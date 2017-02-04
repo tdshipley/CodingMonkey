@@ -1,4 +1,7 @@
-﻿namespace CodingMonkey.UITests.PageObjects
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace CodingMonkey.UITests.PageObjects
 {
     using System;
     using CodingMonkey.UITests.PageObjects.Interfaces;
@@ -52,11 +55,15 @@
 
         public IWebElement FindVisibleElement(By by, int timeoutInSeconds = 10)
         {
+            return this.FindVisibleElements(by, timeoutInSeconds).FirstOrDefault();
+        }
+
+        public IReadOnlyCollection<IWebElement> FindVisibleElements(By by, int timeoutInSeconds = 10)
+        {
             var wait = new WebDriverWait(this.Driver, TimeSpan.FromSeconds(timeoutInSeconds));
             wait.Until(ExpectedConditions.ElementIsVisible(by));
-            var element = this.Driver.FindElement(by);
 
-            return element;
+            return this.Driver.FindElements(by);
         }
 
         public void QuitDriver()

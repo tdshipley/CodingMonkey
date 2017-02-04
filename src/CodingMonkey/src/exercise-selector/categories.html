@@ -4,11 +4,11 @@
             <h1>${heading}</h1>
         </div>
     </div>
-    <div class="row top-buffer">
+    <div id="category-list" class="row top-buffer">
         <div if.bind="vm.pageLoading" class="col-lg-1 col-lg-offset-5">
             <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
-        <div repeat.for="category of vm.categories" class="col-lg-4 col-lg-offset-1">
+        <div repeat.for="category of vm.categories" class="category-list-item col-lg-4 col-lg-offset-1">
             <div id="${category.pageId}" class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">${category.name}</h3>
@@ -17,7 +17,7 @@
                     ${category.description}
                 </div>
                 <div class="panel-footer">
-                    <button class="btn btn-success" click.delegate="goToExercisesInCategory(category.id)">Select Category</button>
+                    <button class="select-category-btn btn btn-success" click.delegate="goToExercisesInCategory(category.id)">Select Category</button>
                 </div>
             </div>
         </div>

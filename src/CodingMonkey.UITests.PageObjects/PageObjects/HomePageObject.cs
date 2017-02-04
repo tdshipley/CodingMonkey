@@ -25,5 +25,11 @@
             string cssSelector = ".jumbotron .btn";
             return this.IsElementDisplayed(By.CssSelector(cssSelector));
         }
+
+        public HomePageObject ClickPickCategoryButton()
+        {
+            this.FindVisibleElement(By.ClassName("pick-category-btn")).Click();
+            return this;
+        }
     }
 }

@@ -2,15 +2,10 @@
 {
     using PageObjects;
     using PageObjects.PageObjects;
-    using System;
     using Xunit;
 
     public class HomepageTests
     {
-        public HomepageTests()
-        {
-        }
-
         [Fact]
         public void HomepageHasJumbotronDisplayed()
         {
@@ -22,8 +17,8 @@
             bool getStartedButtonDisplayedInJumbotron = basePageObject.Get<HomePageObject>()
                                                                       .IsGetStartedButtonDisplayedInJumbotron();
 
-            Assert.True(jumbotronIsDisplayed);
-            Assert.True(getStartedButtonDisplayedInJumbotron);
+            Assert.True(jumbotronIsDisplayed, "Homepage jumbotron is not displayed");
+            Assert.True(getStartedButtonDisplayedInJumbotron, "Get started button in the homepage jumbotron is not displayed");
 
             // TODO: Setup per test class clean up to clean up driver per
             // test class instead of this. 
@@ -38,7 +33,7 @@
             bool navigationBarIsDisplayed = basePageObject.Get<HomePageObject>()
                                                           .IsNavigationBarDisplayed();
 
-            Assert.True(navigationBarIsDisplayed);
+            Assert.True(navigationBarIsDisplayed, "Navigation bar is not displayed");
 
             basePageObject.QuitDriver();
         }
