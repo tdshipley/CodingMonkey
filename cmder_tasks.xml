@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2017-01-11 15:09:35" build="160710">
+		<key name=".Vanilla" modified="2017-02-04 09:56:05" build="160710">
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
 			<value name="StartTasksFile" type="string" data=""/>
@@ -151,11 +151,11 @@
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="1764"/>
-			<value name="ConWnd Y" type="long" data="348"/>
-			<value name="LastMonitor" type="string" data="0,0,5120,2678"/>
-			<value name="ConWnd Width" type="dword" data="00000079"/>
-			<value name="ConWnd Height" type="dword" data="0000003c"/>
+			<value name="ConWnd X" type="long" data="95"/>
+			<value name="ConWnd Y" type="long" data="404"/>
+			<value name="LastMonitor" type="string" data="0,0,2880,1720"/>
+			<value name="ConWnd Width" type="dword" data="000000b0"/>
+			<value name="ConWnd Height" type="dword" data="00000023"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="QuakeStyle" type="hex" data="00"/>
 			<value name="Restore2ActiveMon" type="hex" data="00"/>
@@ -400,7 +400,7 @@
 			<value name="Update.DownloadPath" type="string" data="%TEMP%\ConEmu"/>
 			<value name="Update.LeavePackages" type="hex" data="00"/>
 			<value name="Update.PostUpdateCmd" type="string" data="echo Last successful update&gt;ConEmuUpdate.info &amp;&amp; date /t&gt;&gt;ConEmuUpdate.info &amp;&amp; time /t&gt;&gt;ConEmuUpdate.info"/>
-			<key name="HotKeys" modified="2017-01-11 15:09:35" build="160710">
+			<key name="HotKeys" modified="2017-02-04 09:56:05" build="160710">
 				<value name="KeyMacroVersion" type="hex" data="02"/>
 				<value name="Multi.Modifier" type="dword" data="00000011"/>
 				<value name="Multi.ArrowsModifier" type="dword" data="0000005b"/>
@@ -585,22 +585,31 @@
 				<value name="DndRKey" type="hex" data="a2"/>
 				<value name="WndDragKey" type="dword" data="00121101"/>
 			</key>
-			<key name="Tasks" modified="2017-01-11 15:09:35" build="160710">
-				<value name="Count" type="long" data="5"/>
-				<key name="Task1" modified="2017-01-11 15:09:35" build="160710">
+			<key name="Tasks" modified="2017-02-04 09:56:05" build="160710">
+				<value name="Count" type="long" data="6"/>
+				<key name="Task1" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="{Start Coding Monkey}"/>
 					<value name="Flags" type="dword" data="00000004"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
 					<value name="Cmd1" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot;&quot;  -new_console:d:&quot;C:\home_code\CodingMonkey&quot;"/>
 					<value name="Cmd2" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; gulp watch&quot; -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey\src\CodingMonkey&quot;"/>
-					<value name="Cmd3" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:49850 &amp;&amp; dotnet run&quot; -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey\src\CodingMonkey&quot;"/>
-					<value name="Cmd4" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:60149 &amp;&amp; dotnet run&quot;  -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey.CodeExecutor\src\CodingMonkey.CodeExecutor&quot;"/>
-					<value name="Cmd5" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:55497 &amp;&amp; dotnet run&quot;  -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey.IdentityServer\src\CodingMonkey.IdentityServer&quot;"/>
+					<value name="Cmd3" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:49850&amp;&amp; SET ASPNETCORE_ENVIRONMENT=development&amp;&amp; dotnet run&quot; -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey\src\CodingMonkey&quot;"/>
+					<value name="Cmd4" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:60149&amp;&amp; SET ASPNETCORE_ENVIRONMENT=development&amp;&amp; dotnet run&quot;  -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey.CodeExecutor\src\CodingMonkey.CodeExecutor&quot;"/>
+					<value name="Cmd5" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot; &amp;&amp; SET ASPNETCORE_URLS=https://*:55497&amp;&amp; SET ASPNETCORE_ENVIRONMENT=development&amp;&amp; dotnet run&quot;  -new_console:d:&quot;C:\home_code\CodingMonkey\CodingMonkey.IdentityServer\src\CodingMonkey.IdentityServer&quot;"/>
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="5"/>
 				</key>
-				<key name="Task2" modified="2017-01-11 15:09:35" build="160710">
+				<key name="Task2" modified="2017-02-04 09:59:21" build="160710">
+					<value name="Name" type="string" data="{Open Code Dir}"/>
+					<value name="Flags" type="dword" data="00000004"/>
+					<value name="Hotkey" type="dword" data="00000000"/>
+					<value name="GuiArgs" type="string" data=""/>
+					<value name="Cmd1" type="string" data="*cmd /k &quot;&quot;%ConEmuDir%\..\init.bat&quot;&quot;  -new_console:d:&quot;C:\code&quot;"/>
+					<value name="Active" type="long" data="0"/>
+					<value name="Count" type="long" data="1"/>
+				</key>
+				<key name="Task3" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="{cmd::Cmder as Admin}"/>
 					<value name="Flags" type="dword" data="00000000"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -609,7 +618,7 @@
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task3" modified="2017-01-11 15:09:35" build="160710">
+				<key name="Task4" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="{cmd::Cmder}"/>
 					<value name="Flags" type="dword" data="00000000"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -618,7 +627,7 @@
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task4" modified="2017-01-11 15:09:35" build="160710">
+				<key name="Task5" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="{Powershell::PowerShell as Admin}"/>
 					<value name="Flags" type="dword" data="00000000"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -627,7 +636,7 @@
 					<value name="Active" type="long" data="0"/>
 					<value name="Count" type="long" data="1"/>
 				</key>
-				<key name="Task5" modified="2017-01-11 15:09:35" build="160710">
+				<key name="Task6" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="{Powershell::Powershell}"/>
 					<value name="Flags" type="dword" data="00000000"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -637,12 +646,12 @@
 					<value name="Count" type="long" data="1"/>
 				</key>
 			</key>
-			<key name="Apps" modified="2017-01-11 15:09:35" build="160710">
+			<key name="Apps" modified="2017-02-04 09:59:21" build="160710">
 				<value name="Count" type="long" data="0"/>
 			</key>
-			<key name="Colors" modified="2017-01-11 15:09:35" build="160710">
+			<key name="Colors" modified="2017-02-04 09:59:21" build="160710">
 				<value name="Count" type="long" data="1"/>
-				<key name="Palette1" modified="2017-01-11 15:09:35" build="160710">
+				<key name="Palette1" modified="2017-02-04 09:59:21" build="160710">
 					<value name="Name" type="string" data="Monokai"/>
 					<value name="ExtendColors" type="hex" data="00"/>
 					<value name="ExtendColorIdx" type="hex" data="0e"/>

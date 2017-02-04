@@ -48,7 +48,7 @@
                 .SetBasePath(applicationPath)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.secrets.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false);
 
             if (env.IsDevelopment())
             {
