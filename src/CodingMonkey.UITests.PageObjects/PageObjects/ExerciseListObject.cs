@@ -24,5 +24,11 @@
         {
             return this.FindVisibleElements(By.ClassName("select-exercise-btn")).Count;
         }
+
+        public ExerciseListObject ClickSelectExerciseButtonForFirstFoundExercise()
+        {
+            this.FindVisibleElement(By.ClassName("select-exercise-btn")).Click();
+            return this;
+        }
     }
 }
