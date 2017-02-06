@@ -45,7 +45,7 @@ export class update {
           .then(data => {
               this.vm.exerciseCategory.id = data.Id;
               this.vm.exerciseCategory.name = data.Name;
-              this.vm.exerciseCategory.description = data.Guidance;
+              this.vm.exerciseCategory.description = data.Description;
               this.vm.exerciseCategory.exerciseids = data.ExerciseIds;
               
               this.heading = "Update Exercise Category: " + this.vm.exerciseCategory.name;
