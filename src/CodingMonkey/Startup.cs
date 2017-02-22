@@ -177,7 +177,7 @@
             
             app.UseApplicationInsightsExceptionTelemetry();
 
-            app.UseStaticFiles();
+            app.UseFileServer();
 
             app.UseIdentity();
 
