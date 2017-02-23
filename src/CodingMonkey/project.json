@@ -81,6 +81,8 @@
   "publishOptions": {
     "include": [
       "wwwroot",
+      "Views",
+      "appsettings.json",
       "node_modules",
       "**.user",
       "**.vspscc"

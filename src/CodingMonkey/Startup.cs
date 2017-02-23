@@ -164,7 +164,7 @@
 
             app.UseApplicationInsightsRequestTelemetry();
 
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsStaging())
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
