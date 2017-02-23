@@ -83,6 +83,9 @@
       "wwwroot",
       "Views",
       "appsettings.json",
+      "appsettings.development.json",
+      "appsettings.staging.json",
+      "appsettings.production.json",
       "node_modules",
       "**.user",
       "**.vspscc"
