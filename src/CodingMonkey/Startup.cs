@@ -31,12 +31,6 @@
         {
             string applicationPath = env.ContentRootPath;
 
-            // Create SeriLog
-            Log.Logger = new LoggerConfiguration()
-                                .MinimumLevel.Debug()
-                                .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
-                                .CreateLogger();
-
             // Setup automapper
             _mapperConfiguration = new MapperConfiguration(cfg =>
             {
@@ -50,7 +44,7 @@
                 .AddJsonFile("appsettings.secrets.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false);
 
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsStaging())
             {
                 // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
                 // Not using anyway atm - disabled until https://github.com/aspnet/UserSecrets/issues/62 is fixed
@@ -58,6 +52,12 @@
 
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
+
+                // Create SeriLog
+                Log.Logger = new LoggerConfiguration()
+                                    .MinimumLevel.Debug()
+                                    .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
+                                    .CreateLogger();
             }
 
             builder.AddEnvironmentVariables();
