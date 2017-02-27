@@ -43,24 +43,26 @@ export class NavBar {
         this.http.baseUrl = this.baseUrl + '/api/Account/';
 
         this.http.fetch('CurrentUser')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw Error(response.statusText);
+                }
+
+                return response.json();
+            })
             .then(data => {
                 if (data.GetUserSucceeded) {
                     this.vm.user.isLoggedIn = true;
                     this.vm.user.username = data.Username;
                     this.vm.user.roles = data.Roles;
                 } else {
-                    this.vm.user.isLoggedIn = false;
-                    this.vm.user.username = "";
-                    this.vm.user.roles = [];
+                    this.setVmUserToNull();
                 }
 
                 this.setCurrentUserInSessionStorage();
             })
             .catch(err => {
-                this.vm.user.isLoggedIn = false;
-                this.vm.user.username = "";
-                this.vm.user.roles = [];
+                this.setVmUserToNull();
 
                 this.setCurrentUserInSessionStorage();
             });
@@ -72,5 +74,11 @@ export class NavBar {
 
     setCurrentUserInSessionStorage() {
         sessionStorage.setItem("currentUser", JSON.stringify(this.vm.user));
+    }
+
+    setVmUserToNull() {
+        this.vm.user.isLoggedIn = false;
+        this.vm.user.username = "";
+        this.vm.user.roles = [];
     }
 }
