@@ -33,7 +33,6 @@ gulp.task('prepare-release', function(callback) {
   return runSequence(
     'build',
     'bump-version',
-    'changelog',
     callback
   );
 });
