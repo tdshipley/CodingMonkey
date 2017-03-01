@@ -20,6 +20,16 @@ export class App {
                 settings: {
                     group: 'user'
                 },
+                route: 'categories',  
+                name: 'Categories',
+                moduleId: './exercise-selector/categories',
+                nav: true,
+                title: 'Exercise Categories'
+            },
+            {
+                settings: {
+                    group: 'user'
+                },
                 route: ['about'],
                 name: 'about',
                 moduleId: 'about',
@@ -35,16 +45,6 @@ export class App {
                 moduleId: './code/editor',
                 nav: false,
                 title: 'Code Editor'
-            },
-            {
-                settings: {
-                    group: 'user'
-                },
-                route: 'categories',  
-                name: 'Categories',
-                moduleId: './exercise-selector/categories',
-                nav: true,
-                title: 'Exercise Categories'
             },
             {
                 settings: {

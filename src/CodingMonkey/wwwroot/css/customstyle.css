@@ -34,6 +34,12 @@
     font-size: 26px;
 }
 
+.centre-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* ### Boostrap Additional ### */
 .top-buffer {
     margin-top:20px !important;
@@ -62,6 +68,13 @@
   max-height: 100px;
   overflow-y: auto;
 }
+
+.fixed-panel-large {
+  min-height: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 
 /* ### Ace Editor ### */
 #aceEditor {
