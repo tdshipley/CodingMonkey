@@ -8,7 +8,9 @@ module.exports = {
       ],
       "options": {
         "inject": true,
-        "minify": true
+        "minify": true,
+        "depCache": true,
+        "rev": true
       }
     },
     "dist/aurelia": {
@@ -33,6 +35,7 @@ module.exports = {
       "options": {
         "inject": true,
         "minify": true,
+        "depCache": true,
         "rev": true
       }
     }
