@@ -10,7 +10,7 @@ module.exports = {
         "inject": true,
         "minify": true,
         "depCache": true,
-        "rev": true
+        "rev": false
       }
     },
     "dist/aurelia": {
@@ -30,13 +30,14 @@ module.exports = {
         "bootstrap/css/bootstrap.css!text",
         "toastr",
         "toastr/build/toastr.css!text",
-        "font-awesome/css/font-awesome.min.css!text"
+        "font-awesome/css/font-awesome.min.css!text",
+        "fetch"
       ],
       "options": {
         "inject": true,
         "minify": true,
-        "depCache": true,
-        "rev": true
+        "depCache": false,
+        "rev": false
       }
     }
   }
