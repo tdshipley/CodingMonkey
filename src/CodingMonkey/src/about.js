@@ -25,7 +25,7 @@ export class About {
     }
 
     getContributorProfiles() {
-        this.http.fetch("json/contributors.json")
+        this.http.fetch("../../json/contributors.json")
             .then(response => response.json())
             .then(contributors => {
                 for (let contributor of contributors) {
