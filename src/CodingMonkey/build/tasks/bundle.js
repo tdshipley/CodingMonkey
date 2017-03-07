@@ -1,8 +1,8 @@
 var gulp = require('gulp');
-var bundler = require('aurelia-bundler');
+var aureliabundler = require('aurelia-bundler');
 var bundles = require('../bundles.js');
 
-var config = {
+var bundler_config = {
   force: true,
   baseURL: './wwwroot',
   configPath: './wwwroot/config.js',
@@ -10,9 +10,9 @@ var config = {
 };
 
 gulp.task('bundle', ['unbundle', 'build'], function() {
-  return bundler.bundle(config);
+    return aureliabundler.bundle(bundler_config);
 });
 
 gulp.task('unbundle', function() {
-  return bundler.unbundle(config);
+    return aureliabundler.unbundle(bundler_config);
 });
