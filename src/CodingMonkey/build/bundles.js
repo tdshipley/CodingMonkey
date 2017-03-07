@@ -35,7 +35,7 @@ module.exports = {
             "font-awesome/css/font-awesome.min.css!text",
             "fetch",
             "jquery",
-            "jquery/jquery.min.js"
+            "jquery/dist/jquery.min.js"
         ],
         "options": {
             "minify": true
