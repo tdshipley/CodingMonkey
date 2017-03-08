@@ -6,7 +6,8 @@ module.exports = {
             // First, we bundle all css, html, and javascript in the root folder 
       	    // and all subfolders. The bundler reads the mapping from the
       	    // config.js file, which by default uses the './dist/' folder.
-            "**/*.js",
+            // Checking that is a issue caused by bundling system.js files
+            "[**/*.js]",
             "**/*.html!text",
             "**/*.css!text",
 
