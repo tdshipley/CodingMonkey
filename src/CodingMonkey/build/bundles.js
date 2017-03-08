@@ -33,8 +33,7 @@ module.exports = {
             "toastr",
             "toastr/build/toastr.css!text",
             "font-awesome/css/font-awesome.min.css!text",
-            "fetch",
-            "jquery"
+            "fetch"
         ],
         "options": {
             "minify": true
