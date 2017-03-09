@@ -1,5 +1,6 @@
 ﻿namespace CodingMonkey.Controllers
 {
+    using Serilog;
     using System;
     using System.Collections.Generic;
     using CodingMonkey.ViewModels;
@@ -234,12 +235,21 @@
             var accessToken = await this.GetCodeExecutorAccessTokenAsync();
 
             httpClient.SetBearerToken(accessToken);
-            return httpClient.PostAsync(
+
+            try
+            {
+                return httpClient.PostAsync(
                     path,
                     new StringContent(
                         JsonConvert.SerializeObject(dataToPost),
                         Encoding.UTF8,
                         "application/json")).Result;
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Fatal(e, @"Failed to post code to code execution service path: {@path}", path);
+                throw;
+            }
         }
 
         private async Task<string> GetCodeExecutorAccessTokenAsync()
