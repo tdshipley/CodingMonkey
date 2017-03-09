@@ -92,7 +92,7 @@
     ]
   },
   "scripts": {
-    "prepublish": [ "npm install jspm -g", "npm install", "bower install", "jspm install -y", "gulp prepare-release", "gulp export" ],
+    "prepublish": [ "npm install", "bower install", "jspm install -y", "gulp prepare-release", "gulp export" ],
     "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ],
     "watch": [ "gulp watch" ]
   },

@@ -7,7 +7,7 @@ module.exports = {
       	    // and all subfolders. The bundler reads the mapping from the
       	    // config.js file, which by default uses the './dist/' folder.
             // Checking that is a issue caused by bundling system.js files
-            "[**/*.js]",
+            "**/*.js",
             "**/*.html!text",
             "**/*.css!text",
 
@@ -15,9 +15,15 @@ module.exports = {
             // idea to explicitly all required Aurelia libraries.
             "aurelia-framework",
             "aurelia-bootstrapper",
+            "aurelia-binding",
+            "aurelia-templating",
             "aurelia-templating-binding",
             "aurelia-templating-resources",
+            "aurelia-loader",
             "aurelia-loader-default",
+            "aurelia-pal",
+            "aurelia-pal-browser",
+            "aurelia-polyfills",
 
             // Next, we include the optional Aurelia dependencies. Your project 
             // may use dependencies not listed here.
@@ -25,8 +31,14 @@ module.exports = {
             "aurelia-router",
             "aurelia-animator-css",
             "aurelia-history-browser",
+            "aurelia-logging",
             "aurelia-logging-console",
             "aurelia-templating-router",
+            "aurelia-dialog",
+            "aurelia-metadata",
+            "aurelia-path",
+            "aurelia-task-queue",
+
 
             // Last, we include any other project dependencies.
             "bootstrap",
@@ -37,7 +49,7 @@ module.exports = {
             "fetch"
         ],
         "options": {
-            "minify": true
+            "minify": false
         }
     }
   }
