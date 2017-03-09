@@ -42,15 +42,16 @@
         public async Task<JsonResult> Compile(int id, [FromBody] CodeEditorViewModel vm)
         {
             CodeSubmission codeToSubmit = new CodeSubmission()
-                                              {
-                                                  Code = vm.Code
-                                              };
+            {
+                Code = vm.Code
+            };
 
             var response = await PostRequestToCodeExecutorAsync("api/compile", codeToSubmit);
 
             if (response.IsSuccessStatusCode)
             {
-                CodeSubmission codeSubmissionCompiled = JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+                CodeSubmission codeSubmissionCompiled =
+                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
                 vm.HasCompilerErrors = codeSubmissionCompiled.ResultSummary.HasCompilerErrors;
 
@@ -64,16 +65,16 @@
                 foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
                 {
                     vm.CompilerErrors.Add(new CompilerErrorViewModel()
-                                              {
-                                                  ColEnd = compilerError.ColEnd,
-                                                  ColStart = compilerError.ColStart,
-                                                  ErrorLength = compilerError.ErrorLength,
-                                                  Id = compilerError.Id,
-                                                  LineNumberEnd = compilerError.EndLineNumber,
-                                                  LineNumberStart = compilerError.StartLineNumber,
-                                                  Message = compilerError.Message,
-                                                  Severity = compilerError.Severity
-                                              });
+                    {
+                        ColEnd = compilerError.ColEnd,
+                        ColStart = compilerError.ColStart,
+                        ErrorLength = compilerError.ErrorLength,
+                        Id = compilerError.Id,
+                        LineNumberEnd = compilerError.EndLineNumber,
+                        LineNumberStart = compilerError.StartLineNumber,
+                        Message = compilerError.Message,
+                        Severity = compilerError.Severity
+                    });
                 }
             }
             else
@@ -88,10 +89,10 @@
         public async Task<JsonResult> Execute(int id, [FromBody] CodeEditorViewModel vm)
         {
             var exercise = CodingMonkeyContext.Exercises
-                                              .Include(e => e.Template)
-                                              .Include(e => e.Tests).ThenInclude(t => t.TestInputs)
-                                              .Include(e => e.Tests).ThenInclude(t => t.TestOutput)
-                                              .SingleOrDefault(e => e.ExerciseId == id);
+                .Include(e => e.Template)
+                .Include(e => e.Tests).ThenInclude(t => t.TestInputs)
+                .Include(e => e.Tests).ThenInclude(t => t.TestOutput)
+                .SingleOrDefault(e => e.ExerciseId == id);
 
             if (exercise?.Template == null)
             {
@@ -101,7 +102,8 @@
             vm.AllTestsExecuted = true;
             vm.TestResults = new List<TestResultViewModel>();
 
-            bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName, exercise.Template.MainMethodSignature, vm.TestResults);
+            bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName,
+                exercise.Template.MainMethodSignature, vm.TestResults);
 
             if (!coreTestsPassed)
             {
@@ -109,38 +111,38 @@
             }
 
             var codeToExecute = new CodeSubmission()
-                                               {
-                                                   Code = vm.Code,
-                                                   CodeTemplate = new CodeTemplate()
-                                                                      {
-                                                                          ClassName = exercise.Template.ClassName,
-                                                                          MainMethodName = exercise.Template.MainMethodName
-                                                                      },
-                                                   Tests = new List<CodeTest>()
-                                               };
+            {
+                Code = vm.Code,
+                CodeTemplate = new CodeTemplate()
+                {
+                    ClassName = exercise.Template.ClassName,
+                    MainMethodName = exercise.Template.MainMethodName
+                },
+                Tests = new List<CodeTest>()
+            };
 
             foreach (var test in exercise.Tests)
             {
                 CodeTest testToRun = new CodeTest()
-                                         {
-                                             Description = test.Description,
-                                             ExpectedOutput = new CodeTestExpectedOutput()
-                                                                  {
-                                                                      Value = test.TestOutput.Value,
-                                                                      ValueType = test.TestOutput.ValueType
-                                                                  },
-                                             Inputs = new List<CodeTestInput>()
-                                         };
+                {
+                    Description = test.Description,
+                    ExpectedOutput = new CodeTestExpectedOutput()
+                    {
+                        Value = test.TestOutput.Value,
+                        ValueType = test.TestOutput.ValueType
+                    },
+                    Inputs = new List<CodeTestInput>()
+                };
 
                 foreach (var testInput in test.TestInputs)
                 {
                     testToRun.Inputs.Add(
                         new CodeTestInput()
-                            {
-                                ArgumentName = testInput.ArgumentName,
-                                Value = testInput.Value,
-                                ValueType = testInput.ValueType
-                            });
+                        {
+                            ArgumentName = testInput.ArgumentName,
+                            Value = testInput.Value,
+                            ValueType = testInput.ValueType
+                        });
                 }
 
                 codeToExecute.Tests.Add(testToRun);
@@ -150,17 +152,18 @@
 
             if (response.IsSuccessStatusCode)
             {
-                CodeSubmission codeSubmissionExecuted = JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+                CodeSubmission codeSubmissionExecuted =
+                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
                 if (codeSubmissionExecuted.ResultSummary.HasRuntimeError)
                 {
                     vm.HasRuntimeError = codeSubmissionExecuted.ResultSummary.HasRuntimeError;
                     vm.HasCompilerErrors = false;
                     vm.RuntimeError = new RuntimeErrorViewModel()
-                                          {
-                                              Message = codeSubmissionExecuted.ResultSummary.RuntimeError.Message,
-                                              HelpLink = codeSubmissionExecuted.ResultSummary.RuntimeError.HelpLink
-                                          };
+                    {
+                        Message = codeSubmissionExecuted.ResultSummary.RuntimeError.Message,
+                        HelpLink = codeSubmissionExecuted.ResultSummary.RuntimeError.HelpLink
+                    };
 
                     return Json(vm);
                 }
@@ -176,16 +179,16 @@
                     {
                         vm.CompilerErrors.Add(
                             new CompilerErrorViewModel()
-                                {
-                                    ColEnd = compilerError.ColEnd,
-                                    ColStart = compilerError.ColEnd,
-                                    ErrorLength = compilerError.ErrorLength,
-                                    Id = compilerError.Id,
-                                    LineNumberEnd = compilerError.EndLineNumber,
-                                    LineNumberStart = compilerError.StartLineNumber,
-                                    Message = compilerError.Message,
-                                    Severity = compilerError.Severity
-                                });
+                            {
+                                ColEnd = compilerError.ColEnd,
+                                ColStart = compilerError.ColEnd,
+                                ErrorLength = compilerError.ErrorLength,
+                                Id = compilerError.Id,
+                                LineNumberEnd = compilerError.EndLineNumber,
+                                LineNumberStart = compilerError.StartLineNumber,
+                                Message = compilerError.Message,
+                                Severity = compilerError.Severity
+                            });
                     }
 
                     return Json(vm);
@@ -196,14 +199,14 @@
                 foreach (var test in codeSubmissionExecuted.Tests)
                 {
                     var testResult = new TestResultViewModel()
-                                         {
-                                             ActualOutput = test.ActualOutput,
-                                             Description = test.Description,
-                                             ExpectedOutput = test.ExpectedOutput.Value,
-                                             Inputs = new List<TestResultInputViewModel>(),
-                                             TestExecuted = test.Result.TestExecuted,
-                                             TestPassed = test.Result.TestPassed
-                                         };
+                    {
+                        ActualOutput = test.ActualOutput,
+                        Description = test.Description,
+                        ExpectedOutput = test.ExpectedOutput.Value,
+                        Inputs = new List<TestResultInputViewModel>(),
+                        TestExecuted = test.Result.TestExecuted,
+                        TestPassed = test.Result.TestPassed
+                    };
 
                     vm.TestResults.Add(testResult);
 
@@ -211,10 +214,10 @@
                     {
                         testResult.Inputs.Add(
                             new TestResultInputViewModel()
-                                {
-                                    ArgumentName = testInput.ArgumentName,
-                                    Value = testInput.Value
-                                });
+                            {
+                                ArgumentName = testInput.ArgumentName,
+                                Value = testInput.Value
+                            });
                     }
                 }
             }
@@ -230,7 +233,7 @@
         {
             var baseAddress = this._appConfig.Value.CodeExecutorApiEndpoint;
 
-            var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
+            var httpClient = new HttpClient {BaseAddress = new Uri(baseAddress)};
 
             var accessToken = await this.GetCodeExecutorAccessTokenAsync();
 
@@ -247,7 +250,7 @@
             }
             catch (Exception e)
             {
-                Log.Logger.Fatal(e, @"Failed to post code to code execution service path: {@path}", path);
+                Log.Logger.Fatal(e, @"Failed to post code to code execution service path: {@path} / base address: {@baseAddress}", path, baseAddress);
                 throw;
             }
         }
@@ -264,22 +267,23 @@
             return accessToken;
         }
 
-        private static bool RunCoreTests(string code, string className, string mainMethodName, string mainMethodSignature, List<TestResultViewModel> testResults)
+        private static bool RunCoreTests(string code, string className, string mainMethodName,
+            string mainMethodSignature, List<TestResultViewModel> testResults)
         {
             bool coreTestsPassed = true;
 
             // Check code has a public class matching expected
             string classPattern = $"public\\s*class\\s*{className}(\\n*|\\s*){{";
             var containsPublicClass = new TestResultViewModel()
-                                          {
-                                              Description =
-                                                  $"Code contains a Public Class named '{className}'",
-                                              ExpectedOutput = true,
-                                              ActualOutput = true,
-                                              TestPassed = true,
-                                              TestExecuted = true,
-                                              Inputs = new List<TestResultInputViewModel>()
-                                          };
+            {
+                Description =
+                    $"Code contains a Public Class named '{className}'",
+                ExpectedOutput = true,
+                ActualOutput = true,
+                TestPassed = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
 
             if (!Regex.Match(code, classPattern).Success)
             {
@@ -292,15 +296,15 @@
             string constructorPattern = $"(private|internal|protected|\\s*)\\s*{className}\\s*\\(";
             string publicConstructorPattern = $"public\\s*{className}\\s*\\(";
             var doesNotConatainPublicClassConstructor = new TestResultViewModel()
-                                                             {
-                                                                 Description =
-                                                                     $"Code does not contain a Internal, Private or Protected Class Constructor '{className}'.",
-                                                                 ExpectedOutput = true,
-                                                                 ActualOutput = true,
-                                                                 TestPassed = true,
-                                                                 TestExecuted = true,
-                                                                 Inputs = new List<TestResultInputViewModel>()
-                                                             };
+            {
+                Description =
+                    $"Code does not contain a Internal, Private or Protected Class Constructor '{className}'.",
+                ExpectedOutput = true,
+                ActualOutput = true,
+                TestPassed = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
 
             bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
             if (Regex.Match(code, constructorPattern).Success && !publicConstructorFound)
@@ -312,15 +316,15 @@
 
             // If code has public constructor check it does not take any arguments
             var publicClassConstructorTakesNoArguments = new TestResultViewModel()
-                                                             {
-                                                                 Description =
-                                                                     $"Public Constructor in Class '{className}' takes no arguments.",
-                                                                 ExpectedOutput = true,
-                                                                 ActualOutput = true,
-                                                                 TestPassed = true,
-                                                                 TestExecuted = true,
-                                                                 Inputs = new List<TestResultInputViewModel>()
-                                                             };
+            {
+                Description =
+                    $"Public Constructor in Class '{className}' takes no arguments.",
+                ExpectedOutput = true,
+                ActualOutput = true,
+                TestPassed = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
 
             if (publicConstructorFound)
             {
@@ -336,19 +340,20 @@
 
             // Check code has main method
             string mainMethodSignaturePattern = mainMethodSignature.Replace(" ", "\\s*")
-                                                                   .Replace("(", "\\(")
-                                                                   .Replace(")", "\\)")
-                                                                   .Replace(",", "\\s*,");
+                .Replace("(", "\\(")
+                .Replace(")", "\\)")
+                .Replace(",", "\\s*,");
 
             var containsMainMethod = new TestResultViewModel()
-                                         {
-                                             Description = $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
-                                             ExpectedOutput = true,
-                                             ActualOutput = true,
-                                             TestPassed = true,
-                                             TestExecuted = true,
-                                             Inputs = new List<TestResultInputViewModel>()
-                                         };
+            {
+                Description =
+                    $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
+                ExpectedOutput = true,
+                ActualOutput = true,
+                TestPassed = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
 
             if (!Regex.Match(code, mainMethodSignaturePattern).Success)
             {
@@ -358,11 +363,11 @@
             }
 
             testResults.AddRange(new List<TestResultViewModel>()
-                                     {
-                                         containsPublicClass,
-                                         doesNotConatainPublicClassConstructor,
-                                         containsMainMethod
-                                     });
+            {
+                containsPublicClass,
+                doesNotConatainPublicClassConstructor,
+                containsMainMethod
+            });
 
             if (publicConstructorFound)
             {
