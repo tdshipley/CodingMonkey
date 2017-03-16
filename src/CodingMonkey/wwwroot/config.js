@@ -43,6 +43,9 @@ System.config({
     "core-js": "npm:core-js@1.2.7",
     "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "npm:font-awesome@4.7.0",
+    "jquery": "npm:jquery@3.1.1",
+    "jquery-validation": "npm:jquery-validation@1.16.0",
+    "jquery-validation-unobtrusive": "npm:jquery-validation-unobtrusive@3.2.6",
     "text": "github:systemjs/plugin-text@0.0.3",
     "toastr": "github:CodeSeven/toastr@2.1.3",
     "github:CodeSeven/toastr@2.1.3": {
@@ -224,6 +227,14 @@ System.config({
     },
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
+    },
+    "npm:jquery-validation-unobtrusive@3.2.6": {
+      "jquery": "npm:jquery@3.1.1",
+      "jquery-validation": "npm:jquery-validation@1.16.0"
+    },
+    "npm:jquery-validation@1.16.0": {
+      "jquery": "npm:jquery@3.1.1",
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:path-browserify@0.0.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
