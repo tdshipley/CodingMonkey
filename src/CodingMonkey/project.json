@@ -93,8 +93,7 @@
   },
   "scripts": {
     "prepublish": [ "npm install", "bower install", "jspm install -y", "gulp prepare-release", "gulp export" ],
-    "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ],
-    "watch": [ "gulp watch" ]
+    "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
   },
   "userSecretsId": "codingmonkey-6df5fca9-b862-4931-8867-c46d52bbed68",
   "version": "1.0.1-*"
