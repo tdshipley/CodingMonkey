@@ -48,38 +48,51 @@
 
             var response = await PostRequestToCodeExecutorAsync("api/compile", codeToSubmit);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                CodeSubmission codeSubmissionCompiled =
-                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
-
-                vm.HasCompilerErrors = codeSubmissionCompiled.ResultSummary.HasCompilerErrors;
-
-                if (!vm.HasCompilerErrors)
+                if (response.IsSuccessStatusCode)
                 {
-                    return Json(vm);
-                }
+                    CodeSubmission codeSubmissionCompiled =
+                        JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
-                vm.CompilerErrors = new List<CompilerErrorViewModel>();
+                    vm.HasCompilerErrors = codeSubmissionCompiled.ResultSummary.HasCompilerErrors;
 
-                foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
-                {
-                    vm.CompilerErrors.Add(new CompilerErrorViewModel()
+                    if (!vm.HasCompilerErrors)
                     {
-                        ColEnd = compilerError.ColEnd,
-                        ColStart = compilerError.ColStart,
-                        ErrorLength = compilerError.ErrorLength,
-                        Id = compilerError.Id,
-                        LineNumberEnd = compilerError.EndLineNumber,
-                        LineNumberStart = compilerError.StartLineNumber,
-                        Message = compilerError.Message,
-                        Severity = compilerError.Severity
-                    });
+                        return Json(vm);
+                    }
+
+                    vm.CompilerErrors = new List<CompilerErrorViewModel>();
+
+                    foreach (var compilerError in codeSubmissionCompiled.ResultSummary.CompilerErrors)
+                    {
+                        vm.CompilerErrors.Add(new CompilerErrorViewModel()
+                        {
+                            ColEnd = compilerError.ColEnd,
+                            ColStart = compilerError.ColStart,
+                            ErrorLength = compilerError.ErrorLength,
+                            Id = compilerError.Id,
+                            LineNumberEnd = compilerError.EndLineNumber,
+                            LineNumberStart = compilerError.StartLineNumber,
+                            Message = compilerError.Message,
+                            Severity = compilerError.Severity
+                        });
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to code execution service");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return Json(string.Empty);
+                Log.Fatal(ex, "Failed to post to Code Execution service with HTTP code {httpCode}", response.StatusCode);
+                vm.HasRuntimeError = true;
+                vm.RuntimeError = new RuntimeErrorViewModel()
+                {
+                    Message = "Coding Monkey failed to run code. This issue has been logged we will fix it soon sorry.",
+                    HelpLink = string.Empty
+                };
             }
 
             return Json(vm);
@@ -96,6 +109,7 @@
 
             if (exercise?.Template == null)
             {
+                Log.Fatal("Exercise with ID: {0} has no template!", exercise.ExerciseId);
                 return Json(string.Empty);
             }
 
@@ -150,80 +164,94 @@
 
             var response = await PostRequestToCodeExecutorAsync("api/Execution", codeToExecute);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                CodeSubmission codeSubmissionExecuted =
-                    JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
 
-                if (codeSubmissionExecuted.ResultSummary.HasRuntimeError)
+                if (response.IsSuccessStatusCode)
                 {
-                    vm.HasRuntimeError = codeSubmissionExecuted.ResultSummary.HasRuntimeError;
-                    vm.HasCompilerErrors = false;
-                    vm.RuntimeError = new RuntimeErrorViewModel()
+                    CodeSubmission codeSubmissionExecuted =
+                        JsonConvert.DeserializeObject<CodeSubmission>(response.Content.ReadAsStringAsync().Result);
+
+                    if (codeSubmissionExecuted.ResultSummary.HasRuntimeError)
                     {
-                        Message = codeSubmissionExecuted.ResultSummary.RuntimeError.Message,
-                        HelpLink = codeSubmissionExecuted.ResultSummary.RuntimeError.HelpLink
-                    };
+                        vm.HasRuntimeError = codeSubmissionExecuted.ResultSummary.HasRuntimeError;
+                        vm.HasCompilerErrors = false;
+                        vm.RuntimeError = new RuntimeErrorViewModel()
+                        {
+                            Message = codeSubmissionExecuted.ResultSummary.RuntimeError.Message,
+                            HelpLink = codeSubmissionExecuted.ResultSummary.RuntimeError.HelpLink
+                        };
 
-                    return Json(vm);
-                }
-
-                if (codeSubmissionExecuted.ResultSummary.HasCompilerErrors)
-                {
-                    vm.HasRuntimeError = false;
-                    vm.HasCompilerErrors = codeSubmissionExecuted.ResultSummary.HasCompilerErrors;
-
-                    vm.CompilerErrors = new List<CompilerErrorViewModel>();
-
-                    foreach (var compilerError in codeSubmissionExecuted.ResultSummary.CompilerErrors)
-                    {
-                        vm.CompilerErrors.Add(
-                            new CompilerErrorViewModel()
-                            {
-                                ColEnd = compilerError.ColEnd,
-                                ColStart = compilerError.ColEnd,
-                                ErrorLength = compilerError.ErrorLength,
-                                Id = compilerError.Id,
-                                LineNumberEnd = compilerError.EndLineNumber,
-                                LineNumberStart = compilerError.StartLineNumber,
-                                Message = compilerError.Message,
-                                Severity = compilerError.Severity
-                            });
+                        return Json(vm);
                     }
 
-                    return Json(vm);
-                }
-
-                vm.AllTestsExecuted = codeSubmissionExecuted.ResultSummary.AllTestsExecuted;
-
-                foreach (var test in codeSubmissionExecuted.Tests)
-                {
-                    var testResult = new TestResultViewModel()
+                    if (codeSubmissionExecuted.ResultSummary.HasCompilerErrors)
                     {
-                        ActualOutput = test.ActualOutput,
-                        Description = test.Description,
-                        ExpectedOutput = test.ExpectedOutput.Value,
-                        Inputs = new List<TestResultInputViewModel>(),
-                        TestExecuted = test.Result.TestExecuted,
-                        TestPassed = test.Result.TestPassed
-                    };
+                        vm.HasRuntimeError = false;
+                        vm.HasCompilerErrors = codeSubmissionExecuted.ResultSummary.HasCompilerErrors;
 
-                    vm.TestResults.Add(testResult);
+                        vm.CompilerErrors = new List<CompilerErrorViewModel>();
 
-                    foreach (var testInput in test.Inputs)
-                    {
-                        testResult.Inputs.Add(
-                            new TestResultInputViewModel()
-                            {
-                                ArgumentName = testInput.ArgumentName,
-                                Value = testInput.Value
-                            });
+                        foreach (var compilerError in codeSubmissionExecuted.ResultSummary.CompilerErrors)
+                        {
+                            vm.CompilerErrors.Add(
+                                new CompilerErrorViewModel()
+                                {
+                                    ColEnd = compilerError.ColEnd,
+                                    ColStart = compilerError.ColEnd,
+                                    ErrorLength = compilerError.ErrorLength,
+                                    Id = compilerError.Id,
+                                    LineNumberEnd = compilerError.EndLineNumber,
+                                    LineNumberStart = compilerError.StartLineNumber,
+                                    Message = compilerError.Message,
+                                    Severity = compilerError.Severity
+                                });
+                        }
+
+                        return Json(vm);
                     }
+
+                    vm.AllTestsExecuted = codeSubmissionExecuted.ResultSummary.AllTestsExecuted;
+
+                    foreach (var test in codeSubmissionExecuted.Tests)
+                    {
+                        var testResult = new TestResultViewModel()
+                        {
+                            ActualOutput = test.ActualOutput,
+                            Description = test.Description,
+                            ExpectedOutput = test.ExpectedOutput.Value,
+                            Inputs = new List<TestResultInputViewModel>(),
+                            TestExecuted = test.Result.TestExecuted,
+                            TestPassed = test.Result.TestPassed
+                        };
+
+                        vm.TestResults.Add(testResult);
+
+                        foreach (var testInput in test.Inputs)
+                        {
+                            testResult.Inputs.Add(
+                                new TestResultInputViewModel()
+                                {
+                                    ArgumentName = testInput.ArgumentName,
+                                    Value = testInput.Value
+                                });
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to connect to code execution service");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return Json(string.Empty);
+                Log.Fatal(ex, "Failed to post to Code Execution service with HTTP code {httpCode}", response.StatusCode);
+                vm.HasRuntimeError = true;
+                vm.RuntimeError = new RuntimeErrorViewModel()
+                {
+                    Message = "Coding Monkey failed to run code. This issue has been logged we will fix it soon sorry.",
+                    HelpLink = string.Empty
+                };
             }
 
             return Json(vm);
