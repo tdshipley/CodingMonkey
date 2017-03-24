@@ -24,25 +24,8 @@ export class Editor {
         this.vm = this;
         this.markedLines = [];
         this.allTestsPassed = false;
-        
-        this.vm = {
-            exercise: {
-                id: 0,
-                name: "",
-                guidance: "",
-                categoryids: []
-            },
-            exerciseTemplate: {
-                id: 0,
-                initialCode: "",
-                className: "",
-                mainMethodName: ""
-            },
-            testResults: [],
-            processingCode: false,
-            pageLoading: true,
-            showTestResults: false
-        }
+
+        this.vm = this.createEmptyViewModel();
         
         this.exerciseId = 0;
     }
@@ -117,11 +100,7 @@ export class Editor {
         .then(response => response.json())
         .then(data => {
             this.vm.SubmittedCode = true;
-            this.vm.codeHasCompilerErrors = data.HasCompilerErrors;
-            this.vm.codeHasRuntimeError = data.HasRuntimeError;
-            this.vm.compilerErrors = data.CompilerErrors;
-            this.vm.runtimeError = data.RuntimeError;
-            this.highlightErrors(data);
+            this.processCodeCompliationResults(data);
         })
         .then(() => {
             this.executeCode();
@@ -162,7 +141,6 @@ export class Editor {
     executeCode() {
         if (this.vm.codeHasCompilerErrors === false) {
             let testsPassed = true;
-
             this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
 
             this.http.fetch('Execute/' + this.exerciseId, {
@@ -171,30 +149,7 @@ export class Editor {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    this.vm.SubmittedCode = true;
-                    this.vm.testResults = [];
-
-                    this.vm.codeHasRuntimeError = data.HasRuntimeError;
-                    this.vm.runtimeError = data.RuntimeError;
-                    this.vm.allTestsExecuted = data.AllTestsExecuted;
-
-                    if (!data.HasRuntimeError) {
-                        let testsPassed = this.processTestResults(data);
-
-                        if (testsPassed) {
-                            this.notify.success("All tests passed!");
-                            this.allTestsPassed = true;
-                        } else {
-                            this.notify.warning("Tests Failed. Review the results and try again.");
-                            this.allTestsPassed = false;
-                        }
-                    } else {
-                        this.notify.warning("There was an error running your code. Review the error and try again.");
-                        this.allTestsPassed = false;
-                    }
-
-                    this.vm.processingCode = false;
-                    this.vm.showTestResults = this.getShowTestResultsValue();
+                    this.processCodeExecutionResults(data);
                 })
                 .catch(err => {
                     this.notify.error("Failed to execute code");
@@ -213,6 +168,41 @@ export class Editor {
             !this.vm.processingCode &&
             this.vm.SubmittedCode &&
             this.vm.testResults.length > 0;
+    }
+
+    processCodeCompliationResults(data) {
+        this.vm.codeHasCompilerErrors = data.HasCompilerErrors;
+        this.vm.codeHasRuntimeError = data.HasRuntimeError;
+        this.vm.compilerErrors = data.CompilerErrors;
+        this.vm.runtimeError = data.RuntimeError;
+        this.highlightErrors(data);
+    }
+
+    processCodeExecutionResults(data) {
+        this.vm.SubmittedCode = true;
+        this.vm.testResults = [];
+
+        this.vm.codeHasRuntimeError = data.HasRuntimeError;
+        this.vm.runtimeError = data.RuntimeError;
+        this.vm.allTestsExecuted = data.AllTestsExecuted;
+
+        if (!data.HasRuntimeError) {
+            let testsPassed = this.processTestResults(data);
+
+            if (testsPassed) {
+                this.notify.success("All tests passed!");
+                this.allTestsPassed = true;
+            } else {
+                this.notify.warning("Tests Failed. Review the results and try again.");
+                this.allTestsPassed = false;
+            }
+        } else {
+            this.notify.warning("There was an error running your code. Review the error and try again.");
+            this.allTestsPassed = false;
+        }
+
+        this.vm.processingCode = false;
+        this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
     processTestResults(data) {
@@ -245,5 +235,26 @@ export class Editor {
         }
 
         return lastTestPassed;
+    }
+
+    createEmptyViewModel() {
+        return {
+            exercise: {
+                id: 0,
+                    name: "",
+                        guidance: "",
+                            categoryids: []
+            },
+            exerciseTemplate: {
+                id: 0,
+                    initialCode: "",
+                        className: "",
+                            mainMethodName: ""
+            },
+            testResults: [],
+                processingCode: false,
+                    pageLoading: true,
+                        showTestResults: false
+        }
     }
 }
