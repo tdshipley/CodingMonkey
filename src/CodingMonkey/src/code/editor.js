@@ -89,7 +89,7 @@ export class Editor {
     }
 
     submitCode() {
-        this.vm.processingCode = true;
+        this.vm.codeProcessingStatus.processing = true;
 
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
@@ -118,7 +118,7 @@ export class Editor {
                 this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
             }
 
-            this.vm.processingCode = false;
+            this.vm.codeProcessingStatus.processing = false;
         }
         else {
             this.unhighlightError();
@@ -153,7 +153,7 @@ export class Editor {
                 })
                 .catch(err => {
                     this.notify.error("Failed to execute code");
-                    this.vm.processingCode = false;
+                    this.vm.codeProcessingStatus.processing = false;
                     this.vm.testResults = [];
                     console.log(err);
                 });
@@ -165,7 +165,7 @@ export class Editor {
     getShowTestResultsValue() {
         return !this.vm.codeHasCompilerErrors &&
             !this.vm.codeHasRuntimeError &&
-            !this.vm.processingCode &&
+            !this.vm.codeProcessingStatus.processing &&
             this.vm.SubmittedCode &&
             this.vm.testResults.length > 0;
     }
@@ -201,7 +201,7 @@ export class Editor {
             this.allTestsPassed = false;
         }
 
-        this.vm.processingCode = false;
+        this.vm.codeProcessingStatus.processing = false;
         this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
@@ -252,9 +252,13 @@ export class Editor {
                             mainMethodName: ""
             },
             testResults: [],
-                processingCode: false,
-                    pageLoading: true,
-                        showTestResults: false
+            codeProcessingStatus: {
+                processing: false,
+                compiling: false,
+                executingTests: false
+            },
+            pageLoading: true,
+            showTestResults: false
         }
     }
 }
