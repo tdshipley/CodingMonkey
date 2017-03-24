@@ -3,7 +3,7 @@ import {HttpClient, json} from 'aurelia-fetch-client';
 import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
-import {StringHelpers} from './../utility-classes/string-helpers.js'
+import {StringHelpers} from './../_utility-classes/string-helpers.js'
 
 @inject(HttpClient, Router)
 export class exercises {
