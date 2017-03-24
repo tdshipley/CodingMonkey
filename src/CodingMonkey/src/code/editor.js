@@ -24,24 +24,8 @@ export class Editor {
         this.vm = this;
         this.markedLines = [];
         this.allTestsPassed = false;
-        
-        this.vm = {
-            exercise: {
-                id: 0,
-                name: "",
-                guidance: "",
-                categoryids: []
-            },
-            exerciseTemplate: {
-                id: 0,
-                initialCode: "",
-                className: "",
-                mainMethodName: ""
-            },
-            testResults: [],
-            processingCode: false,
-            pageLoading: true
-        }
+
+        this.vm = this.createEmptyViewModel();
         
         this.exerciseId = 0;
     }
@@ -105,7 +89,9 @@ export class Editor {
     }
 
     submitCode() {
-        this.vm.processingCode = true;
+        this.setCodeProcessingStatusToFalse();
+        this.vm.codeProcessingStatus.processing = true;
+        this.vm.codeProcessingStatus.compiling = true;
 
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
@@ -116,18 +102,18 @@ export class Editor {
         .then(response => response.json())
         .then(data => {
             this.vm.SubmittedCode = true;
-            this.vm.codeHasCompilerErrors = data.HasCompilerErrors;
-            this.vm.codeHasRuntimeError = data.HasRuntimeError;
-            this.vm.compilerErrors = data.CompilerErrors;
-            this.vm.runtimeError = data.RuntimeError;
-            this.highlightErrors(data);
+            this.processCodeCompliationResults(data);
         })
         .then(() => {
+            this.vm.codeProcessingStatus.compileComplete = true;
             this.executeCode();
         })
         .catch(err => {
+            this.vm.codeProcessingStatus.processing = false;
             this.notify.error("Failed to submit code to test.");
         });
+
+        this.vm.codeProcessingStatus.processing = false;
     }
 
     highlightErrors(data) {
@@ -137,8 +123,6 @@ export class Editor {
             for (let compilerError of data.CompilerErrors) {
                 this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
             }
-
-            this.vm.processingCode = false;
         }
         else {
             this.unhighlightError();
@@ -160,8 +144,9 @@ export class Editor {
 
     executeCode() {
         if (this.vm.codeHasCompilerErrors === false) {
-            let testsPassed = true;
+            this.vm.codeProcessingStatus.executingTests = true;
 
+            let testsPassed = true;
             this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
 
             this.http.fetch('Execute/' + this.exerciseId, {
@@ -170,60 +155,132 @@ export class Editor {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    this.vm.SubmittedCode = true;
-                    this.vm.testResults = [];
-
-                    this.vm.codeHasRuntimeError = data.HasRuntimeError;
-                    this.vm.runtimeError = data.RuntimeError;
-                    this.vm.allTestsExecuted = data.AllTestsExecuted;
-
-                    if (!data.HasRuntimeError) {
-                        for (let testResult of data.TestResults) {
-                            var testVM = {
-                                actualOutput: testResult.ActualOutput,
-                                description: testResult.Description,
-                                expectedOutput: testResult.ExpectedOutput,
-                                testPassed: testResult.TestPassed,
-                                testExecuted: testResult.TestExecuted,
-                                inputs: []
-                            };
-
-                            for (let testInput of testResult.Inputs) {
-                                var inputVM = {
-                                    argumentName: testInput.ArgumentName,
-                                    value: testInput.Value
-                                }
-
-                                testVM.inputs.push(inputVM);
-                            }
-
-                            if (testsPassed) {
-                                testsPassed = testVM.testPassed;
-                            }
-
-                            this.vm.testResults.push(testVM);
-                        }
-
-                        if (testsPassed) {
-                            this.notify.success("All tests passed!");
-                            this.allTestsPassed = true;
-                        } else {
-                            this.notify.warning("Tests Failed. Review the results and try again.");
-                            this.allTestsPassed = false;
-                        }
-                    } else {
-                        this.notify.warning("There was an error running your code. Review the error and try again.");
-                        this.allTestsPassed = false;
-                    }
-
-                    this.vm.processingCode = false;
+                    this.vm.codeProcessingStatus.executingTestsComplete = true;
+                    this.processCodeExecutionResults(data);
                 })
                 .catch(err => {
+                    this.vm.codeProcessingStatus.processing = false;
                     this.notify.error("Failed to execute code");
-                    this.vm.processingCode = false;
                     this.vm.testResults = [];
-                    console.log(err);
                 });
+        }
+
+        this.vm.showTestResults = this.getShowTestResultsValue();
+    }
+
+    getShowTestResultsValue() {
+        return !this.vm.codeHasCompilerErrors &&
+            !this.vm.codeHasRuntimeError &&
+            !this.vm.codeProcessingStatus.processing &&
+            this.vm.SubmittedCode &&
+            this.vm.testResults.length > 0;
+    }
+
+    processCodeCompliationResults(data) {
+        this.vm.codeHasCompilerErrors = data.HasCompilerErrors;
+        this.vm.codeHasRuntimeError = data.HasRuntimeError;
+        this.vm.compilerErrors = data.CompilerErrors;
+        this.vm.runtimeError = data.RuntimeError;
+        this.vm.codeProcessingStatus.compileSucessful = data.CompilerErrors.length === 0;
+        this.highlightErrors(data);
+    }
+
+    processCodeExecutionResults(data) {
+        this.vm.SubmittedCode = true;
+        this.vm.testResults = [];
+
+        this.vm.codeHasRuntimeError = data.HasRuntimeError;
+        this.vm.runtimeError = data.RuntimeError;
+        this.vm.allTestsExecuted = data.AllTestsExecuted;
+
+        if (!data.HasRuntimeError) {
+            this.vm.codeProcessingStatus.executeTestsSuccessful = true;
+            let testsPassed = this.processTestResults(data);
+
+            if (testsPassed) {
+                this.notify.success("All tests passed!");
+                this.allTestsPassed = true;
+            } else {
+                this.notify.warning("Tests Failed. Review the results and try again.");
+                this.allTestsPassed = false;
+            }
+        } else {
+            this.vm.codeProcessingStatus.executeTestsSuccessful = false;
+            this.notify.warning("There was an error running your code. Review the error and try again.");
+            this.allTestsPassed = false;
+        }
+        
+        this.vm.showTestResults = this.getShowTestResultsValue();
+    }
+
+    processTestResults(data) {
+        let lastTestPassed = true;
+
+        for (let testResult of data.TestResults) {
+            var testVM = {
+                actualOutput: testResult.ActualOutput,
+                description: testResult.Description,
+                expectedOutput: testResult.ExpectedOutput,
+                testPassed: testResult.TestPassed,
+                testExecuted: testResult.TestExecuted,
+                inputs: []
+            };
+
+            for (let testInput of testResult.Inputs) {
+                var inputVM = {
+                    argumentName: testInput.ArgumentName,
+                    value: testInput.Value
+                }
+
+                testVM.inputs.push(inputVM);
+            }
+
+            if (lastTestPassed) {
+                lastTestPassed = testVM.testPassed;
+            }
+
+            this.vm.testResults.push(testVM);
+        }
+
+        return lastTestPassed;
+    }
+
+    setCodeProcessingStatusToFalse() {
+        this.vm.codeProcessingStatus.processing = false;
+        this.vm.codeProcessingStatus.compiling = false;
+        this.vm.codeProcessingStatus.compileComplete = false;
+        this.vm.codeProcessingStatus.compileSucessful = false;
+        this.vm.codeProcessingStatus.executingTests = false;
+        this.vm.codeProcessingStatus.executingTestsComplete = false;
+        this.vm.codeProcessingStatus.executeTestsSuccessful = false;
+    }
+
+    createEmptyViewModel() {
+        return {
+            exercise: {
+                id: 0,
+                    name: "",
+                        guidance: "",
+                            categoryids: []
+            },
+            exerciseTemplate: {
+                id: 0,
+                    initialCode: "",
+                        className: "",
+                            mainMethodName: ""
+            },
+            testResults: [],
+            codeProcessingStatus: {
+                processing: false,
+                compiling: false,
+                compileComplete: false,
+                compileSucessful: false,
+                executingTests: false,
+                executingTestsComplete: false,
+                executeTestsSuccessful: false
+            },
+            pageLoading: true,
+            showTestResults: false
         }
     }
 }
