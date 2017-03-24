@@ -32,6 +32,19 @@
     </div>
     <div class="row top-buffer">
         <div class="col-lg-7 col-lg-offset-2">
+            <div if.bind="vm.SubmittedCode">
+                <h2>Code Submission Status</h2>
+                <h3 if.two-way="vm.codeProcessingStatus.compiling">Compiling Code...
+                    <i if.two-way="!vm.codeProcessingStatus.compileComplete" class="fa fa-spinner fa-spin"></i>
+                    <i if.two-way="vm.codeProcessingStatus.compileSucessful" class="fa fa-check" aria-hidden="true"></i>
+                    <i if.two-way="!vm.codeProcessingStatus.compileSucessful" class="fa fa-times" aria-hidden="true"></i>
+                </h3>
+                <h3 if.two-way="vm.codeProcessingStatus.executingTests">Running Tests...
+                    <i if.two-way="!vm.codeProcessingStatus.executingTestsComplete" class="fa fa-spinner fa-spin"></i>
+                    <i if.two-way="vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-check" aria-hidden="true"></i>
+                    <i if.two-way="!vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-times" aria-hidden="true"></i>
+                </h3> 
+            </div>
             <div if.bind="vm.codeHasCompilerErrors && vm.SubmittedCode">
                 <h2>Compiler Errors</h2>
                 <table class="table table-striped">

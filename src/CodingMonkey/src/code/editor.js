@@ -89,7 +89,9 @@ export class Editor {
     }
 
     submitCode() {
+        this.setCodeProcessingStatusToFalse();
         this.vm.codeProcessingStatus.processing = true;
+        this.vm.codeProcessingStatus.compiling = true;
 
         this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
         
@@ -103,11 +105,15 @@ export class Editor {
             this.processCodeCompliationResults(data);
         })
         .then(() => {
+            this.vm.codeProcessingStatus.compileComplete = true;
             this.executeCode();
         })
         .catch(err => {
+            this.vm.codeProcessingStatus.processing = false;
             this.notify.error("Failed to submit code to test.");
         });
+
+        this.vm.codeProcessingStatus.processing = false;
     }
 
     highlightErrors(data) {
@@ -117,8 +123,6 @@ export class Editor {
             for (let compilerError of data.CompilerErrors) {
                 this.highlightError(compilerError.LineNumberStart, compilerError.LineNumberEnd, 0, compilerError.ColEnd);
             }
-
-            this.vm.codeProcessingStatus.processing = false;
         }
         else {
             this.unhighlightError();
@@ -140,6 +144,8 @@ export class Editor {
 
     executeCode() {
         if (this.vm.codeHasCompilerErrors === false) {
+            this.vm.codeProcessingStatus.executingTests = true;
+
             let testsPassed = true;
             this.http.baseUrl = this.baseUrl + '/api/CodeExecution/';
 
@@ -149,17 +155,17 @@ export class Editor {
                 })
                 .then(response => response.json())
                 .then(data => {
+                    this.vm.codeProcessingStatus.executingTestsComplete = true;
                     this.processCodeExecutionResults(data);
                 })
                 .catch(err => {
-                    this.notify.error("Failed to execute code");
                     this.vm.codeProcessingStatus.processing = false;
+                    this.notify.error("Failed to execute code");
                     this.vm.testResults = [];
-                    console.log(err);
                 });
-        } else {
-            this.vm.showTestResults = this.getShowTestResultsValue();
         }
+
+        this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
     getShowTestResultsValue() {
@@ -175,6 +181,7 @@ export class Editor {
         this.vm.codeHasRuntimeError = data.HasRuntimeError;
         this.vm.compilerErrors = data.CompilerErrors;
         this.vm.runtimeError = data.RuntimeError;
+        this.vm.codeProcessingStatus.compileSucessful = data.CompilerErrors.length === 0;
         this.highlightErrors(data);
     }
 
@@ -187,6 +194,7 @@ export class Editor {
         this.vm.allTestsExecuted = data.AllTestsExecuted;
 
         if (!data.HasRuntimeError) {
+            this.vm.codeProcessingStatus.executeTestsSuccessful = true;
             let testsPassed = this.processTestResults(data);
 
             if (testsPassed) {
@@ -197,11 +205,11 @@ export class Editor {
                 this.allTestsPassed = false;
             }
         } else {
+            this.vm.codeProcessingStatus.executeTestsSuccessful = false;
             this.notify.warning("There was an error running your code. Review the error and try again.");
             this.allTestsPassed = false;
         }
-
-        this.vm.codeProcessingStatus.processing = false;
+        
         this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
@@ -237,6 +245,16 @@ export class Editor {
         return lastTestPassed;
     }
 
+    setCodeProcessingStatusToFalse() {
+        this.vm.codeProcessingStatus.processing = false;
+        this.vm.codeProcessingStatus.compiling = false;
+        this.vm.codeProcessingStatus.compileComplete = false;
+        this.vm.codeProcessingStatus.compileSucessful = false;
+        this.vm.codeProcessingStatus.executingTests = false;
+        this.vm.codeProcessingStatus.executingTestsComplete = false;
+        this.vm.codeProcessingStatus.executeTestsSuccessful = false;
+    }
+
     createEmptyViewModel() {
         return {
             exercise: {
@@ -255,7 +273,11 @@ export class Editor {
             codeProcessingStatus: {
                 processing: false,
                 compiling: false,
-                executingTests: false
+                compileComplete: false,
+                compileSucessful: false,
+                executingTests: false,
+                executingTestsComplete: false,
+                executeTestsSuccessful: false
             },
             pageLoading: true,
             showTestResults: false
