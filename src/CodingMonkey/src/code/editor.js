@@ -40,7 +40,8 @@ export class Editor {
             },
             testResults: [],
             processingCode: false,
-            pageLoading: true
+            pageLoading: true,
+            showTestResults: false
         }
         
         this.exerciseId = 0;
@@ -178,31 +179,7 @@ export class Editor {
                     this.vm.allTestsExecuted = data.AllTestsExecuted;
 
                     if (!data.HasRuntimeError) {
-                        for (let testResult of data.TestResults) {
-                            var testVM = {
-                                actualOutput: testResult.ActualOutput,
-                                description: testResult.Description,
-                                expectedOutput: testResult.ExpectedOutput,
-                                testPassed: testResult.TestPassed,
-                                testExecuted: testResult.TestExecuted,
-                                inputs: []
-                            };
-
-                            for (let testInput of testResult.Inputs) {
-                                var inputVM = {
-                                    argumentName: testInput.ArgumentName,
-                                    value: testInput.Value
-                                }
-
-                                testVM.inputs.push(inputVM);
-                            }
-
-                            if (testsPassed) {
-                                testsPassed = testVM.testPassed;
-                            }
-
-                            this.vm.testResults.push(testVM);
-                        }
+                        let testsPassed = this.processTestResults(data);
 
                         if (testsPassed) {
                             this.notify.success("All tests passed!");
@@ -217,6 +194,7 @@ export class Editor {
                     }
 
                     this.vm.processingCode = false;
+                    this.vm.showTestResults = this.getShowTestResultsValue();
                 })
                 .catch(err => {
                     this.notify.error("Failed to execute code");
@@ -224,6 +202,48 @@ export class Editor {
                     this.vm.testResults = [];
                     console.log(err);
                 });
+        } else {
+            this.vm.showTestResults = this.getShowTestResultsValue();
         }
+    }
+
+    getShowTestResultsValue() {
+        return !this.vm.codeHasCompilerErrors &&
+            !this.vm.codeHasRuntimeError &&
+            !this.vm.processingCode &&
+            this.vm.SubmittedCode &&
+            this.vm.testResults.length > 0;
+    }
+
+    processTestResults(data) {
+        let lastTestPassed = true;
+
+        for (let testResult of data.TestResults) {
+            var testVM = {
+                actualOutput: testResult.ActualOutput,
+                description: testResult.Description,
+                expectedOutput: testResult.ExpectedOutput,
+                testPassed: testResult.TestPassed,
+                testExecuted: testResult.TestExecuted,
+                inputs: []
+            };
+
+            for (let testInput of testResult.Inputs) {
+                var inputVM = {
+                    argumentName: testInput.ArgumentName,
+                    value: testInput.Value
+                }
+
+                testVM.inputs.push(inputVM);
+            }
+
+            if (lastTestPassed) {
+                lastTestPassed = testVM.testPassed;
+            }
+
+            this.vm.testResults.push(testVM);
+        }
+
+        return lastTestPassed;
     }
 }

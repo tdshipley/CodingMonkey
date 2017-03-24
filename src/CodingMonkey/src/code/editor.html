@@ -2,7 +2,7 @@
     <div class="row top-buffer">
         <div class="col-lg-7 col-lg-offset-2">
             <h1 id="exerciseHeading">${heading}</h1>
-            <div if.bind="allTestsPassed">
+            <div if.two-way="allTestsPassed">
                 <i class="fa fa-check-square-o exercise-complete" aria-hidden="true">Exercise Complete</i>
             </div>
         </div>
@@ -68,7 +68,7 @@
                     </tbody>
                 </table>
             </div>
-            <div if.bind="!vm.codeHasCompilerErrors && !vm.codeHasRuntimeError && !vm.processingCode && vm.SubmittedCode && vm.testResults.length > 0">
+            <div if.two-way="vm.showTestResults">
                 <h2>Test Results</h2>
                 <p if.bind="!vm.allTestsExecuted"><i>Some tests haven't been run because there were failures in the core tests. Review and fix the failed tests to run the complete test suite.</i></p>
                 <table class="table table-striped">
