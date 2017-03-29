@@ -29,7 +29,7 @@
                 // Loading...
             </div>
         </div>
-        <div class="col-lg-5">
+        <div class="col-lg-5" style="overflow: scroll; max-height:400px">
             <div if.bind="!vm.SubmittedCode">
                 <h3 class="top-buffer">Submit your Code to See the Results Here</h3>
             </div>
@@ -38,7 +38,7 @@
                     <!-- Default panel contents -->
                     <div class="panel-heading"><h4>Code Submission Status</h4></div>
                     <!-- Table -->
-                    <table class="table" style="overflow: scroll">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>
@@ -71,7 +71,7 @@
                     <!-- Default panel contents -->
                     <div class="panel-heading"><h4>Compiler Errors</h4></div>
                     <!-- Table -->
-                    <table class="table table-striped" style="overflow: scroll">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -94,7 +94,7 @@
                     <!-- Default panel contents -->
                     <div class="panel-heading"><h4>Runtime Error</h4></div>
                     <!-- Table -->
-                    <table class="table" style="overflow: scroll">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>Error Message</th>
@@ -118,7 +118,7 @@
                         <p if.bind="!vm.allTestsExecuted"><i>Some tests haven't been run because there were failures in the core tests. Review and fix the failed tests to run the complete test suite.</i></p>
                     </div>
                     <!-- Table -->
-                    <table class="table table-striped" style="overflow: scroll">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Test Passed</th>
