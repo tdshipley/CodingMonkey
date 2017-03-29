@@ -2,6 +2,7 @@
 import {HttpClient, json} from 'aurelia-fetch-client';
 import 'fetch';
 import 'ace';
+import "ace/ext-language_tools";
 import toastr from 'toastr';
 
 @inject(HttpClient)
@@ -41,9 +42,16 @@ export class Editor {
         ace.config.set('basePath', base);
 
         //Ace settings
+        ace.require("ace/ext/language_tools");
         this.codeEditor = ace.edit("aceEditor");
+        this.codeEditor.$blockScrolling = Infinity;
         this.codeEditor.setTheme("ace/theme/dreamweaver");
         this.codeEditor.getSession().setMode("ace/mode/csharp");
+        this.codeEditor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
         
         this.getExerciseTemplate(this.exerciseId);
     }
