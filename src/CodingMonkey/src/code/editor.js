@@ -155,16 +155,17 @@ export class Editor {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    this.vm.codeProcessingStatus.executingTestsComplete = true;
                     this.processCodeExecutionResults(data);
                 })
                 .catch(err => {
                     this.vm.codeProcessingStatus.processing = false;
+                    this.vm.codeProcessingStatus.executingTests = false;
                     this.notify.error("Failed to execute code");
                     this.vm.testResults = [];
                 });
         }
 
+        this.vm.codeProcessingStatus.executingTestsComplete = true;
         this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
@@ -181,6 +182,7 @@ export class Editor {
         this.vm.codeHasRuntimeError = data.HasRuntimeError;
         this.vm.compilerErrors = data.CompilerErrors;
         this.vm.runtimeError = data.RuntimeError;
+        this.vm.codeProcessingStatus.compileSucessful = false;
         this.vm.codeProcessingStatus.compileSucessful = data.CompilerErrors.length === 0;
         this.highlightErrors(data);
     }
@@ -209,7 +211,8 @@ export class Editor {
             this.notify.warning("There was an error running your code. Review the error and try again.");
             this.allTestsPassed = false;
         }
-        
+
+        this.vm.codeProcessingStatus.executingTestsComplete = true;
         this.vm.showTestResults = this.getShowTestResultsValue();
     }
 
