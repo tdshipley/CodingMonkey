@@ -1,13 +1,21 @@
 ﻿<template>
     <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-10 col-lg-offset-1">
             <h1 id="exerciseHeading">${heading}</h1>
             <div if.two-way="allTestsPassed && vm.showTestResults">
                 <i class="fa fa-check-square-o exercise-complete" aria-hidden="true">Exercise Complete</i>
             </div>
         </div>
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-10 col-lg-offset-1">
             <p class="exercise-guidance">${vm.exercise.guidance}</p>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <button type="button" disabled.bind="vm.codeProcessingStatus.processing" class="submit-code-btn btn btn-primary" click.trigger="submitCode()">
+                Submit Exercise
+                <i if.bind="vm.codeProcessingStatus.processing" class="fa fa-cog fa-spin fa-2x"></i>
+            </button>
         </div>
     </div>
     <div class="row">
@@ -15,25 +23,18 @@
             <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-7 col-lg-offset-2">
+    <div class="row top-buffer">
+        <div class="col-lg-5 col-lg-offset-1">
             <div id="aceEditor" value.bind="code" disabled.bind="vm.codeProcessingStatus.processing">
                 // Loading...
             </div>
         </div>
-    </div>
-    <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
-            <button type="button" disabled.bind="vm.codeProcessingStatus.processing" class="submit-code-btn btn btn-primary pull-right" click.trigger="submitCode()">
-                Submit Exercise
-                <i if.bind="vm.codeProcessingStatus.processing" class="fa fa-cog fa-spin fa-2x"></i>
-            </button>
-        </div>
-    </div>
-    <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-5" style="overflow: scroll; max-height:400px">
+            <div if.bind="!vm.SubmittedCode">
+                <h3 class="top-buffer">Submit your Code to See the Results Here</h3>
+            </div>
             <div if.bind="vm.SubmittedCode">
-                <div class="panel panel-default">
+                <div class="panel panel-default top-buffer">
                     <!-- Default panel contents -->
                     <div class="panel-heading"><h4>Code Submission Status</h4></div>
                     <!-- Table -->

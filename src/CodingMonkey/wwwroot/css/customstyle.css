@@ -78,8 +78,9 @@
 
 /* ### Ace Editor ### */
 #aceEditor {
-    min-height: 300px;
+    min-height: 400px;
     border: #DADDDF solid 1px;
     font-size: 14px;
     margin-top: 10px;
+    height: auto !important;
 }
