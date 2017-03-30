@@ -53,13 +53,13 @@
                             <tr>
                                 <td>
                                     <i if.two-way="!vm.codeProcessingStatus.compileComplete" class="fa fa-spinner fa-spin"></i>
-                                    <i if.two-way="vm.codeProcessingStatus.compileSucessful" class="fa fa-check" aria-hidden="true" style="color:green"></i>
-                                    <i if.two-way="!vm.codeProcessingStatus.compileSucessful" class="fa fa-times" aria-hidden="true" style="color:red"></i>
+                                    <i if.two-way="vm.codeProcessingStatus.compileSucessful && vm.codeProcessingStatus.compileComplete" class="fa fa-check" aria-hidden="true" style="color:green"></i>
+                                    <i if.two-way="!vm.codeProcessingStatus.compileSucessful && vm.codeProcessingStatus.compileComplete" class="fa fa-times" aria-hidden="true" style="color:red"></i>
                                 </td>
                                 <td>
                                     <i if.two-way="!vm.codeProcessingStatus.executingTestsComplete" class="fa fa-spinner fa-spin"></i>
-                                    <i if.two-way="vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-check" aria-hidden="true" style="color:green"></i>
-                                    <i if.two-way="!vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-times" aria-hidden="true" style="color:red"></i>
+                                    <i if.two-way="vm.codeProcessingStatus.executeTestsSuccessful && vm.codeProcessingStatus.executingTestsComplete" class="fa fa-check" aria-hidden="true" style="color:green"></i>
+                                    <i if.two-way="!vm.codeProcessingStatus.executeTestsSuccessful && vm.codeProcessingStatus.executingTestsComplete" class="fa fa-times" aria-hidden="true" style="color:red"></i>
                                 </td>
                             </tr>
                         </tbody>
