@@ -114,10 +114,11 @@
             }
 
             vm.AllTestsExecuted = true;
+            bool coreTestsPassed = false;
             vm.TestResults = new List<TestResultViewModel>();
 
-            bool coreTestsPassed = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName,
-                exercise.Template.MainMethodSignature, vm.TestResults);
+            vm.TestResults = RunCoreTests(vm.Code, exercise.Template.ClassName, exercise.Template.MainMethodName,
+                exercise.Template.MainMethodSignature, vm.TestResults, ref coreTestsPassed);
 
             if (!coreTestsPassed)
             {
@@ -295,78 +296,44 @@
             return accessToken;
         }
 
-        private static bool RunCoreTests(string code, string className, string mainMethodName,
-            string mainMethodSignature, List<TestResultViewModel> testResults)
+        private static List<TestResultViewModel> RunCoreTests(string code, string className, string mainMethodName,
+            string mainMethodSignature, List<TestResultViewModel> testResults, ref bool coreTestsPassed)
         {
-            bool coreTestsPassed = true;
+            bool containsPublicClassTestPassed = false;
+            bool doesNotContainPrivateClassConstructorTestPassed = false;
+            bool publicClassConstructorTakesNoArgumentsTestPassed = false;
+            bool containsMainMethodTestPassed = false;
 
-            // Check code has a public class matching expected
-            string classPattern = $"public\\s*class\\s*{className}(\\n*|\\s*){{";
-            var containsPublicClass = new TestResultViewModel()
-            {
-                Description =
-                    $"Code contains a Public Class named '{className}'",
-                ExpectedOutput = true,
-                ActualOutput = true,
-                TestPassed = true,
-                TestExecuted = true,
-                Inputs = new List<TestResultInputViewModel>()
-            };
-
-            if (!Regex.Match(code, classPattern).Success)
-            {
-                coreTestsPassed = false;
-                containsPublicClass.TestPassed = false;
-                containsPublicClass.ActualOutput = false;
-            }
-
+            // Check code contains public class
+            TestResultViewModel containsPublicClass = RunCodeContainsPublicClassCoreTest(code, className, ref containsPublicClassTestPassed);
             // Check code does not have private, protected, internal constructor
-            string constructorPattern = $"(private|internal|protected|\\s*)\\s*{className}\\s*\\(";
-            string publicConstructorPattern = $"public\\s*{className}\\s*\\(";
-            var doesNotConatainPublicClassConstructor = new TestResultViewModel()
-            {
-                Description =
-                    $"Code does not contain a Internal, Private or Protected Class Constructor '{className}'.",
-                ExpectedOutput = true,
-                ActualOutput = true,
-                TestPassed = true,
-                TestExecuted = true,
-                Inputs = new List<TestResultInputViewModel>()
-            };
-
-            bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
-            if (Regex.Match(code, constructorPattern).Success && !publicConstructorFound)
-            {
-                coreTestsPassed = false;
-                doesNotConatainPublicClassConstructor.TestPassed = false;
-                doesNotConatainPublicClassConstructor.ActualOutput = false;
-            }
-
-            // If code has public constructor check it does not take any arguments
-            var publicClassConstructorTakesNoArguments = new TestResultViewModel()
-            {
-                Description =
-                    $"Public Constructor in Class '{className}' takes no arguments.",
-                ExpectedOutput = true,
-                ActualOutput = true,
-                TestPassed = true,
-                TestExecuted = true,
-                Inputs = new List<TestResultInputViewModel>()
-            };
-
-            if (publicConstructorFound)
-            {
-                string publicConstructorWithNoArgumentsPattern = publicConstructorPattern + "\\s*\\)";
-
-                if (!Regex.Match(code, publicConstructorWithNoArgumentsPattern).Success)
-                {
-                    coreTestsPassed = false;
-                    publicClassConstructorTakesNoArguments.TestPassed = false;
-                    publicClassConstructorTakesNoArguments.ActualOutput = false;
-                }
-            }
-
+            TestResultViewModel doesNotContainPrivateClassConstructor = RunCodeDoesNotHaveProtectedInternalPrivateClassConstructorTest(code, className, ref doesNotContainPrivateClassConstructorTestPassed);
+            // Check code has public constructor check it does not take any arguments
+            TestResultViewModel publicClassConstructorTakesNoArguments = RunCodeDoesNotHavePublicClassConstructorArgumentsTest(code, className, ref publicClassConstructorTakesNoArgumentsTestPassed);
             // Check code has main method
+            TestResultViewModel containsMainMethod = RunCodeContainsMainMethodTest(code, className, mainMethodName, mainMethodSignature, ref containsMainMethodTestPassed);
+
+            testResults = new List<TestResultViewModel>();
+            testResults.AddRange(new List<TestResultViewModel>()
+            {
+                containsPublicClass,
+                doesNotContainPrivateClassConstructor,
+                containsMainMethod,
+                publicClassConstructorTakesNoArguments
+            });
+
+            testResults = testResults.Where(x => !x.TestPassed).ToList();
+
+            coreTestsPassed = containsPublicClassTestPassed &&
+                doesNotContainPrivateClassConstructorTestPassed &&
+                publicClassConstructorTakesNoArgumentsTestPassed &&
+                containsMainMethodTestPassed;
+
+            return testResults;
+        }
+
+        private static TestResultViewModel RunCodeContainsMainMethodTest(string code, string className, string mainMethodName, string mainMethodSignature, ref bool containsPublicClassTestPassed)
+        {
             string mainMethodSignaturePattern = mainMethodSignature.Replace(" ", "\\s*")
                 .Replace("(", "\\(")
                 .Replace(")", "\\)")
@@ -377,32 +344,123 @@
                 Description =
                     $"Class '{className}' has method named '{mainMethodName}' with signature of '{mainMethodSignature}'",
                 ExpectedOutput = true,
-                ActualOutput = true,
-                TestPassed = true,
                 TestExecuted = true,
                 Inputs = new List<TestResultInputViewModel>()
             };
 
             if (!Regex.Match(code, mainMethodSignaturePattern).Success)
             {
-                coreTestsPassed = false;
+                containsPublicClassTestPassed = false;
                 containsMainMethod.TestPassed = false;
                 containsMainMethod.ActualOutput = false;
             }
-
-            testResults.AddRange(new List<TestResultViewModel>()
+            else
             {
-                containsPublicClass,
-                doesNotConatainPublicClassConstructor,
-                containsMainMethod
-            });
-
-            if (publicConstructorFound)
-            {
-                testResults.Add(publicClassConstructorTakesNoArguments);
+                containsPublicClassTestPassed = true;
+                containsMainMethod.TestPassed = true;
+                containsMainMethod.ActualOutput = true;
             }
 
-            return coreTestsPassed;
+            return containsMainMethod;
+        }
+
+        private static TestResultViewModel RunCodeDoesNotHavePublicClassConstructorArgumentsTest(string code, string className, ref bool doesNotContainPublicConstructorArguments)
+        {
+            string publicConstructorPattern = $"public\\s*{className}\\s*\\(";
+            var publicClassConstructorTakesNoArguments = new TestResultViewModel()
+            {
+                Description =
+                    $"Class Public Constructor in Class '{className}' takes no arguments.",
+                ExpectedOutput = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
+
+            bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
+            if (publicConstructorFound)
+            {
+                string publicConstructorWithNoArgumentsPattern = publicConstructorPattern + "\\s*\\)";
+
+                if (!Regex.Match(code, publicConstructorWithNoArgumentsPattern).Success)
+                {
+                    doesNotContainPublicConstructorArguments = false;
+                    publicClassConstructorTakesNoArguments.TestPassed = false;
+                    publicClassConstructorTakesNoArguments.ActualOutput = false;
+                }
+                else
+                {
+                    doesNotContainPublicConstructorArguments = true;
+                    publicClassConstructorTakesNoArguments.TestPassed = true;
+                    publicClassConstructorTakesNoArguments.ActualOutput = true;
+                }
+            }
+            else
+            {
+                doesNotContainPublicConstructorArguments = true;
+                publicClassConstructorTakesNoArguments.TestPassed = true;
+                publicClassConstructorTakesNoArguments.ActualOutput = true;
+            }
+
+            return publicClassConstructorTakesNoArguments;
+        }
+
+        private static TestResultViewModel RunCodeDoesNotHaveProtectedInternalPrivateClassConstructorTest(string code, string className, ref bool testsPassed)
+        {
+            string constructorPattern = $"(private|internal|protected|\\s*)\\s*{className}\\s*\\(";
+            string publicConstructorPattern = $"public\\s*{className}\\s*\\(";
+            var doesNotContainPrivateClassConstructor = new TestResultViewModel()
+            {
+                Description =
+                    $"Code does not contain a Internal, Private or Protected Class Constructor '{className}'.",
+                ExpectedOutput = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
+
+            bool publicConstructorFound = Regex.Match(code, publicConstructorPattern).Success;
+            if (Regex.Match(code, constructorPattern).Success && !publicConstructorFound)
+            {
+                testsPassed = false;
+                doesNotContainPrivateClassConstructor.TestPassed = false;
+                doesNotContainPrivateClassConstructor.ActualOutput = false;
+            }
+            else
+            {
+                testsPassed = true;
+                doesNotContainPrivateClassConstructor.TestPassed = true;
+                doesNotContainPrivateClassConstructor.ActualOutput = true;
+            }
+
+            return doesNotContainPrivateClassConstructor;
+        }
+
+        private static TestResultViewModel RunCodeContainsPublicClassCoreTest(string code, string className, ref bool testsPassed)
+        {
+            // Check code has a public class matching expected
+            string classPattern = $"public\\s*class\\s*{className}(\\n*|\\s*){{";
+            var containsPublicClass = new TestResultViewModel()
+            {
+                Description =
+                    $"Code contains a Public Class named '{className}'",
+                ExpectedOutput = true,
+                TestExecuted = true,
+                Inputs = new List<TestResultInputViewModel>()
+            };
+
+            if (!Regex.Match(code, classPattern).Success)
+            {
+                testsPassed = false;
+                containsPublicClass.TestPassed = false;
+                containsPublicClass.ActualOutput = false;
+            }
+            else
+            {
+                testsPassed = true;
+                containsPublicClass.TestPassed = true;
+                containsPublicClass.ActualOutput = true;
+            }
+
+            return containsPublicClass;
         }
     }
 }
