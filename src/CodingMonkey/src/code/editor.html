@@ -1,13 +1,21 @@
 ﻿<template>
     <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-10 col-lg-offset-1">
             <h1 id="exerciseHeading">${heading}</h1>
-            <div if.bind="allTestsPassed">
+            <div if.two-way="allTestsPassed && vm.showTestResults">
                 <i class="fa fa-check-square-o exercise-complete" aria-hidden="true">Exercise Complete</i>
             </div>
         </div>
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-10 col-lg-offset-1">
             <p class="exercise-guidance">${vm.exercise.guidance}</p>
+        </div>
+    </div>
+    <div class="row top-buffer">
+        <div class="col-lg-10 col-lg-offset-1">
+            <button type="button" disabled.bind="vm.codeProcessingStatus.processing" class="submit-code-btn btn btn-primary" click.trigger="submitCode()">
+                Submit Exercise
+                <i if.bind="vm.codeProcessingStatus.processing" class="fa fa-cog fa-spin fa-2x"></i>
+            </button>
         </div>
     </div>
     <div class="row">
@@ -15,78 +23,122 @@
             <i class="fa fa-spinner fa-spin fa-5x"></i>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-7 col-lg-offset-2">
-            <div id="aceEditor" value.bind="code">
+    <div class="row top-buffer">
+        <div class="col-lg-5 col-lg-offset-1">
+            <div id="aceEditor" value.bind="code" disabled.bind="vm.codeProcessingStatus.processing">
                 // Loading...
             </div>
         </div>
-    </div>
-    <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
-            <button type="button" disabled.bind="vm.processingCode" class="submit-code-btn btn btn-primary pull-right" click.trigger="submitCode()">
-                Submit Exercise
-                <i if.bind="vm.processingCode" class="fa fa-cog fa-spin fa-2x"></i>
-            </button>
-        </div>
-    </div>
-    <div class="row top-buffer">
-        <div class="col-lg-7 col-lg-offset-2">
+        <div class="col-lg-5" style="overflow: scroll; max-height:400px">
+            <div if.bind="!vm.SubmittedCode">
+                <h3 class="top-buffer">Submit your Code to See the Results Here</h3>
+            </div>
+            <div if.bind="vm.SubmittedCode">
+                <div class="panel panel-default top-buffer">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading"><h4>Code Submission Status</h4></div>
+                    <!-- Table -->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Code Compilation Complete
+                                </th>
+                                <th>
+                                    Test Run Complete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i if.two-way="!vm.codeProcessingStatus.compileComplete" class="fa fa-spinner fa-spin"></i>
+                                    <i if.two-way="vm.codeProcessingStatus.compileSucessful" class="fa fa-check" aria-hidden="true" style="color:green"></i>
+                                    <i if.two-way="!vm.codeProcessingStatus.compileSucessful" class="fa fa-times" aria-hidden="true" style="color:red"></i>
+                                </td>
+                                <td>
+                                    <i if.two-way="!vm.codeProcessingStatus.executingTestsComplete" class="fa fa-spinner fa-spin"></i>
+                                    <i if.two-way="vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-check" aria-hidden="true" style="color:green"></i>
+                                    <i if.two-way="!vm.codeProcessingStatus.executeTestsSuccessful" class="fa fa-times" aria-hidden="true" style="color:red"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div if.bind="vm.codeHasCompilerErrors && vm.SubmittedCode">
-                <h2>Compiler Errors</h2>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Line Number</th>
-                        <th>Error Message</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr repeat.for="error of vm.compilerErrors" value.two-way="vm.compilerErrors">
-                        <td>${error.Id}</td>
-                        <td>${error.LineNumberStart}</td>
-                        <td>${error.Message}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading"><h4>Compiler Errors</h4></div>
+                    <!-- Table -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Line Number</th>
+                                <th>Error Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr repeat.for="error of vm.compilerErrors" value.two-way="vm.compilerErrors">
+                                <td>${error.Id}</td>
+                                <td>${error.LineNumberStart}</td>
+                                <td>${error.Message}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div if.bind="vm.codeHasRuntimeError && vm.SubmittedCode">
-                <h2>Runtime Error</h2>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Error Message</th>
-                        <th>Help Link</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>${vm.runtimeError.Message}</td>
-                        <td>${error.runtimeError.HelpLink}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading"><h4>Runtime Error</h4></div>
+                    <!-- Table -->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Error Message</th>
+                                <th>Help Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${vm.runtimeError.Message}</td>
+                                <td>${error.runtimeError.HelpLink}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div if.bind="!vm.codeHasCompilerErrors && !vm.codeHasRuntimeError && !vm.processingCode && vm.SubmittedCode && vm.testResults.length > 0">
-                <h2>Test Results</h2>
-                <p if.bind="!vm.allTestsExecuted"><i>Some tests haven't been run because there were failures in the core tests. Review and fix the failed tests to run the complete test suite.</i></p>
-                <table class="table table-striped">
-                    <tr>
-                        <th>Test Passed</th>
-                        <th>Description</th>
-                        <th>Expected Result</th>
-                        <th>Actual Result</th>
-                    </tr>
-                    <tr repeat.for="testResult of vm.testResults">
-                        <td if.bind="testResult.testPassed  && testResult.testExecuted" style="background-color: greenyellow"></td>
-                        <td if.bind="!testResult.testPassed && !testResult.testExecuted" style="background-color: orange"></td>
-                        <td if.bind="!testResult.testPassed && testResult.testExecuted" style="background-color: red"></td>
-                        <td>${testResult.description}</td>
-                        <td>${testResult.expectedOutput}</td>
-                        <td>${testResult.actualOutput}</td>
-                    </tr>
-                </table>
+            <div if.two-way="vm.showTestResults">
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">
+                        <h4>Test Results</h4>
+                        <p if.bind="!vm.allTestsExecuted"><i>Some tests haven't been run because there were failures in the core tests. Review and fix the failed tests to run the complete test suite.</i></p>
+                    </div>
+                    <!-- Table -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Test Passed</th>
+                                <th>Description</th>
+                                <th>Expected Result</th>
+                                <th>Actual Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr repeat.for="testResult of vm.testResults">
+                                <td if.bind="testResult.testPassed  && testResult.testExecuted" style="background-color: greenyellow"></td>
+                                <td if.bind="!testResult.testPassed && !testResult.testExecuted" style="background-color: orange"></td>
+                                <td if.bind="!testResult.testPassed && testResult.testExecuted" style="background-color: red"></td>
+                                <td>${testResult.description}</td>
+                                <td>${testResult.expectedOutput}</td>
+                                <td>${testResult.actualOutput}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
