@@ -17,7 +17,7 @@
     using Microsoft.Extensions.Logging;
 
     using Serilog;
-    using Serilog.Sinks.RollingFile;
+    using Serilog.Sinks.ApplicationInsights;
 
     using AutoMapper;
     using Models.Repositories;
@@ -42,7 +42,10 @@
                 .SetBasePath(applicationPath)
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile("appsettings.secrets.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false);
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
+                .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
 
             if (env.IsDevelopment() || env.IsStaging())
             {
@@ -50,18 +53,18 @@
                 // Not using anyway atm - disabled until https://github.com/aspnet/UserSecrets/issues/62 is fixed
                 // builder.AddUserSecrets();
 
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-                builder.AddApplicationInsightsSettings(developerMode: true);
-
                 // Create SeriLog
                 Log.Logger = new LoggerConfiguration()
                                     .MinimumLevel.Debug()
                                     .WriteTo.RollingFile(Path.Combine(applicationPath, "log_{Date}.txt"))
                                     .CreateLogger();
             }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            else
+            {
+                Log.Logger = new LoggerConfiguration()
+                                    .WriteTo.ApplicationInsightsEvents(Configuration["ApplicationInsights:InstrumentationKey"])
+                                    .CreateLogger();
+            }
         }
 
         public IConfigurationRoot Configuration { get; set; }

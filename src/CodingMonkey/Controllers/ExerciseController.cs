@@ -91,7 +91,7 @@
                                                                         .Update(id, updatedExercise);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return DataActionFailedMessage(DataAction.Updated);
             }
