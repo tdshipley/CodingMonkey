@@ -165,8 +165,6 @@
             loggerFactory.AddDebug();
             loggerFactory.AddSerilog();
 
-            app.UseApplicationInsightsRequestTelemetry();
-
             if (env.IsDevelopment() || env.IsStaging())
             {
                 app.UseBrowserLink();
@@ -177,8 +175,6 @@
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            
-            app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseFileServer();
 
