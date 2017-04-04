@@ -194,4 +194,8 @@ export class update {
             return true;
         }
     }
+
+    toggleAddCategoryForm() {
+        this.showAddCategoryForm = !this.showAddCategoryForm;
+    }
 }
