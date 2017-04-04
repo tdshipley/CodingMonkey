@@ -6,7 +6,7 @@
     {
         List<T> All(int parentId);
 
-        T GetById(int id);
+        T GetById(int id, bool ignoreCache = false);
 
         T Create(int parentId, T entity);
 
