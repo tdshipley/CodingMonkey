@@ -36,33 +36,35 @@
 
         public List<ExerciseCategory> All()
         {
-            List<ExerciseCategory> categories = new List<ExerciseCategory>();
+            bool success = false;
+            var exerciseCategories = this.TryGetAllInCache<ExerciseCategory>(out success);
 
-            if(!MemoryCache.TryGetValue(this.AllCacheKey, out categories))
+            if(!success)
             {
-                categories = CodingMonkeyContext.ExerciseCategories
+                exerciseCategories = CodingMonkeyContext.ExerciseCategories
                                                 .Include(e => e.ExerciseExerciseCategories)
                                                 .ToList();
 
-                MemoryCache.Set(this.AllCacheKey, categories, this.DefaultCacheEntryOptions);
+                MemoryCache.Set(this.AllCacheKey, exerciseCategories, this.DefaultCacheEntryOptions);
             }
 
-            return categories;
+            return exerciseCategories;
         }
 
-        public ExerciseCategory GetById(int exerciseCategoryId)
+        public ExerciseCategory GetById(int exerciseCategoryId, bool ignoreCache = false)
         {
             ExerciseCategory category = null;
 
-            string exerciseCategoryCacheKey = this.GetEntityCacheKey(exerciseCategoryId);
+            bool success = false;
+            if(!ignoreCache) category = this.TryGetEntityInCacheById<ExerciseCategory>(exerciseCategoryId, out success);
 
-            if (!MemoryCache.TryGetValue(exerciseCategoryCacheKey, out category))
+            if (!success)
             {
                 category = CodingMonkeyContext.ExerciseCategories
                                               .Include(e => e.ExerciseExerciseCategories)
                                               .SingleOrDefault(e => e.ExerciseCategoryId == exerciseCategoryId);
 
-                MemoryCache.Set(exerciseCategoryCacheKey, category, this.DefaultCacheEntryOptions);
+                this.UpdateEntityInCacheById<ExerciseCategory>(exerciseCategoryId, category);
             }
 
             return category;
@@ -80,17 +82,14 @@
                 throw new Exception("Failed to create exercise category", ex);
             }
 
-            string exerciseCategoryCacheKey = this.GetEntityCacheKey(exerciseCategory.ExerciseCategoryId);
-            MemoryCache.Set(exerciseCategoryCacheKey, exerciseCategory, this.DefaultCacheEntryOptions);
-
-            MemoryCache.Remove(this.AllCacheKey);
+            this.CreateEntityInCacheById<ExerciseCategory>(exerciseCategory.ExerciseCategoryId, exerciseCategory);
 
             return exerciseCategory;
         }
 
         public ExerciseCategory Update(int exerciseCategoryId, ExerciseCategory newExerciseCategory)
         {
-            ExerciseCategory existingExerciseCategory = this.GetById(exerciseCategoryId);
+            ExerciseCategory existingExerciseCategory = this.GetById(exerciseCategoryId, true);
 
             if (existingExerciseCategory == null) throw new ArgumentException("Exercise category to update not found.");
 
@@ -106,9 +105,7 @@
                 throw new Exception("Failed to update exercise category", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseCategoryId));
-            MemoryCache.Set(this.GetEntityCacheKey(exerciseCategoryId), existingExerciseCategory);
-            MemoryCache.Remove(this.AllCacheKey);
+            this.UpdateEntityInCacheById<ExerciseCategory>(exerciseCategoryId, existingExerciseCategory);
 
             return existingExerciseCategory;
         }
@@ -131,8 +128,7 @@
                 throw new Exception("Failed to delete exercise category", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseCategoryId));
-            MemoryCache.Remove(this.AllCacheKey);
+            this.DeleteEntityInCacheById(exerciseCategoryId);
         }
     }
 }

@@ -36,11 +36,13 @@
 
         public List<Test> All(int exerciseId)
         {
+            bool success = false;
             List<Test> tests = new List<Test>();
+            this.SetAllCacheKeyScopedToExercise(exerciseId);
 
-            string allCacheKeyScopedToExercise = this.GetAllCacheKeyScopedToExercise(exerciseId);
+            tests = this.TryGetAllInCache<Test>(out success);
 
-            if (!MemoryCache.TryGetValue(allCacheKeyScopedToExercise, out tests))
+            if (!success)
             {
                 tests = CodingMonkeyContext.Tests
                                            .Include(x => x.TestInputs)
@@ -48,19 +50,20 @@
                                            .Include(x => x.Exercise)
                                            .Where(x => x.Exercise.ExerciseId == exerciseId).ToList();
 
-                MemoryCache.Set(allCacheKeyScopedToExercise, tests, this.DefaultCacheEntryOptions);
+                MemoryCache.Set(this.AllCacheKey, tests, this.DefaultCacheEntryOptions);
             }
 
             return tests;
         }
 
-        public Test GetById(int testId)
+        public Test GetById(int testId, bool ignoreCache = false)
         {
+            bool success = false;
             Test test = null;
 
-            string testCacheKey = this.GetEntityCacheKey(testId);
+            if (!ignoreCache) test = this.TryGetEntityInCacheById<Test>(testId, out success);
 
-            if (!MemoryCache.TryGetValue(testCacheKey, out test))
+            if (!success)
             {
                 test = CodingMonkeyContext.Tests
                                           .Include(x => x.TestInputs)
@@ -68,7 +71,7 @@
                                           .Include(x => x.Exercise)
                                           .SingleOrDefault(e => e.TestId == testId);
 
-                MemoryCache.Set(testCacheKey, test, this.DefaultCacheEntryOptions);
+                this.UpdateEntityInCacheById<Test>(testId, test);
             }
 
             return test;
@@ -95,10 +98,8 @@
                 throw new Exception("Failed to create test", ex);
             }
 
-            string testCacheKey = this.GetEntityCacheKey(entity.TestId);
-            MemoryCache.Set(testCacheKey, entity, this.DefaultCacheEntryOptions);
-
-            MemoryCache.Remove(this.GetAllCacheKeyScopedToExercise(exerciseId));
+            this.SetAllCacheKeyScopedToExercise(exerciseId);
+            this.CreateEntityInCacheById<Test>(entity.TestId, entity);
 
             return entity;
         }
@@ -139,9 +140,8 @@
                 throw new Exception("Failed to update test", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(testId));
-            MemoryCache.Set(this.GetEntityCacheKey(testId), existingTest);
-            MemoryCache.Remove(this.GetAllCacheKeyScopedToExercise(exerciseId));
+            this.SetAllCacheKeyScopedToExercise(exerciseId);
+            this.UpdateEntityInCacheById<Test>(testId, existingTest);
 
             return existingTest;
         }
@@ -163,14 +163,13 @@
             {
                 throw new Exception("Failed to delete Test", ex);
             }
-
-            MemoryCache.Remove(this.GetEntityCacheKey(testId));
-            MemoryCache.Remove(this.GetAllCacheKeyScopedToExercise(test.Exercise.ExerciseId));
+            this.SetAllCacheKeyScopedToExercise(test.Exercise.ExerciseId);
+            this.DeleteEntityInCacheById(testId);
         }
 
-        private string GetAllCacheKeyScopedToExercise(int exerciseId)
+        private void SetAllCacheKeyScopedToExercise(int exerciseId)
         {
-            return $"{this.AllCacheKey}_{exerciseId}";
+            this.AllCacheKey = $"{this.AllCacheKey}_{exerciseId}";
         }
     }
 }

@@ -37,9 +37,12 @@ namespace CodingMonkey.Models.Repositories
 
         public List<Exercise> All()
         {
+            bool success = false;
             List<Exercise> exercises = new List<Exercise>();
 
-            if (!MemoryCache.TryGetValue(this.AllCacheKey, out exercises))
+            exercises = this.TryGetAllInCache<Exercise>(out success);
+
+            if (!success)
             {
                 exercises = CodingMonkeyContext.Exercises
                                                .Include(e => e.ExerciseExerciseCategories)
@@ -52,20 +55,21 @@ namespace CodingMonkey.Models.Repositories
             return exercises;
         }
 
-        public Exercise GetById(int exerciseId)
+        public Exercise GetById(int exerciseId, bool ignoreCache = false)
         {
+            bool success = false;
             Exercise exercise = null;
 
-            string exerciseCacheKey = this.GetEntityCacheKey(exerciseId);
+            if(!ignoreCache) exercise = this.TryGetEntityInCacheById<Exercise>(exerciseId, out success);
 
-            if (!MemoryCache.TryGetValue(exerciseCacheKey, out exercise))
+            if (!success)
             {
                 exercise = CodingMonkeyContext.Exercises
                                               .Include(e => e.ExerciseExerciseCategories)
                                               .Include(e => e.Template)
                                               .SingleOrDefault(e => e.ExerciseId == exerciseId);
 
-                MemoryCache.Set(exerciseCacheKey, exercise, this.DefaultCacheEntryOptions);
+                this.UpdateEntityInCacheById<Exercise>(exerciseId, exercise);
             }
 
             return exercise;
@@ -88,17 +92,14 @@ namespace CodingMonkey.Models.Repositories
                 throw new Exception("Failed to create exercise", ex);
             }
 
-            string exerciseCacheKey = this.GetEntityCacheKey(entity.ExerciseId);
-            MemoryCache.Set(exerciseCacheKey, entity, this.DefaultCacheEntryOptions);
-
-            MemoryCache.Remove(this.AllCacheKey);
+            this.CreateEntityInCacheById<Exercise>(entity.ExerciseId, entity);
 
             return entity;
         }
 
         public Exercise Update(int exerciseId, Exercise entity)
         {
-            Exercise existingExercise = this.GetById(exerciseId);
+            Exercise existingExercise = this.GetById(exerciseId, true);
 
             if (existingExercise == null) throw new ArgumentException("Exercise to update not found.");
 
@@ -119,9 +120,7 @@ namespace CodingMonkey.Models.Repositories
                 throw new Exception("Failed to update exercise", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
-            MemoryCache.Set(this.GetEntityCacheKey(exerciseId), existingExercise);
-            MemoryCache.Remove(this.AllCacheKey);
+            this.UpdateEntityInCacheById<Exercise>(exerciseId, existingExercise);
 
             return existingExercise;
         }
@@ -144,8 +143,7 @@ namespace CodingMonkey.Models.Repositories
                 throw new Exception("Failed to delete exercise", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
-            MemoryCache.Remove(this.AllCacheKey);
+            this.DeleteEntityInCacheById(exerciseId);
         }
     }
 }
