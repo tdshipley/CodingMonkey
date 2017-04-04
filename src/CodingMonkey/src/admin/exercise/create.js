@@ -166,7 +166,7 @@ export class create {
     extractExpectedCodeSnippets() {
         let classNameRegexPattern = /(class\s)(\s*\w*)/;
         let methodNameRegexPattern = /\S*\s*(?=\()/;
-        let methodSignatureRegexPattern = /(public|private|protected|internal)\s*(int|string|bool|char|bit|byte)\s*\S*\(\S*\s*\S*\)/;
+        let methodSignatureRegexPattern = /(public|protected|private)\s*(int|string|bool|char|bit|byte).+/;
 
         if (classNameRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
             this.vm.exerciseTemplate.className = this.vm.exerciseTemplate.initialCode.match(classNameRegexPattern)[2];
