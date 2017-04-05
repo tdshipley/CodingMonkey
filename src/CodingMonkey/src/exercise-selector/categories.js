@@ -47,7 +47,9 @@ export class categories {
                       pageId: categoryPageId
                   };
 
-                  this.vm.categories.push(vm);
+                  if (exerciseCategory.ExerciseIds.length > 0) {
+                      this.vm.categories.push(vm);
+                  }
               }
 
                 this.vm.pageLoading = false;
