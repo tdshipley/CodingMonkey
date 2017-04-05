@@ -24,7 +24,6 @@
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<JsonResult> CurrentUser()
         {
             var response = new ApplicationUserViewModel();
