@@ -42,9 +42,12 @@
 
         public List<ExerciseTemplate> All(int exerciseId)
         {
+            bool success = false;
             List<ExerciseTemplate> exerciseTemplates = new List<ExerciseTemplate>();
 
-            if (!MemoryCache.TryGetValue(this.AllCacheKey, out exerciseTemplates))
+            exerciseTemplates = this.TryGetAllInCache<ExerciseTemplate>(out success);
+
+            if (!success)
             {
                 exerciseTemplates = CodingMonkeyContext.ExerciseTemplates
                                                        .Include(e => e.Exercise)
@@ -57,19 +60,20 @@
             return exerciseTemplates;
         }
 
-        public ExerciseTemplate GetById(int exerciseId)
+        public ExerciseTemplate GetById(int exerciseId, bool ignoreCache = false)
         {
+            bool success = false;
             ExerciseTemplate exerciseTemplate = null;
 
-            string exerciseTemplateCacheKey = this.GetEntityCacheKey(exerciseId);
+            if(!ignoreCache) exerciseTemplate = this.TryGetEntityInCacheById<ExerciseTemplate>(exerciseId, out success);
 
-            if (!MemoryCache.TryGetValue(exerciseTemplateCacheKey, out exerciseTemplate))
+            if (!success)
             {
                 exerciseTemplate = CodingMonkeyContext.ExerciseTemplates
                                                       .Include(e => e.Exercise)
                                                       .SingleOrDefault(e => e.Exercise.ExerciseId == exerciseId);
 
-                MemoryCache.Set(exerciseTemplateCacheKey, exerciseTemplate, this.DefaultCacheEntryOptions);
+                this.UpdateEntityInCacheById<ExerciseTemplate>(exerciseId, exerciseTemplate);
             }
 
             return exerciseTemplate;
@@ -97,10 +101,7 @@
                 throw new Exception("Failed to create exercise template", ex);
             }
 
-            string exerciseTemplateCacheKey = this.GetEntityCacheKey(relatedExercise.ExerciseId);
-            MemoryCache.Set(exerciseTemplateCacheKey, relatedExercise.Template, this.DefaultCacheEntryOptions);
-
-            MemoryCache.Remove(this.AllCacheKey);
+            this.CreateEntityInCacheById<ExerciseTemplate>(relatedExercise.ExerciseId, relatedExercise.Template);
 
             return entity;
         }
@@ -130,9 +131,7 @@
                 throw new Exception("Failed to update exercise template", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
-            MemoryCache.Set(this.GetEntityCacheKey(exerciseId), relatedExercise.Template);
-            MemoryCache.Remove(this.AllCacheKey);
+            this.UpdateEntityInCacheById<ExerciseTemplate>(exerciseId, relatedExercise.Template);
 
             return relatedExercise.Template;
         }
@@ -155,8 +154,7 @@
                 throw new Exception("Failed to delete Exercise Template", ex);
             }
 
-            MemoryCache.Remove(this.GetEntityCacheKey(exerciseId));
-            MemoryCache.Remove(this.AllCacheKey);
+            this.DeleteEntityInCacheById(exerciseId);
         }
     }
 }
