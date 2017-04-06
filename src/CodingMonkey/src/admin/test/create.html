@@ -7,58 +7,71 @@
                     <label for="testDescription">Description</label>
                     <textarea value.bind="vm.test.description" class="form-control" rows="5" id="testDescription" placeholder="Description"></textarea>
                 </div>
-                <h2>Test Expected Output</h2>
-                <div class="form-group">
-                    <label for="testOutputValueType">Expected Value Type</label>
-                    <select class="form-control" value.bind="vm.test.testOutput.valueType">
-                        <option repeat.for="valueType of valueTypeList" value.bind="valueType">${valueType}</option>
-                    </select>
+                <p if.bind="vm.test.testInputs.length === 0">This test has no (detected) assosiated inputs. Did you include method arguements in the Exercise Template?</p>
+                <div if.bind="vm.test.testInputs.length !== 0">
+                    <div class="panel panel-default">
+                        <!-- Table -->
+                        <!-- Default panel contents -->
+                        <div class="panel-heading"><h4>Test Expected Inputs</h4></div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Argument Name</th>
+                                    <th>Value Type</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr repeat.for="testInput of vm.test.testInputs" value.two-way="vm.test.testInputs">
+                                    <td id="testInputArgumentName${$index}">${testInput.argumentName}</td>
+                                    <td>${testInput.valueType}</td>
+                                    <td>
+                                        <template if.bind="testInput.valueType === 'Boolean'">  
+                                            <select class="form-control" value.bind="testInput.value">
+                                                <option selected="selected" disabled="disabled"></option>
+                                                <option>true</option>
+                                                <option>false</option>
+                                            </select>
+                                        </template>
+                                        <template if.bind="testInput.valueType !== 'Boolean'">
+                                            <input value.bind="testInput.value" type="text" class="form-control" id="testInputValue${$index}" placeholder="Expected Value">
+                                        </template>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="testOutputValue">Expected Value</label>
-                    <template if.bind="vm.test.testOutput.valueType === 'Boolean'">  
-                        <select class="form-control" value.bind="vm.test.testOutput.value">
-                            <option selected="selected" disabled="disabled"></option>
-                            <option>true</option>
-                            <option>false</option>
-                        </select>
-                    </template>
-                    <template if.bind="vm.test.testOutput.valueType !== 'Boolean'">
-                        <input value.bind="vm.test.testOutput.value" type="text" class="form-control" id="testOutputValue" placeholder="Expected Value">
-                    </template>
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading"><h4>Test Expected Output</h4></div>
+                    <!-- Table -->
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Value Type</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <td>${vm.test.testOutput.valueType}</td>
+                            <td>
+                                <template if.bind="vm.test.testOutput.valueType === 'Boolean'">  
+                                    <select class="form-control" value.bind="vm.test.testOutput.value">
+                                        <option selected="selected" disabled="disabled"></option>
+                                        <option>true</option>
+                                        <option>false</option>
+                                    </select>
+                                </template>
+                                <template if.bind="vm.test.testOutput.valueType !== 'Boolean'">
+                                    <input value.bind="vm.test.testOutput.value" type="text" class="form-control" placeholder="Expected Value">
+                                </template>
+                            </td>
+                        </tbody>
+                    </table>
                 </div>
-                <h2>Test Expected Inputs</h2>
-                <p if.bind="vm.test.testInputs.length === 0">This test has no inputs. Click the button below to add one.</p>
-                <template repeat.for="testInput of vm.test.testInputs">
-                    <div class="form-group">
-                        <label for="testInputArgumentName${$index}">Argument Name</label>
-                        <input value.bind="testInput.argumentName" type="text" class="form-control" id="testInputArgumentName${$index}" placeholder="Argument Name">
-                    </div>
-                    <div class="form-group">
-                        <div class="form-group">
-                            <label for="testInputValueType${$index}">Value Type</label>
-                            <select class="form-control" value.bind="testInput.valueType">
-                                <option repeat.for="valueType of valueTypeList" value.bind="valueType">${valueType}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="testInputValue${$index}">Value</label>
-                        <template if.bind="testInput.valueType === 'Boolean'">  
-                            <select class="form-control" value.bind="testInput.value">
-                                <option selected="selected" disabled="disabled"></option>
-                                <option>true</option>
-                                <option>false</option>
-                            </select>
-                        </template>
-                        <template if.bind="testInput.valueType !== 'Boolean'">
-                            <input value.bind="testInput.value" type="text" class="form-control" id="testInputValue${$index}" placeholder="Expected Value">
-                        </template>
-                    </div>
-                    <button click.delegate="removeTestInput($index)" class="btn btn-danger btn-sm small-bottom-buffer small-top-buffer">Remove Test Input</button>
-                </template>
                 <hr/>
-                <button click.delegate="addTestInput()" class="btn btn-default">Add Test Input</button> <button click.delegate="createTest(false)" class="btn btn-success">Create Test</button> <button click.delegate="createTest(true)" class="btn btn-success">Create Test And Add Another</button><br/>
+                <button click.delegate="createTest(false)" class="btn btn-success">Create Test</button> <button click.delegate="createTest(true)" class="btn btn-success">Create Test And Add Another</button><br/>
                 <hr/>
                 <button class="btn btn-primary" click.delegate="goToTestList()">Go To Test List</button>
             </form>

@@ -48,7 +48,8 @@ export class create {
                 id: 0,
                 initialCode: "",
                 className: "",
-                mainMethodName: ""
+                mainMethodName: "",
+                mainMethodSignature: ""
             }
         };
     }
@@ -65,10 +66,10 @@ export class create {
               this.vm.exercise.categoryids = data.CategoryIds;
           })
           .then(() => {
-              this.getExerciseTemplate(params.exerciseId)
+              this.getExerciseTemplate(params.exerciseId);
           })
           .catch(err => {
-              this.notify.error("Failed to get Exercise and Exercise Template")
+              this.notify.error("Failed to get Exercise and Exercise Template");
           });
           
           this.valueTypeList = ["Boolean", "Integer", "String"];
@@ -84,6 +85,11 @@ export class create {
               this.vm.exerciseTemplate.initialCode = data.InitialCode;
               this.vm.exerciseTemplate.className = data.ClassName;
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
+              this.vm.exerciseTemplate.mainMethodSignature = data.MainMethodSignature;
+          })
+          .then(() => {
+              this.createTestInputs(this.vm.exerciseTemplate.mainMethodSignature);
+              this.createTestOutput(this.vm.exerciseTemplate.mainMethodSignature);
           })
           .catch(err => {
               this.notify.error("Failed to get Exercise Template for Exercise.")
@@ -145,20 +151,57 @@ export class create {
         });
     }
     
-    addTestInput() {      
-        this.vm.test.testInputs.push({
-            argumentName: "",
-            valueType: "",
-            value: ""
-        });
-        return false;
-    }
-    
-    removeTestInput(index) {
-        if(index > -1) {
-            this.vm.test.testInputs.splice(index, 1);
+    createTestInputs(mainMethodNameToParse) {
+        let methodStart = mainMethodNameToParse.split("(");
+
+        if(methodStart.length <= 2 && methodStart[1] == ")") {
+            return;
         }
-        return false;
+
+        let methodArgsAndTypes = mainMethodNameToParse.split("(")[1].split(",");
+        methodArgsAndTypes[methodArgsAndTypes.length - 1] = methodArgsAndTypes[methodArgsAndTypes.length - 1].slice(0, -1);
+
+        for(let methodArgAndType of methodArgsAndTypes) {
+            let methodArgAndTypeSplit = methodArgAndType.trim().split(" ");
+            let argName = methodArgAndTypeSplit[methodArgAndTypeSplit.length - 1];
+            let argType = this.getValueType(methodArgAndTypeSplit[0]);
+
+            this.vm.test.testInputs.push({
+                argumentName: argName,
+                valueType: argType,
+                value: ""
+            });
+        }
+    }
+
+    createTestOutput(mainMethodNameToParse) {
+        let returnTypeRegexPatten = /public\s+(int|string|bool)/;
+        let returnTypeMatch = "";
+        if (returnTypeRegexPatten.test(mainMethodNameToParse)) {
+            returnTypeMatch = mainMethodNameToParse.match(returnTypeRegexPatten)[0];
+        }
+
+        let returnTypeSplit = returnTypeMatch.split(" ")
+        this.vm.test.testOutput.valueType = this.getValueType(returnTypeSplit[returnTypeSplit.length - 1]);
+    }
+
+    getValueType(typeToConvert) {
+        let argType = "";
+        switch(typeToConvert.toLowerCase()) {
+            case "int":
+                argType = "Integer";
+                break;
+            case "string":
+                argType = "String";
+                break;
+            case "bool":
+                argType = "Boolean";
+                break;
+            default:
+                break;
+        }
+
+        return argType;
     }
     
     goToTestList() {
