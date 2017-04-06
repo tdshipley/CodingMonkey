@@ -45,6 +45,7 @@ export class update {
             }
         };
         
+        this.selectedCategories = [];
         this.categoriesList = [];
         this.showAddCategoryForm = false;
     }
@@ -96,7 +97,7 @@ export class update {
                     Id: this.vm.exercise.id,
                     Name: this.vm.exercise.name,
                     Guidance: this.vm.exercise.guidance,
-                    CategoryIds: this.vm.exercise.categoryids
+                    CategoryIds: this.getSelectedCategoryIds()
                 })
             })
             .then(response => response.json())
@@ -155,6 +156,7 @@ export class update {
                 }
 
                 this.categoriesList.push(categoryModel);
+                this.selectedCategories.push(categoryModel);
                 this.toggleAddCategoryForm();
 
                 this.notify.success("Create category '" + categoryModel.name + "' succeeded.");
@@ -180,6 +182,10 @@ export class update {
                     }
 
                     this.categoriesList.push(categoryModel);
+
+                    if(this.isExerciseCategorySelected(category.Id)) {
+                        this.selectedCategories.push(categoryModel);
+                    }
                 }
             })
             .catch(err => {
@@ -193,6 +199,15 @@ export class update {
         } else {
             return true;
         }
+    }
+
+    getSelectedCategoryIds() {
+        let selectedCategoryIds = [];
+        for(let selectedCategory of this.selectedCategories) {
+            selectedCategoryIds.push(selectedCategory.id);
+        }
+
+        return selectedCategoryIds;
     }
 
     toggleAddCategoryForm() {

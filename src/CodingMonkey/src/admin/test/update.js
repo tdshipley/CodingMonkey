@@ -162,23 +162,6 @@ export class create {
             });
     }
     
-    
-    addTestInput() {      
-        this.vm.test.testInputs.push({
-            argumentName: "",
-            valueType: "",
-            value: ""
-        });
-        return false;
-    }
-    
-    removeTestInput(index) {
-        if(index > -1) {
-            this.vm.test.testInputs.splice(index, 1);
-        }
-        return false;
-    }
-    
     goToTestList() {
         this.appRouter.navigate("admin/exercise/" + this.vm.exercise.id + "/tests");
     }

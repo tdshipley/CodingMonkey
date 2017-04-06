@@ -9,6 +9,8 @@
     <div class="row top-buffer">
         <div class="col-lg-8 col-lg-offset-1">
             <h2>Test Inputs</h2>
+            <p if.bind="vm.test.testInputs.length === 0">This test has no (detected) assosiated inputs. This might be on purpose. If not did you include method arguments in the Exercise Template?</p>
+            <div if.bind="vm.test.testInputs.length !== 0">
             <table class="table table-striped">
                 <tr>
                     <th>Id</th>
@@ -23,6 +25,7 @@
                     <td>${testInput.value}</td>
                 </tr>
             </table>
+            </div>
         </div>
         <div class="col-lg-8 col-lg-offset-1">
             <h2>Test Outputs</h2>

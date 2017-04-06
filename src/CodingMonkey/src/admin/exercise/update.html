@@ -34,8 +34,8 @@
             <h1>Categories</h1>
                 <form>
                     <div class="form-group">
-                        <select id="exerciseCategoryList" class="form-control" value.bind="vm.exercise.categoryids" multiple size="10">
-                            <option repeat.for="category of categoriesList" value.bind="category.id" selected.bind="isExerciseCategorySelected(category.id)">${category.name}</option>
+                        <select class="form-control" size="10" value.bind="selectedCategories" multiple>
+                            <option repeat.for="category of categoriesList" model.bind="category">${category.name}</option>
                         </select>
                     </div>
                 </form>
