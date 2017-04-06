@@ -7,7 +7,7 @@
                     <label for="testDescription">Description</label>
                     <textarea value.bind="vm.test.description" class="form-control" rows="5" id="testDescription" placeholder="Description"></textarea>
                 </div>
-                <h2>Test Output</h2>
+                <h2>Test Expected Output</h2>
                 <div class="form-group">
                     <label for="testOutputValueType">Expected Value Type</label>
                     <select class="form-control" value.bind="vm.test.testOutput.valueType">
@@ -27,7 +27,7 @@
                         <input value.bind="vm.test.testOutput.value" type="text" class="form-control" id="testOutputValue" placeholder="Expected Value">
                     </template>
                 </div>
-                <h2>Test Inputs</h2>
+                <h2>Test Expected Inputs</h2>
                 <p if.bind="vm.test.testInputs.length === 0">This test has no inputs. Click the button below to add one.</p>
                 <template repeat.for="testInput of vm.test.testInputs">
                     <div class="form-group">
@@ -68,10 +68,10 @@
             <p><i>${vm.exercise.guidance}</i></p>
             
             <h2>Exercise Template</h2>
-            <p>Expected Class Name: <i>${vm.exerciseTemplate.className}</i></p>
-            <p>Expected Main Method Name: <i>${vm.exerciseTemplate.mainMethodName}</i></p>
+            <p><b>Expected Class Name:</b> <i>${vm.exerciseTemplate.className}</i></p>
+            <p><b>Expected Main Method Name:</b> <i>${vm.exerciseTemplate.mainMethodName}</i></p>
             <h3>Initial Code</h3>
-            <p>${vm.exerciseTemplate.initialCode}</p>
+            <textarea rows="15" value.bind="vm.exerciseTemplate.initialCode" class="form-control" disabled><textarea>
             
         </div>
     </div>
