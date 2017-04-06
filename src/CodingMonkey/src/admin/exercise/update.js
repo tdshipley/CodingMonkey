@@ -213,4 +213,19 @@ export class update {
     toggleAddCategoryForm() {
         this.showAddCategoryForm = !this.showAddCategoryForm;
     }
+
+    extractExpectedCodeSnippets() {
+        let classNameRegexPattern = /(class\s)(\s*\w*)/;
+        let methodNameRegexPattern = /\S*\s*(?=\()/;
+        let methodSignatureRegexPattern = /(public|protected|private)\s*(int|string|bool|char|bit|byte).+/;
+
+        if (classNameRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
+            this.vm.exerciseTemplate.className = this.vm.exerciseTemplate.initialCode.match(classNameRegexPattern)[2].trim();
+        }
+
+        if (methodSignatureRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
+            this.vm.exerciseTemplate.mainMethodSignature = this.vm.exerciseTemplate.initialCode.match(methodSignatureRegexPattern)[0].trim();
+            this.vm.exerciseTemplate.mainMethodName = this.vm.exerciseTemplate.mainMethodSignature.match(methodNameRegexPattern)[0].trim();
+        }
+    }
 }
