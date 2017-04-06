@@ -7,7 +7,8 @@
                     <label for="testDescription">Description</label>
                     <textarea value.bind="vm.test.description" class="form-control" rows="5" id="testDescription" placeholder="Description"></textarea>
                 </div>
-                <p if.bind="vm.test.testInputs.length === 0">This test has no (detected) assosiated inputs. Did you include method arguements in the Exercise Template?</p>
+                <h4 if.bind="vm.test.testInputs.length === 0">Expected Test Inputs</h4>
+                <p if.bind="vm.test.testInputs.length === 0">This test has no (detected) assosiated inputs. Did you include method arguments in the Exercise Template?</p>
                 <div if.bind="vm.test.testInputs.length !== 0">
                     <div class="panel panel-default">
                         <!-- Table -->
