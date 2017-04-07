@@ -53,6 +53,7 @@
 
         [HttpPost]
         [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> ChangePassword([FromBody] ChangePasswordViewModel vm)
         {
             if (vm.NewPassword != vm.NewPasswordConfirmation)

@@ -21,6 +21,7 @@
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> Login([FromBody]LoginViewModel vm)
         {
             var response = new LoginResultViewModel();
@@ -40,6 +41,7 @@
 
         [HttpPost]
         [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> Logout()
         {
             var response = new LoginResultViewModel();
