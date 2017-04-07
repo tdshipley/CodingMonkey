@@ -22,6 +22,7 @@
     using AutoMapper;
     using Models.Repositories;
     using Newtonsoft.Json.Serialization;
+    using System;
 
     public class Startup
     {
@@ -41,7 +42,7 @@
             var builder = new ConfigurationBuilder()
                 .SetBasePath(applicationPath)
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.secrets.json")
+                .AddJsonFile("appsettings.secrets.json", optional: false)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
                 .AddEnvironmentVariables();
 
@@ -85,10 +86,19 @@
             services.AddIdentity<ApplicationUser, IdentityRole>(
                 identityContext =>
                     {
+                        // Password settings
                         identityContext.Password.RequireDigit = false;
                         identityContext.Password.RequireUppercase = false;
                         identityContext.Password.RequiredLength = 6;
 
+                        // Lockout settings
+                        identityContext.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                        identityContext.Lockout.MaxFailedAccessAttempts = 10;
+
+                        // User settings
+                        identityContext.User.RequireUniqueEmail = true;
+
+                        // Cookie settings
                         identityContext.Cookies
                                        .ApplicationCookie
                                        .Events = new CookieAuthenticationEvents()
