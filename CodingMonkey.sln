@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26114.2
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2020AC68-78E1-4D95-AF3C-2186B9362078}"
 EndProject
@@ -10,6 +9,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMonkey.UITests", "src\CodingMonkey.UITests\CodingMonkey.UITests.csproj", "{E2A96225-DC97-409D-991F-DBF7A21B5B7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMonkey.UITests.PageObjects", "src\CodingMonkey.UITests.PageObjects\CodingMonkey.UITests.PageObjects.csproj", "{E49A30DF-4295-4A9E-8667-4D1B9AEA450F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D45D934-789A-4068-977E-0E1637CB718A}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
