@@ -25,9 +25,10 @@
 
     public class Startup
     {
+        public IConfiguration Configuration { get; set; }
         private MapperConfiguration _mapperConfiguration { get; set; }
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             string applicationPath = env.ContentRootPath;
 
@@ -37,22 +38,10 @@
                 cfg.AddProfile(new CodingMonkeyAutoMapperProfile());
             });
 
-            // Set up configuration sources.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(applicationPath)
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.secrets.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
 
             if (env.IsDevelopment() || env.IsStaging())
             {
-                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                // Not using anyway atm - disabled until https://github.com/aspnet/UserSecrets/issues/62 is fixed
-                // builder.AddUserSecrets();
-
                 // Create SeriLog
                 Log.Logger = new LoggerConfiguration()
                                     .MinimumLevel.Debug()
@@ -66,8 +55,6 @@
                                     .CreateLogger();
             }
         }
-
-        public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
