@@ -75,27 +75,27 @@
                         identityContext.Password.RequireDigit = false;
                         identityContext.Password.RequireUppercase = false;
                         identityContext.Password.RequiredLength = 6;
-
-                        identityContext.Cookies
-                                       .ApplicationCookie
-                                       .Events = new CookieAuthenticationEvents()
-                                                    {
-                                                        OnRedirectToLogin = ctx =>
-                                                            {
-                                                                if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
-                                                                {
-                                                                    ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                                                }
-                                                                else
-                                                                {
-                                                                    ctx.Response.Redirect(ctx.RedirectUri);
-                                                                }
-                                                                return Task.FromResult(0);
-                                                            }
-                                                    };
                     })
                 .AddEntityFrameworkStores<CodingMonkeyContext>()
                 .AddDefaultTokenProviders();
+
+			services.ConfigureApplicationCookie(opts => {
+				opts.Events = new CookieAuthenticationEvents()
+				{
+					OnRedirectToLogin = ctx =>
+					{
+						if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+						{
+							ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+						}
+						else
+						{
+							ctx.Response.Redirect(ctx.RedirectUri);
+						}
+						return Task.FromResult(0);
+					}
+				};
+			});
 
             // Change JSON serialisation to use property names!
             // See: https://weblog.west-wind.com/posts/2016/Jun/27/Upgrading-to-ASPNET-Core-RTM-from-RC2
