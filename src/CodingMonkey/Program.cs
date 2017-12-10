@@ -1,9 +1,10 @@
 ﻿namespace CodingMonkey
 {
-    using Microsoft.AspNetCore.Hosting;
-    using System.IO;
+	using Microsoft.AspNetCore;
+	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.Extensions.Configuration;
 
-    public class Program
+	public class Program
     {
         // Entry point for the application.
         public static void Main(string[] args)

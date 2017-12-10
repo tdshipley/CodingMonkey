@@ -11,7 +11,6 @@
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -22,8 +21,9 @@
     using AutoMapper;
     using Models.Repositories;
     using Newtonsoft.Json.Serialization;
+	using Microsoft.AspNetCore.Identity;
 
-    public class Startup
+	public class Startup
     {
         public IConfiguration Configuration { get; set; }
         private MapperConfiguration _mapperConfiguration { get; set; }
@@ -165,7 +165,7 @@
 
             app.UseFileServer();
 
-            app.UseIdentity();
+            app.UseAuthentication();
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 

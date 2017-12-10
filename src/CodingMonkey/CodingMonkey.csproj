@@ -8,7 +8,6 @@
     <OutputType>Exe</OutputType>
     <PackageId>CodingMonkey</PackageId>
     <UserSecretsId>codingmonkey-6df5fca9-b862-4931-8867-c46d52bbed68</UserSecretsId>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
     <PackageTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
   </PropertyGroup>
 
