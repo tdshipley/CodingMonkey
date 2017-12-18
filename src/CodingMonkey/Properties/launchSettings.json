@@ -7,20 +7,14 @@
       "sslPort": 0
     }
   },
-  "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "Hosting:Environment": "Development"
-      }
-    },
-    "web": {
-      "commandName": "web",
-      "environmentVariables": {
-        "Hosting:Environment": "Development"
-      },
-      "sdkVersion": "dnx-coreclr-win-x64.1.0.0-rc1-update1"
-    }
-  }
+	"profiles": {
+			"Kestral": {
+				"commandName": "IISExpress",
+				"launchBrowser": true,
+				"launchUrl": "http://localhost:49850/",
+				"environmentVariables": {
+					"ASPNETCORE_ENVIRONMENT": "Development"
+				}
+			}
+	}
 }
