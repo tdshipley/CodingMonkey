@@ -11,7 +11,6 @@
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -22,12 +21,14 @@
     using AutoMapper;
     using Models.Repositories;
     using Newtonsoft.Json.Serialization;
+	using Microsoft.AspNetCore.Identity;
 
-    public class Startup
+	public class Startup
     {
+        public IConfiguration Configuration { get; set; }
         private MapperConfiguration _mapperConfiguration { get; set; }
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             string applicationPath = env.ContentRootPath;
 
@@ -37,22 +38,10 @@
                 cfg.AddProfile(new CodingMonkeyAutoMapperProfile());
             });
 
-            // Set up configuration sources.
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(applicationPath)
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.secrets.json")
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
 
             if (env.IsDevelopment() || env.IsStaging())
             {
-                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                // Not using anyway atm - disabled until https://github.com/aspnet/UserSecrets/issues/62 is fixed
-                // builder.AddUserSecrets();
-
                 // Create SeriLog
                 Log.Logger = new LoggerConfiguration()
                                     .MinimumLevel.Debug()
@@ -66,8 +55,6 @@
                                     .CreateLogger();
             }
         }
-
-        public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -88,27 +75,27 @@
                         identityContext.Password.RequireDigit = false;
                         identityContext.Password.RequireUppercase = false;
                         identityContext.Password.RequiredLength = 6;
-
-                        identityContext.Cookies
-                                       .ApplicationCookie
-                                       .Events = new CookieAuthenticationEvents()
-                                                    {
-                                                        OnRedirectToLogin = ctx =>
-                                                            {
-                                                                if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
-                                                                {
-                                                                    ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                                                }
-                                                                else
-                                                                {
-                                                                    ctx.Response.Redirect(ctx.RedirectUri);
-                                                                }
-                                                                return Task.FromResult(0);
-                                                            }
-                                                    };
                     })
                 .AddEntityFrameworkStores<CodingMonkeyContext>()
                 .AddDefaultTokenProviders();
+
+			services.ConfigureApplicationCookie(opts => {
+				opts.Events = new CookieAuthenticationEvents()
+				{
+					OnRedirectToLogin = ctx =>
+					{
+						if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+						{
+							ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+						}
+						else
+						{
+							ctx.Response.Redirect(ctx.RedirectUri);
+						}
+						return Task.FromResult(0);
+					}
+				};
+			});
 
             // Change JSON serialisation to use property names!
             // See: https://weblog.west-wind.com/posts/2016/Jun/27/Upgrading-to-ASPNET-Core-RTM-from-RC2
@@ -178,7 +165,7 @@
 
             app.UseFileServer();
 
-            app.UseIdentity();
+            app.UseAuthentication();
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 

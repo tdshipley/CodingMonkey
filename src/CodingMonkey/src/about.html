@@ -4,29 +4,8 @@
             <h1>${heading}</h1>
             <p>
                 Coding Monkey is a side project of <a href="http://mrshipley.com">Thomas Shipley</a> to help
-                people learn how to code in C#. It has been created with the help of some <a href="#contributors">Contributors</a>
-                and was inspired by <a href="http://codingbat.com">Coding Bat</a> created by <a href="http://www-cs-faculty.stanford.edu/~nick/">Nick Parlante</a>.
+                people learn how to code in C# and was inspired by <a href="http://codingbat.com">Coding Bat</a> created by <a href="http://www-cs-faculty.stanford.edu/~nick/">Nick Parlante</a>.
             </p>
-        </div>
-    <div class="col-lg-10 col-lg-offset-1">
-        <h1 id="contributors">Contributors</h1>
-        <p>
-            Below is a list of people who have helped out with the project.
-            Making code changes, testing and discussion of architecture, thank you for your help!
-        </p>
-            <div repeat.for="profile of contributorUserProfiles" class="col-lg-4 col-lg-offset-1">
-                <div id="${profile.id}" class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">${profile.displayName}</h3>
-                    </div>
-                    <div class="panel-body fixed-panel">
-                        <img class="centre-img" width="100px" height="100px" src.bind="profile.avatar_url"/>
-                    </div>
-                    <div class="panel-footer">
-                        <a href.bind="profile.html_url" class="btn btn-success" target="_blank">View GitHub Profile</a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
