@@ -38,6 +38,7 @@
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <Exec Command="npm install gulp -g" />
     <Exec Command="npm install jspm -g" />
+    <Exec Command="npm install bower -g" />
     <Exec Command="npm install" />
     <Exec Command="bower install" />
     <Exec Command="jspm install -y" />
