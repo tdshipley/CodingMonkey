@@ -1,15 +1,46 @@
 ﻿namespace CodingMonkey
 {
-	using Microsoft.AspNetCore;
+    using System;
+    using CodingMonkey.Configuration;
+    using CodingMonkey.Models;
+    using CodingMonkey.Models.Repositories;
+    using Microsoft.AspNetCore;
 	using Microsoft.AspNetCore.Hosting;
-	using Microsoft.Extensions.Configuration;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
 
-	public class Program
+    public class Program
     {
         // Entry point for the application.
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var host = BuildWebHost(args);
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                try
+                {
+                    var context = services.GetRequiredService<CodingMonkeyContext>();
+                    var codingMonkeyRepositoryContext = services.GetRequiredService<CodingMonkeyRepositoryContext>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    var initialUserConfig = services.GetRequiredService<IOptions<InitialUserConfig>>();
+                    var env = services.GetRequiredService<IHostingEnvironment>();
+
+                    var seedData = new CodingMonkeyContextSeedData(context, codingMonkeyRepositoryContext, userManager, initialUserConfig, env);
+
+                    seedData.EnsureSeedDataAsync().Wait();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Problem seeding database", ex);
+                }
+            }
+
+            host.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

@@ -165,9 +165,6 @@
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-
-            seeder.EnsureSeedDataAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 }
