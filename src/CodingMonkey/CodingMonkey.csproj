@@ -22,10 +22,8 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.2.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -36,11 +34,30 @@
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <!-- Updated from: https://github.com/aspnet/websdk/issues/114#issuecomment-287679538 -->
+    <!-- Exclude old script and font files from publish output -->
+    <ItemGroup>
+      <PrevScriptFiles Include="wwwroot\**\*" />
+      <ResolvedFileToPublish Remove="@(PrevScriptFiles->'%(FullPath)')" />
+    </ItemGroup>
+
+    <!-- Install all the JS Deps. -->
     <Exec Command="npm install jspm -g" />
     <Exec Command="npm install" />
-    <Exec Command="bower install" />
     <Exec Command="jspm install -y" />
+    <Exec Command="bower install" />
+
+    <!-- Create dist bundle -->
     <Exec Command="gulp bundle" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <RootFiles Include="wwwroot\**\*" />
+      <ResolvedFileToPublish Include="@(RootFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(RootFiles.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
   </Target>
 
   <ItemGroup>
