@@ -1,0 +1,6 @@
+ # Sample contents of .dockerignore file
+ bin/
+ obj/
+ node_modules/
+ CodingMonkey.UITests/
+ CodingMonkey.UITests.PageObjects/
