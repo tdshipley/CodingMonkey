@@ -31,16 +31,6 @@
 
         public DbSet<ExerciseExerciseCategory> ExerciseExerciseCategories { get; set; } 
 
-        public CodingMonkeyContext()
-        {
-            Database.EnsureCreated();
-            // Uncomment line below if using migrations (beyond initial)
-            if(this.environment.IsProduction())
-            {
-                Database.Migrate();
-            }
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (this.environment.IsDevelopment() || this.environment.IsStaging())
@@ -48,6 +38,7 @@
                 var path = PlatformServices.Default.Application.ApplicationBasePath;
                 var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
                 optionsBuilder.UseSqlite(connection);
+                Database.EnsureCreated();
             }
             else
             {
@@ -56,6 +47,7 @@
                 // But needs to be parsed :(
                 var connectionString = this.ParsePostqresUriToConnectionString(new Uri(configuration["DATABASE_URL"]));
                 optionsBuilder.UseNpgsql(connectionString);
+                Database.Migrate();
             }
 
             base.OnConfiguring(optionsBuilder);
