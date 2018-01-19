@@ -14,4 +14,4 @@ FROM microsoft/aspnetcore-build:2.0.3 AS builder
     FROM microsoft/aspnetcore
     WORKDIR /app
     COPY --from=builder /app .
-    ENTRYPOINT ["dotnet", "CodingMonkey.dll"]
+    CMD ["dotnet", "CodingMonkey.dll"]
