@@ -14,11 +14,4 @@ FROM microsoft/aspnetcore-build:2.0.3 AS builder
     FROM microsoft/aspnetcore
     WORKDIR /app
     COPY --from=builder /app .
-    # Set port for Heroku
-    ENV ASPNETCORE_URLS http://*:$PORT
-
-    RUN echo "The APSNETCORE_URLS value is..."
-    RUN echo $ASPNETCORE_URLS
-
-    RUN echo "Starting CodingMonkey"
-    CMD ["dotnet", "CodingMonkey.dll"]
+    CMD ASPNETCORE_URLS=http://*:$PORT dotnet CodingMonkey.dll
