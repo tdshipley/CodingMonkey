@@ -35,7 +35,10 @@
         {
             Database.EnsureCreated();
             // Uncomment line below if using migrations (beyond initial)
-            // Database.Migrate();
+            if(this.environment.IsProduction())
+            {
+                Database.Migrate();
+            }
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
