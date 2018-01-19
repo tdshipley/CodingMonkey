@@ -33,12 +33,30 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
   </ItemGroup>
 
-  <Target Name="PrebuildScript" BeforeTargets="PrepareForBuild">
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <!-- Exclude old script and font files from publish output -->
+    <ItemGroup>
+      <PrevScriptFiles Include="wwwroot\dist\**" />
+      <ResolvedFileToPublish Remove="@(PrevScriptFiles->'%(FullPath)')" />
+    </ItemGroup>
+
+    <!-- Install all the JS Deps. -->
     <Exec Command="npm install jspm -g" />
     <Exec Command="npm install" />
     <Exec Command="jspm install -y" />
     <Exec Command="bower install" />
+
+    <!-- Create dist bundle -->
     <Exec Command="gulp bundle" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="wwwroot\dist\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(DistFiles.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
   </Target>
 
   <ItemGroup>
