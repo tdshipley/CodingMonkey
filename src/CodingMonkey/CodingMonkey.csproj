@@ -34,9 +34,10 @@
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <!-- Updated from: https://github.com/aspnet/websdk/issues/114#issuecomment-287679538 -->
     <!-- Exclude old script and font files from publish output -->
     <ItemGroup>
-      <PrevScriptFiles Include="wwwroot\dist\**" />
+      <PrevScriptFiles Include="wwwroot\**\*" />
       <ResolvedFileToPublish Remove="@(PrevScriptFiles->'%(FullPath)')" />
     </ItemGroup>
 
