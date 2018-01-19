@@ -9,6 +9,7 @@
     using Microsoft.Extensions.PlatformAbstractions;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
+    using System;
 
     public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>
     {
@@ -49,7 +50,9 @@
             {
                 // If in prod use heroku postgres.
                 // Database URL configured as environment var by Heroku
-                optionsBuilder.UseNpgsql(configuration["DATABASE_URL"]);
+                // But needs to be parsed :(
+                var connectionString = this.ParsePostqresUriToConnectionString(new Uri(configuration["DATABASE_URL"]));
+                optionsBuilder.UseNpgsql(connectionString);
             }
 
             base.OnConfiguring(optionsBuilder);
@@ -95,6 +98,20 @@
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Test>().HasMany(ti => ti.TestInputs).WithOne(t => t.Test).OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private string ParsePostqresUriToConnectionString(Uri postgresUri)
+        {
+            string connectionString = string.Empty;
+
+            string server = postgresUri.Host;
+            string username = postgresUri.UserInfo.Split(':')[0];
+            string password = postgresUri.UserInfo.Split(':')[1];
+            string database = postgresUri.AbsolutePath.TrimStart('/');
+
+            connectionString = $"Host={server};Database={database};Username={username};Password={password}";
+
+            return connectionString;
         }
     }
 }
