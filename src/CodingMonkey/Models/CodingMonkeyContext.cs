@@ -5,10 +5,22 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata;
+    using Npgsql.EntityFrameworkCore.PostgreSQL;
     using Microsoft.Extensions.PlatformAbstractions;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
 
     public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>
     {
+        public IHostingEnvironment environment { get; set; }
+        public IConfiguration configuration { get; set; }
+
+        public CodingMonkeyContext(IHostingEnvironment environment, IConfiguration configuration)
+        {
+            this.environment = environment;
+            this.configuration = configuration;
+        }
+
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseTemplate> ExerciseTemplates { get; set; }
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
@@ -27,9 +39,18 @@
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var path = PlatformServices.Default.Application.ApplicationBasePath;
-            var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
-            optionsBuilder.UseSqlite(connection);
+            if (this.environment.IsDevelopment() || this.environment.IsStaging())
+            {
+                var path = PlatformServices.Default.Application.ApplicationBasePath;
+                var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
+                optionsBuilder.UseSqlite(connection);
+            }
+            else
+            {
+                // If in prod use heroku postgres.
+                // Database URL configured as environment var by Heroku
+                optionsBuilder.UseNpgsql(configuration["DATABASE_URL"]);
+            }
 
             base.OnConfiguring(optionsBuilder);
         }
