@@ -136,7 +136,7 @@
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CodingMonkeyContextSeedData seeder)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CodingMonkeyContextSeedData seeder)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -166,7 +166,8 @@
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            await seeder.EnsureSeedDataAsync();
+
+            seeder.EnsureSeedDataAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 }
