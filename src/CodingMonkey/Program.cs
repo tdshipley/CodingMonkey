@@ -49,7 +49,7 @@
                                                                    initialUserConfig,
                                                                    env);
 
-                    context.Database.Migrate();
+                    context.Database.EnsureCreatedAsync().Wait();
                     seedData.EnsureSeedDataAsync().Wait();
                 }
                 catch (Exception ex)
