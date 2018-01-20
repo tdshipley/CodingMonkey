@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore;
 	using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
@@ -17,29 +18,6 @@
         public static void Main(string[] args)
         {
             var host = BuildWebHost(args);
-
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-
-                try
-                {
-                    var context = services.GetRequiredService<CodingMonkeyContext>();
-                    var codingMonkeyRepositoryContext = services.GetRequiredService<CodingMonkeyRepositoryContext>();
-                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-                    var initialUserConfig = services.GetRequiredService<IOptions<InitialUserConfig>>();
-                    var env = services.GetRequiredService<IHostingEnvironment>();
-
-                    var seedData = new CodingMonkeyContextSeedData(context, codingMonkeyRepositoryContext, userManager, initialUserConfig, env);
-
-                    seedData.EnsureSeedDataAsync().Wait();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Problem seeding database", ex);
-                }
-            }
-
             host.Run();
         }
 
@@ -51,5 +29,34 @@
                         config.AddEnvironmentVariables();
                    })
                    .Build();
+
+        private void EnsureDatabaseMigratedAndSeeded(IWebHost host){
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                try
+                {
+                    var context = services.GetRequiredService<CodingMonkeyContext>();
+                    var codingMonkeyRepositoryContext = services.GetRequiredService<CodingMonkeyRepositoryContext>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    var initialUserConfig = services.GetRequiredService<IOptions<InitialUserConfig>>();
+                    var env = services.GetRequiredService<IHostingEnvironment>();
+                    var configuration = services.GetRequiredService<IConfiguration>();
+                    var seedData = new CodingMonkeyContextSeedData(context,
+                                                                   codingMonkeyRepositoryContext,
+                                                                   userManager,
+                                                                   initialUserConfig,
+                                                                   env);
+
+                    context.Database.Migrate();
+                    seedData.EnsureSeedDataAsync().Wait();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Problem seeding database", ex);
+                }
+            }
+        }
     }
 }
