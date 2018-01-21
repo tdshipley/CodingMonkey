@@ -52,8 +52,15 @@
                                                                    initialUserConfig,
                                                                    env);
 
-                    context.Database.EnsureCreatedAsync().Wait();
-                    //context.Database.Migrate();
+                    if(env.IsProduction())
+                    {
+                        context.Database.Migrate();
+                    }
+                    else
+                    {
+                        context.Database.EnsureCreatedAsync().Wait();
+                    }
+                    
                     seedData.EnsureSeedDataAsync().Wait();
                 }
                 catch (Exception ex)
