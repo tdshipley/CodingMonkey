@@ -18,6 +18,9 @@
         public static void Main(string[] args)
         {
             var host = BuildWebHost(args);
+
+            EnsureDatabaseMigratedAndSeeded(host);
+
             host.Run();
         }
 
@@ -30,7 +33,7 @@
                    })
                    .Build();
 
-        private void EnsureDatabaseMigratedAndSeeded(IWebHost host){
+        private static void EnsureDatabaseMigratedAndSeeded(IWebHost host){
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -50,6 +53,7 @@
                                                                    env);
 
                     context.Database.EnsureCreatedAsync().Wait();
+                    //context.Database.Migrate();
                     seedData.EnsureSeedDataAsync().Wait();
                 }
                 catch (Exception ex)
