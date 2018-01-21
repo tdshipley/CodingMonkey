@@ -56,10 +56,6 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add Db
-            var path = PlatformServices.Default.Application.ApplicationBasePath;
-            var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
-
             services.AddMemoryCache();
             services.AddDbContext<CodingMonkeyContext>();
 
@@ -73,23 +69,23 @@
                 .AddEntityFrameworkStores<CodingMonkeyContext>()
                 .AddDefaultTokenProviders();
 
-			services.ConfigureApplicationCookie(opts => {
-				opts.Events = new CookieAuthenticationEvents()
-				{
-					OnRedirectToLogin = ctx =>
-					{
-						if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
-						{
-							ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-						}
-						else
-						{
-							ctx.Response.Redirect(ctx.RedirectUri);
-						}
-						return Task.FromResult(0);
-					}
-				};
-			});
+            services.ConfigureApplicationCookie(opts => {
+                opts.Events = new CookieAuthenticationEvents()
+                {
+                    OnRedirectToLogin = ctx =>
+                    {
+                        if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == (int)HttpStatusCode.OK)
+                        {
+                            ctx.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        }
+                        else
+                        {
+                            ctx.Response.Redirect(ctx.RedirectUri);
+                        }
+                        return Task.FromResult(0);
+                    }
+                };
+            });
 
             // Change JSON serialisation to use property names!
             // See: https://weblog.west-wind.com/posts/2016/Jun/27/Upgrading-to-ASPNET-Core-RTM-from-RC2
@@ -140,7 +136,7 @@
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CodingMonkeyContextSeedData seeder)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CodingMonkeyContextSeedData seeder)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -169,8 +165,6 @@
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            await seeder.EnsureSeedDataAsync();
         }
     }
 }

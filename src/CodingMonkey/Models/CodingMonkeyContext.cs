@@ -5,10 +5,23 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata;
+    using Npgsql.EntityFrameworkCore.PostgreSQL;
     using Microsoft.Extensions.PlatformAbstractions;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using System;
 
     public class CodingMonkeyContext : IdentityDbContext<ApplicationUser>
     {
+        public IHostingEnvironment environment { get; set; }
+        public IConfiguration configuration { get; set; }
+
+        public CodingMonkeyContext(IHostingEnvironment environment, IConfiguration configuration)
+        {
+            this.environment = environment;
+            this.configuration = configuration;
+        }
+
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseTemplate> ExerciseTemplates { get; set; }
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
@@ -18,18 +31,22 @@
 
         public DbSet<ExerciseExerciseCategory> ExerciseExerciseCategories { get; set; } 
 
-        public CodingMonkeyContext()
-        {
-            Database.EnsureCreated();
-            // Uncomment line below if using migrations (beyond initial)
-            // Database.Migrate();
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var path = PlatformServices.Default.Application.ApplicationBasePath;
-            var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
-            optionsBuilder.UseSqlite(connection);
+            if (this.environment.IsDevelopment() || this.environment.IsStaging())
+            {
+                var path = PlatformServices.Default.Application.ApplicationBasePath;
+                var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
+                optionsBuilder.UseSqlite(connection);
+            }
+            else
+            {
+                // If in prod use heroku postgres.
+                // Database URL configured as environment var by Heroku
+                // But needs to be parsed :(
+                var connectionString = this.ParsePostqresUriToConnectionString(new Uri(configuration["DATABASE_URL"]));
+                optionsBuilder.UseNpgsql(connectionString);
+            }
 
             base.OnConfiguring(optionsBuilder);
         }
@@ -74,6 +91,20 @@
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Test>().HasMany(ti => ti.TestInputs).WithOne(t => t.Test).OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private string ParsePostqresUriToConnectionString(Uri postgresUri)
+        {
+            string connectionString = string.Empty;
+
+            string server = postgresUri.Host;
+            string username = postgresUri.UserInfo.Split(':')[0];
+            string password = postgresUri.UserInfo.Split(':')[1];
+            string database = postgresUri.AbsolutePath.TrimStart('/');
+
+            connectionString = $"Host={server};Database={database};Username={username};Password={password}";
+
+            return connectionString;
         }
     }
 }
