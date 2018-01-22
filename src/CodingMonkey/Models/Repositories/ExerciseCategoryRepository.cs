@@ -72,15 +72,15 @@
 
         public ExerciseCategory Create(ExerciseCategory exerciseCategory)
         {
-            try
-            {
+            //try
+            //{
                 CodingMonkeyContext.ExerciseCategories.Add(exerciseCategory);
                 CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to create exercise category", ex);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("Failed to create exercise category", ex);
+            //}
 
             this.CreateEntityInCacheById<ExerciseCategory>(exerciseCategory.ExerciseCategoryId, exerciseCategory);
 
@@ -96,14 +96,14 @@
             existingExerciseCategory.Name = newExerciseCategory.Name;
             existingExerciseCategory.Description = newExerciseCategory.Description;
 
-            //try
-            //{
+            try
+            {
                 CodingMonkeyContext.SaveChanges();
-            //}
-            //catch (Exception ex)
-            //{
-                //throw new Exception("Failed to update exercise category", ex);
-            //}
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to update exercise category", ex);
+            }
 
             this.UpdateEntityInCacheById<ExerciseCategory>(exerciseCategoryId, existingExerciseCategory);
 
