@@ -96,14 +96,14 @@
             existingExerciseCategory.Name = newExerciseCategory.Name;
             existingExerciseCategory.Description = newExerciseCategory.Description;
 
-            try
-            {
+            //try
+            //{
                 CodingMonkeyContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
+            //}
+            //catch (Exception ex)
+            //{
                 throw new Exception("Failed to update exercise category", ex);
-            }
+            //}
 
             this.UpdateEntityInCacheById<ExerciseCategory>(exerciseCategoryId, existingExerciseCategory);
 
