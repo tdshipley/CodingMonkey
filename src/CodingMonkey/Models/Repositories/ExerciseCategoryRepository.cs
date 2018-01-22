@@ -102,7 +102,7 @@
             //}
             //catch (Exception ex)
             //{
-                throw new Exception("Failed to update exercise category", ex);
+                //throw new Exception("Failed to update exercise category", ex);
             //}
 
             this.UpdateEntityInCacheById<ExerciseCategory>(exerciseCategoryId, existingExerciseCategory);
