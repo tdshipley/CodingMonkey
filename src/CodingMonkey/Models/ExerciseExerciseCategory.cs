@@ -5,6 +5,7 @@ namespace CodingMonkey.Models
     [Table("ExerciseExerciseCategory")]
     public class ExerciseExerciseCategory
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ExerciseId { get; set; }
         public Exercise Exercise { get; set; }
 

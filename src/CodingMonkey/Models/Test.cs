@@ -1,6 +1,7 @@
 namespace CodingMonkey.Models
 {
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Test
     {
@@ -9,6 +10,7 @@ namespace CodingMonkey.Models
             this.TestInputs = new List<TestInput>();
         }
         
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int TestId { get; set; }
         public string Description { get; set; }
         public List<TestInput> TestInputs { get; set; }
