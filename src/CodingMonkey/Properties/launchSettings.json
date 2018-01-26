@@ -19,7 +19,9 @@
         "InitialUser:Email": "thomas.shipley@googlemail.com",
         "InitialUser:Password": "password!",
         "IdentityServer:ClientId": "codingmonkey_app",
-        "IdentityServer:ClientSecret": "E40F9FC9-C174-4BB9-8E8D-2B3AF5B1183D"
+        "IdentityServer:ClientSecret": "E40F9FC9-C174-4BB9-8E8D-2B3AF5B1183D",
+        "CodeExecutorApiEndpoint": "http://localhost:60149",
+        "IdentityServerEndpoint": "http://localhost:55497"
       }
     }
   }

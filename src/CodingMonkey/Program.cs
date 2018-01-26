@@ -30,9 +30,6 @@
                    .ConfigureAppConfiguration((hostContext, config) =>
                    {
                         config.AddJsonFile("appsettings.json", optional: false);
-                        config.AddJsonFile("appsettings.development.json", optional: false);
-                        config.AddJsonFile("appsettings.staging.json", optional: false);
-                        config.AddJsonFile("appsettings.production.json", optional: false);
                         config.AddEnvironmentVariables();
                    })
                    .Build();
