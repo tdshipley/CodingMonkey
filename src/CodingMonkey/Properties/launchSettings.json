@@ -12,6 +12,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "DATABASE_URL": "postgres://thomas.shipley:password@localhost/codingmonkey",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:49850/",
         "InitialUser:UserName": "tdshipley",
