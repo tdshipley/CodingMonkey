@@ -12,13 +12,16 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "DATABASE_URL": "postgres://thomas.shipley:password@localhost/codingmonkey",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "http://localhost:49850/",
         "InitialUser:UserName": "tdshipley",
         "InitialUser:Email": "thomas.shipley@googlemail.com",
         "InitialUser:Password": "password!",
-        "IdentityServer:ClientId": "codingmonkey.app",
-        "IdentityServer:ClientSecret": "E40F9FC9-C174-4BB9-8E8D-2B3AF5B1183D"
+        "IdentityServer:ClientId": "codingmonkey_app",
+        "IdentityServer:ClientSecret": "E40F9FC9-C174-4BB9-8E8D-2B3AF5B1183D",
+        "CodeExecutorApiEndpoint": "http://localhost:60149",
+        "IdentityServerEndpoint": "http://localhost:55497"
       }
     }
   }

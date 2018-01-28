@@ -57,18 +57,18 @@ namespace CodingMonkey.Controllers
 
             var exerciseCategoryToCreate = Mapper.Map<ExerciseCategory>(vm);
 
-            try
-            {
+            //try
+            //{
                 if (ModelState.IsValid)
                 {
                     exerciseCategoryToCreate = CodingMonkeyRepositoryContext.ExerciseCatgeoryRepository
                                                                             .Create(exerciseCategoryToCreate);
                 }
-            }
-            catch (Exception)
-            {
-                return Json(this.DataActionFailedMessage(DataAction.Created));
-            }
+            //}
+            //catch (Exception)
+            //{
+            //    return Json(this.DataActionFailedMessage(DataAction.Created));
+            //}
 
             vm = Mapper.Map<ExerciseCategoryViewModel>(exerciseCategoryToCreate);
 

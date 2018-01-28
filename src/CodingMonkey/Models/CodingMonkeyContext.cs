@@ -33,21 +33,8 @@
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (this.environment.IsDevelopment() || this.environment.IsStaging())
-            {
-                var path = PlatformServices.Default.Application.ApplicationBasePath;
-                var connection = $"Filename={Path.Combine(path, "codingmonkey.db")}";
-                optionsBuilder.UseSqlite(connection);
-            }
-            else
-            {
-                // If in prod use heroku postgres.
-                // Database URL configured as environment var by Heroku
-                // But needs to be parsed :(
-                var connectionString = this.ParsePostqresUriToConnectionString(new Uri(configuration["DATABASE_URL"]));
-                optionsBuilder.UseNpgsql(connectionString);
-            }
-
+            var connectionString = this.ParsePostqresUriToConnectionString(new Uri(configuration["DATABASE_URL"]));
+            optionsBuilder.UseNpgsql(connectionString);
             base.OnConfiguring(optionsBuilder);
         }
 

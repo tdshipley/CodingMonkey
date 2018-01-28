@@ -291,7 +291,7 @@
                 this._identityServerConfig.Value.ClientId,
                 this._identityServerConfig.Value.ClientSecret);
 
-            var accessTokenRequest = await tokenClient.RequestClientCredentialsAsync("CodingMonkey.CodeExecutor");
+            var accessTokenRequest = await tokenClient.RequestClientCredentialsAsync("codingmonkey_code_executor");
             var accessToken = accessTokenRequest.AccessToken;
             return accessToken;
         }

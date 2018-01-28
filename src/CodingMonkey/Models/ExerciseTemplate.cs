@@ -1,8 +1,10 @@
 namespace CodingMonkey.Models
 {
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class ExerciseTemplate
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ExerciseTemplateId { get; set; }
         public string InitialCode { get; set; }
         public string ClassName { get; set; }
