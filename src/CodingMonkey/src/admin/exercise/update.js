@@ -4,6 +4,8 @@ import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 import {Authentication} from './../../authentication/authentication.js';
+import 'ace';
+import "ace/ext-language_tools";
 
 @inject(HttpClient, Router)
 export class update {
@@ -49,6 +51,25 @@ export class update {
         this.categoriesList = [];
         this.showAddCategoryForm = false;
     }
+
+    attached(params) {
+        //Config for ace - https://github.com/jspm/registry/issues/38#issuecomment-168572405
+        let base = System.normalizeSync('ace');
+        base = base.substr(0, base.length - 3);
+        ace.config.set('basePath', base);
+
+        //Ace settings
+        ace.require("ace/ext/language_tools");
+        this.codeEditor = ace.edit("aceEditor");
+        this.codeEditor.$blockScrolling = Infinity;
+        this.codeEditor.setTheme("ace/theme/dreamweaver");
+        this.codeEditor.getSession().setMode("ace/mode/csharp");
+        this.codeEditor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+    }
     
     activate(params) {
         this.http.fetch('details/' + params.id)
@@ -61,7 +82,7 @@ export class update {
           })
           .then(() => {
                 this.getExerciseTemplate(params.id);
-              this.heading = "Update Exercise: " + this.vm.exercise.name;
+                this.heading = "Update Exercise: " + this.vm.exercise.name;
           })
           .then(() => {
               this.getCategories();
@@ -82,6 +103,7 @@ export class update {
               this.vm.exerciseTemplate.className = data.ClassName;
               this.vm.exerciseTemplate.mainMethodName = data.MainMethodName;
               this.vm.exerciseTemplate.mainMethodSignature = data.MainMethodSignature;
+              this.codeEditor.setValue(this.vm.exerciseTemplate.initialCode, -1);
             })
           .catch(err => {
                 this.notify.error("Failed to get exercise template");
@@ -118,7 +140,7 @@ export class update {
                 method: 'post',
                 body: json({
                     ExerciseId: exerciseId,
-                    InitialCode: this.vm.exerciseTemplate.initialCode,
+                    InitialCode: this.codeEditor.getValue(),
                     ClassName: this.vm.exerciseTemplate.className,
                     MainMethodName: this.vm.exerciseTemplate.mainMethodName,
                     MainMethodSignature: this.vm.exerciseTemplate.mainMethodSignature
@@ -218,6 +240,8 @@ export class update {
         let classNameRegexPattern = /(class\s)(\s*\w*)/;
         let methodNameRegexPattern = /\S*\s*(?=\()/;
         let methodSignatureRegexPattern = /(public|protected|private)\s*(int|string|bool|char|bit|byte).+/;
+
+        this.vm.exerciseTemplate.initialCode = this.codeEditor.getValue();
 
         if (classNameRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
             this.vm.exerciseTemplate.className = this.vm.exerciseTemplate.initialCode.match(classNameRegexPattern)[2].trim();

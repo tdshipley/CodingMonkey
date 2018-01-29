@@ -17,8 +17,12 @@
                     The <i>Expected Class Name</i> and <i>Expected Main Method Name</i> are used by the tests and for security.
                 </p>
                 <div class="form-group">
-                    <label for="exerciseTemplateInitialCode">Exercise Initial Code</label>
-                    <textarea value.bind="vm.exerciseTemplate.initialCode" class="form-control" rows="10" id="exerciseTemplateInitialCode" placeholder="Initial Code for the Exercise"></textarea>
+                    <label for="aceEditor">Exercise Initial Code</label>
+                        <div class="hide-overflow min-height-400">
+                            <div id="aceEditor" value.bind="vm.exerciseTemplate.initialCode">
+                                // Initial code here
+                            </div>
+                    </div>
                 </div>
                 <button class="btn btn-primary bottom-buffer" click.delegate="extractExpectedCodeSnippets()">Autofil Expected Information</button>
                 <div class="form-group">
