@@ -4,6 +4,8 @@ import {Router} from 'aurelia-router';
 import 'fetch';
 import toastr from 'toastr';
 import {Authentication} from './../../authentication/authentication.js';
+import 'ace';
+import "ace/ext-language_tools";
 
 @inject(HttpClient, Router)
 export class create {
@@ -54,6 +56,25 @@ export class create {
             }
         };
     }
+
+    attached(params) {
+        //Config for ace - https://github.com/jspm/registry/issues/38#issuecomment-168572405
+        let base = System.normalizeSync('ace');
+        base = base.substr(0, base.length - 3);
+        ace.config.set('basePath', base);
+
+        //Ace settings
+        ace.require("ace/ext/language_tools");
+        this.codeEditor = ace.edit("aceEditor");
+        this.codeEditor.$blockScrolling = Infinity;
+        this.codeEditor.setTheme("ace/theme/dreamweaver");
+        this.codeEditor.getSession().setMode("ace/mode/csharp");
+        this.codeEditor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+    }
     
     createExercise() {
         var exerciseId;
@@ -85,7 +106,7 @@ export class create {
                 method: 'post',
                 body: json({
                     ExerciseId: exerciseId,
-                    InitialCode: this.vm.exerciseTemplate.initialCode,
+                    InitialCode: this.codeEditor.getValue(),
                     ClassName: this.vm.exerciseTemplate.className,
                     MainMethodName: this.vm.exerciseTemplate.mainMethodName,
                     MainMethodSignature: this.vm.exerciseTemplate.mainMethodSignature
@@ -167,6 +188,8 @@ export class create {
         let classNameRegexPattern = /(class\s)(\s*\w*)/;
         let methodNameRegexPattern = /\S*\s*(?=\()/;
         let methodSignatureRegexPattern = /(public|protected|private)\s*(int|string|bool|char|bit|byte).+/;
+
+        this.vm.exerciseTemplate.initialCode = this.codeEditor.getValue();
 
         if (classNameRegexPattern.test(this.vm.exerciseTemplate.initialCode)) {
             this.vm.exerciseTemplate.className = this.vm.exerciseTemplate.initialCode.match(classNameRegexPattern)[2].trim();
