@@ -23,6 +23,7 @@
     min-height: 50px;
     border: #DADDDF solid 1px;
     background: #f3f2f1;
+    white-space: pre-wrap;
 }
 
 #footer {
