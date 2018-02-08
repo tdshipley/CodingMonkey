@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace CodingMonkey.UITests.PageObjects
+﻿namespace CodingMonkey.UITests.PageObjects
 {
     using System;
     using CodingMonkey.UITests.PageObjects.Interfaces;
@@ -9,6 +6,8 @@ namespace CodingMonkey.UITests.PageObjects
     using OpenQA.Selenium.Support.UI;
     using OpenQA.Selenium.Chrome;
     using System.IO;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public class BasePageObject : IBasePageObject
     {
@@ -33,8 +32,7 @@ namespace CodingMonkey.UITests.PageObjects
             }
             else
             {
-                string srcDir = this.GetSolutionPath();
-                string driverPath = Path.Combine(srcDir, "src\\CodingMonkey.UITests.PageObjects\\bin\\Debug\\net452\\Drivers");
+                string driverPath = Path.Combine(Directory.GetCurrentDirectory(), "Drivers");
                 this.driverInstance = new ChromeDriver(driverPath);
                 this.Driver.Navigate().GoToUrl(this.BaseUrl);
             }
@@ -75,7 +73,8 @@ namespace CodingMonkey.UITests.PageObjects
         private string GetSolutionPath()
         {
             string currentDir = Directory.GetCurrentDirectory();
-            string soultionPath = currentDir.Substring(0, currentDir.IndexOf("\\src"));
+            string soultionPath = currentDir.Substring(0, currentDir.IndexOf("src"));
+            throw new Exception($"Soultion path found. '{currentDir}'");
 
             return soultionPath;
         }
