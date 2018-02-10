@@ -13,9 +13,9 @@
 
             bool exerciseTitleDisplayed = basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
-                .Get<ExerciseCategoryListObject>()
+                .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
-                .Get<ExerciseListObject>()
+                .Get<ExerciseListPageObject>()
                 .ClickSelectExerciseButtonForFirstFoundExercise()
                 .Get<ExerciseCodeEditorPageObject>()
                 .IsExerciseTitleDisplayed();

@@ -13,9 +13,9 @@
 
             bool exerciseListDisplayed = basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
-                .Get<ExerciseCategoryListObject>()
+                .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
-                .Get<ExerciseListObject>()
+                .Get<ExerciseListPageObject>()
                 .IsExerciseListDisplayed();
 
             Assert.True(exerciseListDisplayed, "Exercise list is not displayed");
@@ -32,12 +32,12 @@
 
             int countOfExercisesDisplayed = basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
-                .Get<ExerciseCategoryListObject>()
+                .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
-                .Get<ExerciseListObject>()
+                .Get<ExerciseListPageObject>()
                 .GetCountOfExercisesDisplayed();
 
-            int numberOfSelectExerciseButtonsDisplayed = basePageObject.Get<ExerciseListObject>()
+            int numberOfSelectExerciseButtonsDisplayed = basePageObject.Get<ExerciseListPageObject>()
                 .GetCountOfSelectExerciseButtons();
 
             Assert.NotEqual(countOfExercisesDisplayed, 0);
