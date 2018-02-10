@@ -4,14 +4,12 @@
     using PageObjects.PageObjects;
     using Xunit;
 
-    public class ExerciseListPageTests
+    public class ExerciseListPageTests : BaseTest
     {
         [Fact]
         public void ExerciseListPageHasExerciseListDisplayed()
         {
-            var basePageObject = new BasePageObject();
-
-            bool exerciseListDisplayed = basePageObject.Get<HomePageObject>()
+            bool exerciseListDisplayed = _basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
                 .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
@@ -19,33 +17,23 @@
                 .IsExerciseListDisplayed();
 
             Assert.True(exerciseListDisplayed, "Exercise list is not displayed");
-
-            // TODO: Setup per test class clean up to clean up driver per
-            // test class instead of this. 
-            basePageObject.QuitDriver();
         }
 
         [Fact]
         public void ExerciseCategoryPageHasCategoriesDisplayedInCategoryList()
         {
-            var basePageObject = new BasePageObject();
-
-            int countOfExercisesDisplayed = basePageObject.Get<HomePageObject>()
+            int countOfExercisesDisplayed = _basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
                 .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
                 .Get<ExerciseListPageObject>()
                 .GetCountOfExercisesDisplayed();
 
-            int numberOfSelectExerciseButtonsDisplayed = basePageObject.Get<ExerciseListPageObject>()
+            int numberOfSelectExerciseButtonsDisplayed = _basePageObject.Get<ExerciseListPageObject>()
                 .GetCountOfSelectExerciseButtons();
 
-            Assert.NotEqual(countOfExercisesDisplayed, 0);
+            Assert.NotEqual(0, countOfExercisesDisplayed);
             Assert.Equal(countOfExercisesDisplayed, numberOfSelectExerciseButtonsDisplayed);
-
-            // TODO: Setup per test class clean up to clean up driver per
-            // test class instead of this. 
-            basePageObject.QuitDriver();
         }
     }
 }

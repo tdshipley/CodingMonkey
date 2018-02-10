@@ -1,47 +1,36 @@
 ﻿namespace CodingMonkey.UITests
 {
+    using System;
     using PageObjects;
     using PageObjects.PageObjects;
     using Xunit;
 
-    public class ExerciseCategoryListPageTests
+    public class ExerciseCategoryListPageTests : BaseTest
     {
         [Fact]
         public void ExerciseCategoryListPageHasCategoryListDisplayed()
         {
-            var basePageObject = new BasePageObject();
-
-            bool categoryListDisplayed = basePageObject.Get<HomePageObject>()
+            bool categoryListDisplayed = _basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
                 .Get<ExerciseCategoryListPageObject>()
                 .IsCategoryListDisplayed();
 
             Assert.True(categoryListDisplayed, "Category list is not displayed");
-
-            // TODO: Setup per test class clean up to clean up driver per
-            // test class instead of this. 
-            basePageObject.QuitDriver();
         }
 
         [Fact]
         public void ExerciseCategoryListPageHasCategoriesDisplayedInCategoryList()
         {
-            var basePageObject = new BasePageObject();
-
-            int numberOfCategoriesDisplayed = basePageObject.Get<HomePageObject>()
+            int numberOfCategoriesDisplayed = _basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
                 .Get<ExerciseCategoryListPageObject>()
                 .GetCountOfCategoriesDisplayed();
 
-            int numberOfSelectCategoryButtonsDisplayed = basePageObject.Get<ExerciseCategoryListPageObject>()
+            int numberOfSelectCategoryButtonsDisplayed = _basePageObject.Get<ExerciseCategoryListPageObject>()
                 .GetCountOfSelectCategoryButtons();
 
-            Assert.NotEqual(numberOfCategoriesDisplayed, 0);
+            Assert.NotEqual(0, numberOfCategoriesDisplayed);
             Assert.Equal(numberOfCategoriesDisplayed, numberOfSelectCategoryButtonsDisplayed);
-
-            // TODO: Setup per test class clean up to clean up driver per
-            // test class instead of this. 
-            basePageObject.QuitDriver();
         }
     }
 }

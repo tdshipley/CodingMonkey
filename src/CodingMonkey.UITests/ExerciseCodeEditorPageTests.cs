@@ -1,17 +1,16 @@
 ﻿namespace CodingMonkey.UITests
 {
+    using System;
     using PageObjects;
     using PageObjects.PageObjects;
     using Xunit;
 
-    public class ExerciseCodeEditorPageTests
+    public class ExerciseCodeEditorPageTests : BaseTest
     {
         [Fact]
         public void ExerciseCodeEditorPageHasExerciseDetailsAndEditorDisplayed()
         {
-            var basePageObject = new BasePageObject();
-
-            bool exerciseTitleDisplayed = basePageObject.Get<HomePageObject>()
+            bool exerciseTitleDisplayed = _basePageObject.Get<HomePageObject>()
                 .ClickPickCategoryButton()
                 .Get<ExerciseCategoryListPageObject>()
                 .ClickSelectCategoryButtonForFirstFoundCategory()
@@ -20,23 +19,19 @@
                 .Get<ExerciseCodeEditorPageObject>()
                 .IsExerciseTitleDisplayed();
 
-            bool exerciseGuidanceDisplayed = basePageObject.Get<ExerciseCodeEditorPageObject>()
+            bool exerciseGuidanceDisplayed = _basePageObject.Get<ExerciseCodeEditorPageObject>()
                 .IsExerciseGuidanceDisplayed();
 
-            bool exerciseCodeEditorDisplayed = basePageObject.Get<ExerciseCodeEditorPageObject>()
+            bool exerciseCodeEditorDisplayed = _basePageObject.Get<ExerciseCodeEditorPageObject>()
                 .IsExerciseCodeEditorDisplayed();
 
-            bool submitExerciseCodeButtonDisplayed = basePageObject.Get<ExerciseCodeEditorPageObject>()
+            bool submitExerciseCodeButtonDisplayed = _basePageObject.Get<ExerciseCodeEditorPageObject>()
                 .IsSubmitExerciseCodeButtonDisplayed();
 
             Assert.True(exerciseTitleDisplayed, "Exercise title is not displayed");
             Assert.True(exerciseGuidanceDisplayed, "Exercise guidance is not displayed");
             Assert.True(exerciseCodeEditorDisplayed, "Exercise code editor is not displayed");
             Assert.True(submitExerciseCodeButtonDisplayed, "Submit exercise code button is not displayed");
-
-            // TODO: Setup per test class clean up to clean up driver per
-            // test class instead of this. 
-            basePageObject.QuitDriver();
         }
     }
 }
