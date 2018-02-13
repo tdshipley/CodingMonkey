@@ -4,9 +4,9 @@
     using Interfaces;
     using OpenQA.Selenium;
 
-    public class ExerciseListObject : BasePageObject, IPageObject
+    public class ExerciseListPageObject : BasePageObject, IPageObject
     {
-        public ExerciseListObject(string baseUrl, IWebDriver driver) : base(baseUrl, driver)
+        public ExerciseListPageObject(string baseUrl, IWebDriver driver) : base(baseUrl, driver)
         {
         }
 
@@ -25,7 +25,7 @@
             return this.FindVisibleElements(By.ClassName("select-exercise-btn")).Count;
         }
 
-        public ExerciseListObject ClickSelectExerciseButtonForFirstFoundExercise()
+        public ExerciseListPageObject ClickSelectExerciseButtonForFirstFoundExercise()
         {
             this.FindVisibleElement(By.ClassName("select-exercise-btn")).Click();
             return this;

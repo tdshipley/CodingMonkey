@@ -70,15 +70,6 @@
             this.driverInstance = null;
         }
 
-        private string GetSolutionPath()
-        {
-            string currentDir = Directory.GetCurrentDirectory();
-            string soultionPath = currentDir.Substring(0, currentDir.IndexOf("src"));
-            throw new Exception($"Soultion path found. '{currentDir}'");
-
-            return soultionPath;
-        }
-
         public bool IsElementDisplayed(By by)
         {
             bool displayed = false;
