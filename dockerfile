@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:2.0.3 AS builder
+FROM microsoft/aspnetcore-build:2.0.5 AS builder
 # Stage 1
     WORKDIR /source
 
