@@ -3,13 +3,10 @@
 The Coding Monkey website is based off the [Aurelia Skeleton Navigation Sample App](https://github.com/aurelia/skeleton-navigation). The site has been implemented with the following stack / tech:
 
 * ASP.NET Core - the backend framework
-* EF Core - ORM framework
-* SQLite - the DB
+* Entity Framework Core - ORM framework
+* Postgres - the DB
 * Aurelia - the frontend framework
-* Babel compiler - for ES6 JavaScript
 * Bootstrap - for styling
-* Font Awesome - for icons and spinners
-* Karma/Protractor/Jasmine - for testing
 
 ## Required Secrets File
 
